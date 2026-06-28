@@ -2,8 +2,8 @@ use api::day::EventDay;
 use chrono::{Duration, NaiveDateTime, NaiveTime};
 use derive_builder::Builder;
 use es_entity::{
-    es_query, EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents,
-    TryFromEvents,
+    EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents, TryFromEvents,
+    es_query,
 };
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
@@ -30,6 +30,7 @@ es_entity::entity_id! { DayId }
 pub enum DayEvent {
     Initialized {
         id: DayId,
+        day_number: u8,
         event_id: EventId,
         start_time: Option<NaiveTime>,
         end_time: Option<NaiveTime>,
@@ -166,6 +167,7 @@ impl TryFromEvents<DayEvent> for Day {
             match event {
                 DayEvent::Initialized {
                     id,
+                    day_number,
                     event_id,
                     start_time,
                     end_time,
@@ -173,6 +175,7 @@ impl TryFromEvents<DayEvent> for Day {
                 } => {
                     builder = builder
                         .id(*id)
+                        .day_number(*day_number)
                         .event_id(*event_id)
                         .start_time(*start_time)
                         .end_time(*end_time);
@@ -252,6 +255,7 @@ impl TryFromEvents<DayEvent> for Day {
             .score(score)
             .upvotes(upvotes)
             .downvotes(downvotes)
+            .edit_proposals(edit_proposals)
             .build()
     }
 }
@@ -294,6 +298,7 @@ impl IntoEvents<DayEvent> for NewDay {
             self.id,
             [DayEvent::Initialized {
                 id: self.id,
+                day_number: self.day_number,
                 event_id: self.event_id,
                 start_time: self.start_time,
                 end_time: self.end_time,

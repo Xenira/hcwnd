@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use chrono::NaiveDate;
 use derive_builder::Builder;
 use es_entity::{
-    es_query, EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents,
-    TryFromEvents,
+    EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents, TryFromEvents,
+    es_query,
 };
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
@@ -32,7 +32,7 @@ pub enum EventEvent {
     Initialized {
         id: EventId,
         name: String,
-        description: Option<String>,
+        description: String,
         start_date: NaiveDate,
         website_url: String,
         image_url: String,
@@ -193,7 +193,7 @@ impl TryFromEvents<EventEvent> for Event {
                     builder = builder
                         .id(*id)
                         .name(name.clone())
-                        .description(description.clone().unwrap_or_default())
+                        .description(description.clone())
                         .start_date(*start_date)
                         .website_url(website_url.clone())
                         .image_url(image_url.clone())
@@ -320,6 +320,7 @@ impl TryFromEvents<EventEvent> for Event {
             .downvotes(downvotes)
             .score(score)
             .events(events)
+            .edit_proposals(edit_proposals)
             .build()
     }
 }
@@ -328,7 +329,7 @@ impl TryFromEvents<EventEvent> for Event {
 pub struct NewEvent {
     id: EventId,
     name: String,
-    description: Option<String>,
+    description: String,
     website_url: String,
     image_url: String,
     start_date: NaiveDate,
@@ -344,7 +345,7 @@ impl NewEvent {
         Self {
             id: event_id,
             name: request.name().as_ref().to_string(),
-            description: request.description().map(|d| d.as_ref().to_string()),
+            description: request.description().as_ref().to_string(),
             website_url: request.website_url().as_ref().to_string(),
             image_url: request.image_url().as_ref().to_string(),
             start_date: request.start_date(),

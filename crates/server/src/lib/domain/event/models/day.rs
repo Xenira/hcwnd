@@ -86,16 +86,12 @@ pub struct CreateDayRequest {
 }
 
 impl CreateDayRequest {
-    pub fn new(
-        day_number: u8,
-        start_time: Option<NaiveTime>,
-        end_time: Option<NaiveTime>,
-    ) -> Result<Self, DayRangeError> {
-        Ok(Self {
+    pub fn new(day_number: u8, start_time: Option<NaiveTime>, end_time: Option<NaiveTime>) -> Self {
+        Self {
             day_number,
             start_time,
             end_time,
-        })
+        }
     }
 
     #[must_use]

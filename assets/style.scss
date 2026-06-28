@@ -85,3 +85,9 @@ article.event {
   border-bottom-left-radius: 0;
   width: 50%;
 }
+
+.short-description {
+  text-overflow: ellipsis;
+  white-space: break-spaces;
+  line-clamp: 3;
+}

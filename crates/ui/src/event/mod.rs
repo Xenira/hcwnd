@@ -1,9 +1,9 @@
 use derive_builder::Builder;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use uuid::Uuid;
 
 use crate::{
-    component::{menu_item, Icons},
+    component::{Icons, menu_item},
     event::{details::EventDetails, lineup::EventLineup, timetable::EventTimetable},
 };
 
@@ -14,6 +14,8 @@ pub mod details;
 pub mod lineup;
 pub mod list;
 pub mod timetable;
+
+pub const BASE_ROUTE: &str = "/event";
 
 pub const EVENT_CONTAINER_ID: &str = "event";
 pub const EVENT_CONTENT_CONTAINER_ID: &str = "event_content";

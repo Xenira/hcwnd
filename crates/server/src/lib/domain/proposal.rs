@@ -12,3 +12,11 @@ pub struct ProposalSource(String);
     derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef)
 )]
 pub struct ProposalSourceUrl(url::Url);
+
+impl TryFrom<url::Url> for ProposalSourceUrl {
+    type Error = ProposalSourceUrlError;
+
+    fn try_from(value: url::Url) -> Result<Self, Self::Error> {
+        ProposalSourceUrl::try_new(value)
+    }
+}

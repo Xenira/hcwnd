@@ -157,7 +157,7 @@ impl EventListItem {
     }
 }
 
-#[nutype(derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef))]
+#[nutype(derive(Display, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef))]
 pub struct EventId(Uuid);
 
 #[nutype(
@@ -201,7 +201,7 @@ impl EventDays {
 #[derive(Clone, Debug)]
 pub struct CreateEventRequest {
     name: EventName,
-    description: Option<EventDescription>,
+    description: EventDescription,
     start_date: NaiveDate,
     days: EventDaysCreateRequests,
     website_url: WebsiteUrl,
@@ -213,7 +213,7 @@ pub struct CreateEventRequest {
 impl CreateEventRequest {
     pub fn new(
         name: EventName,
-        description: Option<EventDescription>,
+        description: EventDescription,
         start_date: NaiveDate,
         days: EventDaysCreateRequests,
         website_url: WebsiteUrl,
@@ -237,8 +237,8 @@ impl CreateEventRequest {
         &self.name
     }
 
-    pub fn description(&self) -> Option<&EventDescription> {
-        self.description.as_ref()
+    pub fn description(&self) -> &EventDescription {
+        &self.description
     }
 
     pub fn start_date(&self) -> NaiveDate {

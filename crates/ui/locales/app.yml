@@ -72,6 +72,26 @@ event:
           en: https://example.com/image.jpg
         hint:
           en: This should be a link to an image representing the event (e.g. poster, logo, etc.)
+    days_step:
+      title:
+        en: “%{name}” - Day(s) and Time
+      subtitle:
+        en: When does the event take place?
+      add_day:
+        en: Add Day
+      remove_day:
+        en: Remove Day
+      date:
+        label:
+          en: Date
+      day_n:
+        en: Day %{n}
+      start_time:
+        label:
+          en: Start Time
+      end_time:
+        label:
+          en: End Time
     stage_step:
       title:
         en: “%{name}” - Stage
@@ -104,3 +124,5 @@ event:
       en: Next
     back:
       en: Back
+    submit:
+      en: Create Event
