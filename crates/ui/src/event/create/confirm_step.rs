@@ -34,6 +34,7 @@ pub struct EventCreateConfirmStep {
     pub days: Vec<EventDay>,
     pub stages: Vec<EventStage>,
     pub source: Option<String>,
+    #[serde(default, deserialize_with = "crate::util::empty_string_as_none")]
     pub source_url: Option<Url>,
 }
 
@@ -81,7 +82,7 @@ impl EventCreateConfirmStep {
                 }
             }
             form
-                hx-post="/create-event/confirm"
+                hx-post=(create::BASE_ROUTE)
                 hx-target="#main"
                 hx-swap="innerHTML"
                 hx-booost="true"

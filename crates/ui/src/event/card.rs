@@ -60,7 +60,7 @@ impl Render for EventSuggestionCard {
                         p {
                             (date_line(self.start_date, self.start_time, self.end_date, self.end_time))
                         }
-                        p { (self.description) }
+                        p.short-description { (self.description) }
                     }
                 }
             }
@@ -97,7 +97,10 @@ fn date_line(
     };
 
     html! {
-        (icon(&Icons::Date, None)) (format!("{} - {}", start, end))
+        (icon(&Icons::Date, None))
+        span {
+            (format!("{} - {}", start, end))
+        }
     }
 }
 
