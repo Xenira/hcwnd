@@ -23,12 +23,24 @@ pub struct EventCard {
 impl Render for EventCard {
     fn render(&self) -> Markup {
         html! {
-            article {
-                header {
-                    img src=(self.image_url) alt=(self.title);
-                    h2 { (self.title) }
+            a.plain
+                href=(format!("/event/{}", self.id))
+                hx-boost="true"
+                hx-target="#main"
+            {
+                article {
+                    img
+                        fetchpriority="high"
+                        src=(self.image_url)
+                        alt=(self.title)
+                    ;
+                    section.hero.hero-primary {
+                        div.container {
+                            h1 { (self.title) }
+                            (date_line(self.start_date, self.start_time, self.end_date, self.end_time))
+                        }
+                    }
                 }
-                (date_line(self.start_date, self.start_time, self.end_date, self.end_time))
             }
         }
     }

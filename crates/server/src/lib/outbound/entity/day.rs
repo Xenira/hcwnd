@@ -250,6 +250,7 @@ impl TryFromEvents<DayEvent> for Day {
                 }
             }
         }
+
         builder
             .events(events)
             .score(score)
