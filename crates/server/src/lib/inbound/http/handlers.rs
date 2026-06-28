@@ -1,7 +1,7 @@
 use actix_identity::Identity;
 use actix_web::{
-    web::{self, Data, ServiceConfig},
     HttpResponse, Responder, ResponseError,
+    web::{self, Data, ServiceConfig},
 };
 use anyhow::Context as _;
 use itertools::Itertools as _;
@@ -24,7 +24,7 @@ use crate::{
             ports::UserService,
         },
     },
-    inbound::http::{user::UserExtractor, AppState},
+    inbound::http::{AppState, user::UserExtractor},
 };
 
 pub mod artist;
@@ -97,6 +97,7 @@ async fn index<ES: EventService, AS: ArtistService, US: UserService>(
         .list_events()
         .await
         .context("Failed to list events")?;
+    dbg!(&events);
     let list = EventListBuilder::default()
         .events(events.iter().map_into().collect_vec())
         .page(1)

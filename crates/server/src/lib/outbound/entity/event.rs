@@ -315,6 +315,7 @@ impl TryFromEvents<EventEvent> for Event {
                 }
             }
         }
+
         builder
             .upvotes(upvotes)
             .downvotes(downvotes)
@@ -397,7 +398,7 @@ pub struct EventRepo {
 
 impl EventRepo {
     pub async fn future_events(&self) -> Result<Vec<Event>, EventQueryError> {
-        es_query!("SELECT * FROM events WHERE start_date < NOW()")
+        es_query!("SELECT * FROM events WHERE start_date > NOW()")
             .fetch_n(&self.pool, usize::MAX)
             .await
             .map(|(r, _)| r)

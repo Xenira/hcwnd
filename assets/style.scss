@@ -91,3 +91,10 @@ article.event {
   white-space: break-spaces;
   line-clamp: 3;
 }
+
+a.plain {
+  &,
+  &:hover {
+    --mu-text-decoration: none;
+  }
+}
