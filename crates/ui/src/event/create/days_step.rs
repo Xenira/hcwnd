@@ -1,5 +1,5 @@
 use chrono::{Duration, Local, NaiveDate, NaiveTime};
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -68,9 +68,11 @@ impl Render for EventCreateDaysStep {
         html! {
             progress.progress-success value=(CURRENT_STEP) max=(TOTAL_STEPS) {}
             hgroup {
-                h2 { "“" (self.name) "” - Day(s) and Time" }
+                h2 {
+                    (t!("event.create.days_step.title", name = self.name))
+                }
                 p {
-                    "When does the event take place?"
+                    (t!("event.create.days_step.subtitle"))
                 }
             }
             form #create_event_form
@@ -81,8 +83,13 @@ impl Render for EventCreateDaysStep {
                 hx-push-url="true"
             {
                 label {
-                    "Date"
-                    input type="date" name="start_date" value=[self.start_date] required {}
+                    (t!("event.create.days_step.date.label"))
+                    input
+                        type="date"
+                        name="start_date"
+                        value=[self.start_date]
+                        required
+                    {}
                 }
                 div #event-dates {
                     @for day in &self.days {
@@ -149,19 +156,27 @@ impl Render for EventDay {
         let end_time_name = format!("days[{}][end_time]", self.day);
         html! {
             div id=(day_id) {
-                h4 { "Day " (self.day + 1) }
+                h4 { (t!("event.create.days_step.day_n", n = (self.day + 1))) }
                 div.row {
                     input type="hidden" name=(format!("days[{}][day]", self.day)) value=(self.day) {}
                     div.col-12.col-md-6 {
                         label {
-                            "Start Time"
-                            input type="time" name=(start_time_name) value=(start_time_str) {}
+                            (t!("event.create.days_step.start_time.label"))
+                            input
+                                type="time"
+                                name=(start_time_name)
+                                value=(start_time_str)
+                            {}
                         }
                     }
                     div.col-12.col-md-6 {
                         label {
-                            "End Time"
-                            input type="time" name=(end_time_name) value=(end_time_str) {}
+                            (t!("event.create.days_step.end_time.label"))
+                            input
+                                type="time"
+                                name=(end_time_name)
+                                value=(end_time_str)
+                            {}
                         }
                     }
                 }
@@ -193,7 +208,7 @@ pub fn day_buttons(day_length: usize, oob: bool) -> Markup {
                     hx-target=(delete_target)
                     hx-swap="outerHTML"
                 {
-                    "Remove a day"
+                    (t!("event.create.days_step.remove_day"))
                 }
             }
             @if day_length < MAX_DAYS - 1 {
@@ -205,7 +220,7 @@ pub fn day_buttons(day_length: usize, oob: bool) -> Markup {
                     hx-target="#event-dates"
                     hx-swap="beforeend"
                 {
-                    "Add another day"
+                    (t!("event.create.days_step.add_day"))
                 }
             }
         }

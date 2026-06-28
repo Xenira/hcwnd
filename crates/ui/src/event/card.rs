@@ -1,11 +1,11 @@
 use chrono::{NaiveDate, NaiveTime};
 use derive_builder::Builder;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    component::{icon, Icons},
+    component::{Icons, icon},
     user::User,
 };
 
@@ -53,27 +53,26 @@ impl Render for EventSuggestionCard {
     fn render(&self) -> Markup {
         html! {
             article.card-warning.event {
-                header {
-                    img fetchpriority="high" src=(self.image_url) alt=(self.title);
-                    section.hero.hero-warning {
-                        div.container {
-                            h1 { (self.title) }
-                            p {
-                                (date_line(self.start_date, self.start_time, self.end_date, self.end_time))
-                            }
-                            p { (self.description) }
+                img fetchpriority="high" src=(self.image_url) alt=(self.title);
+                section.hero.hero-warning {
+                    div.container {
+                        h1 { (self.title) }
+                        p {
+                            (date_line(self.start_date, self.start_time, self.end_date, self.end_time))
                         }
+                        p { (self.description) }
                     }
-                }
-                footer {
-                    span { "Suggested by" (self.suggested_by.handle()) }
-                    (vote_count(self.upvotes, self.downvotes))
-                    (vote())
                 }
             }
         }
     }
 }
+
+// footer {
+//     span { "Suggested by" (self.suggested_by.handle()) }
+//     (vote_count(self.upvotes, self.downvotes))
+//     (vote())
+// }
 
 fn date_line(
     start_date: NaiveDate,
@@ -88,7 +87,11 @@ fn date_line(
     };
 
     let end = if let Some(time) = end_time {
-        format!("{} {}", end_date.format("%d.%m.%Y"), time.format("%H:%M"))
+        if start_date == end_date {
+            time.format("%H:%M").to_string()
+        } else {
+            format!("{} {}", end_date.format("%d.%m.%Y"), time.format("%H:%M"))
+        }
     } else {
         end_date.format("%d.%m.%Y").to_string()
     };

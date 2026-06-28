@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use chrono::{Duration, Local, NaiveDate, NaiveTime};
 use itertools::Itertools;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -10,7 +10,7 @@ use crate::{
     event::create::{
         self,
         confirm_step::{self, EventCreateConfirmStep},
-        days_step::{self, default_days, EventCreateDaysStep, EventDay},
+        days_step::{self, EventCreateDaysStep, EventDay, default_days},
         details_step::{self, EventCreateDetailsStep},
         name_step::{self, TOTAL_STEPS},
     },
@@ -98,9 +98,11 @@ impl Render for EventCreateStageStep {
         html! {
             progress.progress-success value=(CURRENT_STEP) max=(TOTAL_STEPS) {}
             hgroup {
-                h2 { "“" (self.name) "” - Stages" }
+                h2 {
+                    (t!("event.create.stage_step.title", name = self.name))
+                }
                 p {
-                    "Which stages does your event have? If there is no information about stages, just keep the default stage and click next."
+                    (t!("event.create.stage_step.subtitle"))
                 }
             }
             form #create_event_form
@@ -127,7 +129,7 @@ impl Render for EventCreateStageStep {
                     hx-target="#event-stages"
                     hx-swap="beforeend"
                 {
-                    "Add a stage"
+                    (t!("event.create.stage_step.add_stage"))
                 }
 
                 (name_step)
@@ -140,10 +142,10 @@ impl Render for EventCreateStageStep {
                     formaction=(back_url)
                     formnovalidate
                 {
-                    "Back"
+                    (t!("event.create.back"))
                 }
                 button type="submit" {
-                    "Next"
+                    (t!("event.create.next"))
                 }
             }
         }

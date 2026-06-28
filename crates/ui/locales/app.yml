@@ -1,0 +1,106 @@
+_version: 2
+user:
+  sign_up:
+    username:
+      hint:
+        en: This will be your public name.
+      label:
+        en: Username
+    email:
+      hint:
+        en: Used for login, verification, recovery and notifications you opt-in for. Not publicly visible.
+      label:
+        en: Email
+    password:
+      label:
+        en: Password
+    confirm_password:
+      label:
+        en: Confirm Password
+    privacy_policy:
+      en: I agree to the Privacy Policy.
+    submit:
+      en: Sign Up
+    sign_in_link:
+      en: Already have an account? Sign In!
+  sign_in:
+    email:
+      label:
+        en: Email
+    password:
+      label:
+        en: Password
+    submit:
+      en: Sign In
+    sign_up_link:
+      en: Don't have an account? Sign Up!
+event:
+  create:
+    name_step:
+      title:
+        en: Create Event - Name
+      subtitle:
+        en: Let's start with the basics. What is the name of the event?
+      name:
+        label:
+          en: Event Name
+        placeholder:
+          en: Enter Event Name
+    details_step:
+      title:
+        en: “%{name}” - Details
+      subtitle:
+        en: Great! Now let's add some details about the event.
+      description:
+        label:
+          en: Description
+        placeholder:
+          en: Enter Event Description
+        hint:
+          en: If available, this should be the official description of the event, as provided on the event's website or social media pages. If not available, you can write a brief description of the event yourself.
+      website:
+        label:
+          en: Event Website
+        placeholder:
+          en: https://example.com
+        hint:
+          en: This should be a link to the event's official website. If possible, provide a link to the english version of the website.
+      image:
+        label:
+          en: Event Image
+        placeholder:
+          en: https://example.com/image.jpg
+        hint:
+          en: This should be a link to an image representing the event (e.g. poster, logo, etc.)
+    stage_step:
+      title:
+        en: “%{name}” - Stage
+      subtitle:
+        en: Which stages does your event have? If there is no information about stages, just keep the default stage and click next.
+      add_stage:
+        en: Add Stage
+      remove_stage:
+        en: Remove Stage
+    confirm_step:
+      title:
+        en: “%{name}” - Confirmation
+      subtitle:
+        en: Almost there! Check that the information you provided is correct, and let us know where you found the information about this event. This will help us ensure that the events listed on our platform are accurate and reliable.
+      source:
+        label:
+          en: Source
+        placeholder:
+          en: Enter source of information (e.g. event website, social media, etc.)
+        hint:
+          en: Where did you find the information about this event? This is important for verification purposes.
+      source_url:
+        label:
+          en: Source URL
+        placeholder:
+          en: https://example.com/source
+        hint:
+          en: If the source of information is different from the event website, please provide a link to the source (e.g. a social media post, news article, etc.)
+    next:
+      en: Next
+    back:
+      en: Back
