@@ -1,5 +1,5 @@
 use chrono::{Duration, Local, NaiveDate, NaiveTime};
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -76,9 +76,11 @@ impl Render for EventCreateDetailsStep {
         html! {
             progress.progress-success value=(CURRENT_STEP) max=(TOTAL_STEPS) {}
             hgroup {
-                h2 { "“" (self.name) "” - Details" }
+                h2 {
+                    (t!("event.create.details_step.title", name = self.name))
+                }
                 p {
-                    "Great! Now let's add some details about the event."
+                    (t!("event.create.details_step.subtitle"))
                 }
             }
             form #create_event_form
@@ -89,41 +91,42 @@ impl Render for EventCreateDetailsStep {
                 hx-push-url="true"
             {
                 label {
-                    "Description"
+                    (t!("event.create.details_step.description.label"))
                     textarea
                         name="description"
-                        placeholder="Enter Event Description"
+                        placeholder=(t!("event.create.details_step.description.placeholder"))
                         rows="10"
                         autofocus[self.description.as_ref().map_or(true, String::is_empty)]
                     {
                         (self.description.as_deref().unwrap_or_default())
                     }
                     small {
-                        "If available, this should be the official description of the event, as provided on the event's website or social media pages. If not available, you can write a brief description of the event yourself."
+                        (t!("event.create.details_step.description.hint"))
                     }
                 }
                 label {
+                    (t!("event.create.details_step.website.label"))
                     "Event Website"
                     input
                         type="url"
                         name="website"
-                        placeholder="https://example.com"
+                        placeholder=(t!("event.create.details_step.website.placeholder"))
                         value=[self.website.as_ref()]
                         required {}
                     small {
-                        "This should be a link to the event's official website. If possible, provide a link to the english version of the website."
+                        (t!("event.create.details_step.website.hint"))
                     }
                 }
                 label {
-                    "Event Image"
+                    (t!("event.create.details_step.image.label"))
                     input
                         type="url"
                         name="image_url"
-                        placeholder="https://example.com/image.jpg"
+                        placeholder=(t!("event.create.details_step.image.placeholder"))
                         value=[self.image_url.as_ref()]
                         required {}
                     small {
-                        "This should be a link to an image representing the event (e.g. poster, logo, etc.)"
+                        (t!("event.create.details_step.image.hint"))
                     }
                 }
                 (name_step)
@@ -131,14 +134,14 @@ impl Render for EventCreateDetailsStep {
                 (stages_step)
                 (confirm_step)
                 button type="submit" {
-                    "Next"
+                    (t!("event.create.next"))
                 }
                 button.secondary
                     type="submit"
                     formaction=(back_url)
                     formnovalidate
                 {
-                    "Back"
+                    (t!("event.create.back"))
                 }
             }
         }

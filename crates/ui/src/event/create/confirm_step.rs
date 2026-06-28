@@ -1,5 +1,5 @@
 use chrono::{Duration, Local, NaiveDate, NaiveTime};
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use serde::{Deserialize, Serialize};
 use url::Url;
 use uuid::Uuid;
@@ -9,7 +9,7 @@ use crate::{
         card::{EventCard, EventSuggestionCard},
         create::{
             self,
-            days_step::{self, default_days, EventDay},
+            days_step::{self, EventDay, default_days},
             details_step,
             name_step::{self, TOTAL_STEPS},
             stage_step::{self, EventCreateStageStep, EventStage},
@@ -73,9 +73,11 @@ impl EventCreateConfirmStep {
         html! {
             progress.progress-success value=(CURRENT_STEP) max=(TOTAL_STEPS) {}
             hgroup {
-                h2 { (self.name) " - Confirmation" }
+                h2 {
+                    (t!("event.create.confirm_step.title", name = self.name))
+                }
                 p {
-                    "Almost there! Check that the information you provided is correct, and let us know where you found the information about this event. This will help us ensure that the events listed on our platform are accurate and reliable."
+                    (t!("event.create.confirm_step.subtitle"))
                 }
             }
             form
@@ -87,24 +89,31 @@ impl EventCreateConfirmStep {
                 (event_card.render())
 
                 label {
-                    "Source"
+                    (t!("event.create.confirm_step.source.label"))
                     textarea
                         name="source"
-                        placeholder="Enter source of information (e.g. event website, social media, etc.)"
+                        placeholder=(t!("event.create.confirm_step.source.placeholder"))
                         rows="3"
                         value=[(&self.source)]
                         required
                         autofocus[self.source.as_ref().map_or(true, String::is_empty)]
-                    {}
+                    {
+                        (self.source.as_deref().unwrap_or(""))
+                    }
                     small {
-                        "Where did you find the information about this event? This is important for verification purposes."
+                        (t!("event.create.confirm_step.source.hint"))
                     }
                 }
                 label {
-                    "Source URL"
-                    input type="url" name="source_url" placeholder="https://example.com" value=[(&self.source_url)] {}
+                    (t!("event.create.confirm_step.source_url.label"))
+                    input
+                        type="url"
+                        name="source_url"
+                        placeholder=(t!("event.create.confirm_step.source_url.placeholder"))
+                        value=[(&self.source_url)]
+                    {}
                     small {
-                        "If the source of information is different from the event website, please provide a link to the source (e.g. a social media post, news article, etc.)"
+                        (t!("event.create.confirm_step.source_url.hint"))
                     }
                 }
 
@@ -119,10 +128,10 @@ impl EventCreateConfirmStep {
                         formaction=(back_url)
                         formnovalidate
                     {
-                        "Back"
+                        (t!("event.create.back"))
                     }
                     button.col-6 type="submit" {
-                        "Create Event"
+                        (t!("event.create.submit"))
                     }
                 }
             }

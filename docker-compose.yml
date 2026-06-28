@@ -23,7 +23,7 @@ services:
     networks:
       - traefik
     extra_hosts:
-      - "backend:192.168.178.62"
+      - "backend:${IP_ADDRESS:?}"
     labels:
       - "traefik.http.routers.dashboard.rule=Host(`dashboard.docker.localhost`)"
       - "traefik.http.routers.dashboard.entrypoints=websecure"

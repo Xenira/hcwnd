@@ -1,4 +1,4 @@
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 
 pub struct SignUp;
 
@@ -7,30 +7,34 @@ const MIN_PASSWORD_LENGTH: usize = 3;
 #[cfg(not(debug_assertions))]
 const MIN_PASSWORD_LENGTH: usize = 12;
 
+pub const BASE_ROUTE: &str = "/signup";
+
 impl Render for SignUp {
     fn render(&self) -> Markup {
         html! {
-            form hx-post="/signup" hx-swap="innerHTML" {
+            form hx-post=(BASE_ROUTE) hx-swap="innerHTML" {
                 fieldset {
                     label {
-                        "Username"
+                        (t!("user.sign_up.username.label"))
                         input
                             type="text"
                             name="username"
                             minlength="3"
                             maxlength="32"
                             required;
-                        small { "This will be your public name." }
-                    }
-                    label {
-                        "Email"
-                        input type="email" name="email" required;
                         small {
-                            "Used for login, verification, recovery and notifications you opt-in for. Not publicly visible."
+                            (t!("user.sign_up.username.hint"))
                         }
                     }
                     label {
-                        "Password"
+                        (t!("user.sign_up.email.label"))
+                        input type="email" name="email" required;
+                        small {
+                            (t!("user.sign_up.email.hint"))
+                        }
+                    }
+                    label {
+                        (t!("user.sign_up.password.label"))
                         input
                             type="password"
                             name="password"
@@ -38,7 +42,7 @@ impl Render for SignUp {
                             required;
                     }
                     label {
-                        "Confirm Password"
+                        (t!("user.sign_up.confirm_password.label"))
                         input
                             type="password"
                             name="confirm_password"
@@ -47,11 +51,20 @@ impl Render for SignUp {
                     }
                     label {
                         input type="checkbox" name="privacy_policy" value="true" required;
-                        "I agree to the " a href="/privacy-policy" { "Privacy Policy" } "."
+                        a href="/privacy-policy" { (t!("user.sign_up.privacy_policy")) }
                     }
                 }
-                button type="submit" {
-                    "Sign Up"
+                button.btn-primary
+                    type="submit"
+                {
+                    (t!( "user.sign_up.submit"))
+                }
+                a
+                    href=(super::sign_in::BASE_ROUTE)
+                    hx-boost="true"
+                    hx-target="main"
+                {
+                    (t!( "user.sign_up.sign_in_link"))
                 }
             }
         }

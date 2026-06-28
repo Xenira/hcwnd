@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use serde::{Deserialize, Serialize};
 use url::Url;
 use uuid::Uuid;
@@ -52,9 +52,9 @@ impl Render for EventCreateNameStep {
         html! {
             progress.progress-success value=(CURRENT_STEP) max=(TOTAL_STEPS) {}
             hgroup {
-                h2 { "Create Event - Name" }
+                h2 { (t!("event.create.name_step.title")) }
                 p {
-                    "Let's start with the basics. What is the name of the event?"
+                    (t!("event.create.name_step.subtitle"))
                 }
             }
             form
@@ -66,11 +66,11 @@ impl Render for EventCreateNameStep {
                 hx-push-url="true"
             {
                 label {
-                    "Event Name"
+                    (t!("event.create.name_step.name.label"))
                     input
                         type="text"
                         name="name"
-                        placeholder="Enter Event Name"
+                        placeholder=(t!("event.create.name_step.name.placeholder"))
                         minlength="3"
                         maxlength="100"
                         value=[&self.name]
@@ -80,12 +80,14 @@ impl Render for EventCreateNameStep {
                 div #search-results {
                     // This is where search results will be displayed
                 }
+
                 (details_step)
                 (days_step)
                 (stages_step)
                 (confirm_step)
+
                 button type="submit" {
-                    "Next"
+                    (t!("event.create.next"))
                 }
             }
         }
