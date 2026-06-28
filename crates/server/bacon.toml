@@ -1,0 +1,21 @@
+[jobs.webserver]
+command = ["cargo", "run", "--bin", "hcwnd_server"]
+need_stdout = true
+background = false
+on_change_strategy = "kill_then_restart"
+kill = ["kill", "-s", "INT"]
+watch = [
+  "../../assets",
+  "../../package.json",
+  "../../bun.lock",
+]
+scroll_anchor = "auto"
+
+[jobs.webserver.env]
+VALKEY_URL = "redis://localhost:6379"
+DATABASE_URL = "postgresql://postgres:example@localhost:5432/timetable"
+SERVER_PORT = "8090"
+RUST_LOG = "debug"
+RUST_LOG_STYLE = "always"
+URL_SIGNING_SALT = "hello"
+URL_SIGNING_KEY = "secret"

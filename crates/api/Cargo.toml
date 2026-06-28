@@ -1,0 +1,12 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+uuid = { workspace = true, features = ["v4", "serde"] }
+serde = { workspace = true }
+chrono = { workspace = true }
+
+[features]
+client = ["uuid/js"]

@@ -1,0 +1,111 @@
+@import "./breakpoints.scss";
+@import "./colours.scss";
+
+.flex {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.center {
+  align-items: center;
+}
+
+.column {
+  flex-direction: column;
+}
+
+.row {
+  flex-direction: row;
+}
+
+.w100 {
+  width: 100%;
+  margin: 0;
+}
+
+.h100 {
+  height: 100%;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.my-1 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.flash {
+  padding: 1rem;
+  border: 1px solid transparent;
+
+  &:has(i:first-child) {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    > i {
+      font-size: 2rem;
+    }
+  }
+
+  &.primary {
+    background-color: $primary;
+    border-color: $bd-primary;
+  }
+  &.accent {
+    background-color: $accent;
+    border-color: $bd-accent;
+  }
+
+  p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+.phone {
+  @include break("phone") {
+    display: none;
+  }
+}
+
+.tablet {
+  @include break("tablet") {
+    display: none;
+  }
+}
+
+.laptop {
+  @include break("laptop") {
+    display: none;
+  }
+}
+
+button.accent {
+  border-color: $accent;
+  &:hover {
+    background-color: $accent;
+  }
+}
+
+button.error {
+  border-color: $error;
+  &:hover {
+    background-color: $error;
+  }
+}
+
+button.primary {
+  border-color: $primary;
+  &:hover {
+    background-color: $primary;
+  }
+}

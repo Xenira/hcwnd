@@ -1,0 +1,29 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "dependencies": {
+        "@digicreon/mucss": "^1.4.8",
+        "@fontsource/alexandria": "^5.2.8",
+        "@fontsource/open-sans": "^5.2.7",
+        "@phosphor-icons/web": "^2.1.2",
+        "@picocss/pico": "^2.1.1",
+        "htmx.org": "^2.0.8",
+      },
+    },
+  },
+  "packages": {
+    "@digicreon/mucss": ["@digicreon/mucss@1.4.8", "", {}, "sha512-tROK1G/PulvT2QGZHdMjQUKuHznne/cVpPxoCDpmEWWa1VdXnT1L9UiSEHkHs7T4KcHyJ9aI/nAyEhB5cWy6nQ=="],
+
+    "@fontsource/alexandria": ["@fontsource/alexandria@5.2.8", "", {}, "sha512-fEG//tSkzPcPcP443PHxXHxZCIQgIQxuHYB/TXOhjo4s0jeNZvUbPgsgpQSVDIQCtCJ+ZuOl4OUSdjCUd4SB0g=="],
+
+    "@fontsource/open-sans": ["@fontsource/open-sans@5.2.7", "", {}, "sha512-8yfgDYjE5O0vmTPdrcjV35y4yMnctsokmi9gN49Gcsr0sjzkMkR97AnKDe6OqZh2SFkYlR28fxOvi21bYEgMSw=="],
+
+    "@phosphor-icons/web": ["@phosphor-icons/web@2.1.2", "", {}, "sha512-rPAR9o/bEcp4Cw4DEeZHXf+nlGCMNGkNDRizYHM47NLxz9vvEHp/Tt6FMK1NcWadzw/pFDPnRBGi/ofRya958A=="],
+
+    "@picocss/pico": ["@picocss/pico@2.1.1", "", {}, "sha512-kIDugA7Ps4U+2BHxiNHmvgPIQDWPDU4IeU6TNRdvXQM1uZX+FibqDQT2xUOnnO2yq/LUHcwnGlu1hvf4KfXnMg=="],
+
+    "htmx.org": ["htmx.org@2.0.8", "", {}, "sha512-fm297iru0iWsNJlBrjvtN7V9zjaxd+69Oqjh4F/Vq9Wwi2kFisLcrLCiv5oBX0KLfOX/zG8AUo9ROMU5XUB44Q=="],
+  }
+}

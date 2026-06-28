@@ -1,0 +1,17 @@
+[package]
+name = "imgproxy"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+website.workspace = true
+
+[dependencies]
+base64 = { workspace = true }
+derive_builder.workspace = true
+hmac = "0.13.0-rc.6"
+itertools.workspace = true
+sha2 = "0.11.0"
+thiserror = { workspace = true }
+url = { workspace = true }

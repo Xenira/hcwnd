@@ -1,0 +1,109 @@
+services:
+  traefik:
+    image: traefik:v3.6.10
+    volumes:
+      - ${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    command:
+      - --entryPoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+
+      - --entryPoints.websecure.address=:443
+      - --entryPoints.websecure.http.tls=true
+
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=proxy
+      - --api.dashboard=true
+      - --api.insecure=true
+    networks:
+      - traefik
+    extra_hosts:
+      - "backend:192.168.178.62"
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.docker.localhost`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls=true"
+      # Enable self‑routing
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`hardcore.localhost`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      # - "traefik.http.services.backend.loadbalancer.server.port=8090"
+      - "traefik.http.services.backend.loadbalancer.server.url=http://backend:8090"
+      # - traefik.http.routers.backend.middlewares=anubis@docker
+      # - traefik.http.middlewares.anubis.forwardauth.address=http://anubis:8080/.within.website/x/cmd/anubis/api/check
+  # anubis:
+  #   image: ghcr.io/techarohq/anubis:main
+  #   environment:
+  #     # Telling Anubis, where to listen for Traefik
+  #     - BIND=:8080
+  #     # Telling Anubis to do redirect — ensure there is a space after '='
+  #     - "TARGET= "
+  #     # Specifies which domains Anubis is allowed to redirect to.
+  #     - REDIRECT_DOMAINS=hardcore.localhost:8443
+  #     # Should be the full external URL for Anubis (including scheme)
+  #     - PUBLIC_URL=https://anubis.localhost:8443
+  #     # Should match your domain for proper cookie scoping
+  #     # - COOKIE_DOMAIN=localhost
+  #     - COOKIE_DYNAMIC_DOMAIN=true
+  #   networks:
+  #     - traefik
+  #   labels:
+  #     - traefik.enable=true # Enabling Traefik
+  #     - traefik.docker.network=traefik # Telling Traefik which network to use
+  #     - traefik.http.routers.anubis.rule=Host(`anubis.localhost`) # Only Matching Requests for example.com
+  #     - traefik.http.routers.anubis.entrypoints=websecure # Listen on HTTPS
+  #     - traefik.http.services.anubis.loadbalancer.server.port=8080 # Telling Traefik where to receive requests
+  #     - traefik.http.routers.anubis.service=anubis # Telling Traefik to use the above specified port
+  #     # - traefik.http.routers.anubis.tls.certresolver=le # Telling Traefik to resolve a Cert for Anubis
+
+  postgres:
+    image: postgres:18.3
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: postgres
+      POSTGRES_DB: timetable
+    ports:
+      - "5432:5432"
+  valkey:
+    image: valkey/valkey:9.0.3-alpine
+    ports:
+      - "6379:6379"
+  imgproxy:
+    image: ghcr.io/imgproxy/imgproxy:v3.30.1
+    restart: always
+    environment:
+      IMGPROXY_PATH_PREFIX: /image
+      IMGPROXY_ALLOW_PRIVATE_SOURCE_ADDRESSES: false
+    secrets:
+      - imgproxy_key
+      - imgproxy_salt
+    command:
+      - imgproxy
+      - "--keypath=/run/secrets/imgproxy_key"
+      - "--saltpath=/run/secrets/imgproxy_salt"
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.imgproxy.rule=Host(`hardcore.localhost`) && PathPrefix(`/image`)"
+      - "traefik.http.routers.imgproxy.entrypoints=websecure"
+      - "traefik.http.routers.imgproxy.tls=true"
+      - "traefik.http.services.imgproxy.loadbalancer.server.port=8080"
+
+networks:
+  traefik:
+
+secrets:
+  imgproxy_key:
+    environment: IMGPROXY_KEY
+  imgproxy_salt:
+    environment: IMGPROXY_SALT

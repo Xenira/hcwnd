@@ -1,0 +1,64 @@
+/* @import "./semantic.scss"; */
+/* @import "./classes.scss"; */
+/* @import "./breakpoints.scss"; */
+/* @import "./animation.scss"; */
+/**/
+/* #event { */
+/*   display: flex; */
+/*   flex-direction: column; */
+/*   height: 100%; */
+/*   /* overflow-y: auto; */ */
+/**/
+/*   > nav { */
+/*     position: sticky; */
+/*     top: 0; */
+/*   } */
+/*   @include break("tablet") { */
+/*     flex-direction: column-reverse; */
+/*     justify-content: space-between; */
+/*   } */
+/*   @include break("tablet") { */
+/*     > nav { */
+/*       bottom: 0; */
+/*       > menu { */
+/*         > li { */
+/*           > a, */
+/*           > span { */
+/*             padding-top: 0.25rem; */
+/*             border-top: 2px solid transparent; */
+/*           } */
+/*           &.active > span, */
+/*           > a:hover { */
+/*             border-top: 2px solid $primary; */
+/*             border-bottom: none; */
+/*           } */
+/*         } */
+/*       } */
+/*     } */
+/*   } */
+/* } */
+/**/
+/* button.close { */
+/*   position: absolute; */
+/*   top: 0.5rem; */
+/*   right: 0; */
+/*   z-index: 1050; */
+/*   background: none; */
+/*   border: none; */
+/*   font-size: 1.5rem; */
+/*   &:hover { */
+/*     color: $error; */
+/*   } */
+/* } */
+/**/
+/* #home > a { */
+/*   width: fit-content; */
+/*   font-weight: bold; */
+/*   &:any-link { */
+/*     color: unset; */
+/*   } */
+/*   > span { */
+/*     margin-top: 0.1rem; */
+/*     display: inline-block; */
+/*   } */
+/* } */

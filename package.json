@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@digicreon/mucss": "^1.4.8",
+    "@fontsource/alexandria": "^5.2.8",
+    "@fontsource/open-sans": "^5.2.7",
+    "@phosphor-icons/web": "^2.1.2",
+    "@picocss/pico": "^2.1.1",
+    "htmx.org": "^2.0.8"
+  }
+}

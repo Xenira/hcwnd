@@ -1,0 +1,42 @@
+@use "sass:color";
+
+$background-light: #e9edeb;
+$background-dark: #312f2f;
+
+$primary-light: #006ba6;
+$primary-dark: #489fb5;
+
+$accent-light: #3c896d;
+$accent-dark: #79b473;
+
+$error-light: #ff4a1c;
+$error-dark: #f02d3a;
+
+$attention-light: #72195a;
+$attention-dark: #af4d98;
+
+$background: light-dark($background-light, $background-dark);
+$primary: light-dark($primary-light, $primary-dark);
+$accent: light-dark($accent-light, $accent-dark);
+$error: light-dark($error-light, $error-dark);
+$attention: light-dark($attention-light, $attention-dark);
+
+$bd-primary: light-dark(
+  darker($primary-light, 20%),
+  lighter($primary-dark, 20%)
+);
+
+$bd-accent: light-dark(darker($accent-light, 20%), lighter($accent-dark, 20%));
+
+$text: light-dark(#000000, #ffffff);
+$subtext: light-dark(#555555, #cccccc);
+
+$card: light-dark(#d2dad6, #2a2828);
+
+@function darker($color, $amount) {
+  @return color.scale($color, $lightness: -$amount);
+}
+
+@function lighter($color, $amount) {
+  @return color.scale($color, $lightness: $amount);
+}

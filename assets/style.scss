@@ -1,0 +1,88 @@
+body > header {
+  padding-top: 0;
+}
+
+[role="group"] {
+  span {
+    --mu-background-color: var(--mu-form-element-background-color);
+    --mu-border-color: var(--mu-form-element-border-color);
+    --mu-color: var(--mu-form-element-color);
+    padding: var(--mu-form-element-spacing-vertical)
+      var(--mu-form-element-spacing-horizontal);
+    background-color: var(--mu-background-color);
+    border: var(--mu-border-width) solid var(--mu-border-color);
+    border-radius: var(--mu-border-radius);
+    max-height: calc(
+      1rem * var(--mu-line-height) + var(--mu-form-element-spacing-vertical) *
+        2 + var(--mu-border-width) * 2
+    );
+
+    &:not(:first-child) {
+      margin-left: calc(var(--mu-border-width) * -1);
+    }
+  }
+}
+
+i.ph {
+  font-size: 1.25rem;
+  vertical-align: middle;
+
+  &:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
+
+article.event {
+  header {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 0;
+    * {
+      transition: all 0.4s ease-in-out;
+    }
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+      z-index: 1;
+      width: 100%;
+      min-height: 100%;
+      opacity: 0.5;
+    }
+
+    section.hero {
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--card-color), transparent 80%) 0%,
+        color-mix(in oklch, var(--card-color), transparent 10%) 100%
+      );
+    }
+  }
+  &:hover > header {
+    img {
+      transform: scale(1.05);
+      opacity: 0.75;
+    }
+    > section.hero {
+      background: linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--card-color), transparent 70%) 0%,
+        color-mix(in oklch, var(--card-color), transparent 5%) 100%
+      );
+    }
+  }
+}
+
+.reverse {
+  transform: scaleX(-1);
+}
+
+.votes > progress {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  width: 50%;
+}
