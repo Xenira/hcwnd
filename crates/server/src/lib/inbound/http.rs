@@ -28,29 +28,23 @@ pub mod actix_macro;
 pub mod handlers;
 pub mod user;
 
-#[derive(Debug, Clone)]
-pub struct AppState<ES, AS, US>
-where
-    ES: EventService + Clone + Sync + Send + 'static,
-    AS: ArtistService + Clone + Sync + Send + 'static,
-    US: UserService + Clone + Sync + Send + 'static,
-{
-    event_service: Arc<ES>,
-    artist_service: Arc<AS>,
-    user_service: Arc<US>,
+#[derive(Clone)]
+pub struct AppState {
+    event_service: Arc<dyn EventService + Sync + Send>,
+    artist_service: Arc<dyn ArtistService + Sync + Send>,
+    user_service: Arc<dyn UserService + Sync + Send>,
 }
 
-impl<ES, AS, US> AppState<ES, AS, US>
-where
-    ES: EventService + Clone + Sync + Send + 'static,
-    AS: ArtistService + Clone + Sync + Send + 'static,
-    US: UserService + Clone + Sync + Send + 'static,
-{
-    pub fn new(event_service: ES, artist_service: AS, user_service: US) -> Self {
+impl AppState {
+    pub fn new(
+        event_service: Arc<dyn EventService + Sync + Send>,
+        artist_service: Arc<dyn ArtistService + Sync + Send>,
+        user_service: Arc<dyn UserService + Sync + Send>,
+    ) -> Self {
         Self {
-            event_service: Arc::new(event_service),
-            artist_service: Arc::new(artist_service),
-            user_service: Arc::new(user_service),
+            event_service,
+            artist_service,
+            user_service,
         }
     }
 }
@@ -58,18 +52,13 @@ where
 pub struct HttpServer;
 
 impl HttpServer {
-    pub async fn run<ES, AS, US>(
-        event_service: ES,
-        artist_service: AS,
-        user_service: US,
-        session_store: impl SessionStore + Sync + Send + Clone + 'static,
+    pub async fn run(
+        event_service: Arc<dyn EventService + Sync + Send + 'static>,
+        artist_service: Arc<dyn ArtistService + Sync + Send + 'static>,
+        user_service: Arc<dyn UserService + Sync + Send + 'static>,
+        session_store: impl SessionStore + Clone + Sync + Send + 'static,
         signer: SignedUrlRepo,
-    ) -> anyhow::Result<()>
-    where
-        ES: EventService + Sync + Send + Clone + 'static,
-        AS: ArtistService + Sync + Send + Clone + 'static,
-        US: UserService + Sync + Send + Clone + 'static,
-    {
+    ) -> anyhow::Result<()> {
         let app_state = AppState::new(event_service, artist_service, user_service);
         let app_data = web::Data::new(app_state);
 
@@ -117,7 +106,7 @@ impl HttpServer {
                 .wrap(HtmxMiddleware)
                 // .service(web::scope("/api").configure(controller::api_v1))
                 // .service(Files::new("/static", "./dist/static"))
-                .configure(handlers::configure::<ES, AS, US>)
+                .configure(handlers::configure)
                 .wrap(Compress::default())
         })
         .bind(("0.0.0.0", 8090))?

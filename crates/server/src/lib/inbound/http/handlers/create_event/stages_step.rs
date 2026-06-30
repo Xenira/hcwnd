@@ -1,6 +1,6 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get,
+    get, post,
     web::{self, ServiceConfig},
     HttpResponse, Responder,
 };
@@ -19,28 +19,27 @@ use ui::{
 };
 
 use crate::{
-    domain::{artist::ports::ArtistService, event::ports::EventService, user::ports::UserService},
-    inbound::http::{handlers::index_markup, user::UserExtractor},
+    domain::{
+        artist::ports::ArtistService,
+        event::ports::EventService,
+        user::{models::user::User, ports::UserService},
+    },
+    inbound::http::handlers::index_markup,
 };
 
-pub fn configure<ES, AS, US>(cfg: &mut ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
+pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
-        .route("", web::post().to(stages_step_form::<ES, AS, US>))
+        .service(stages_step_form)
         .route(
             ui::event::create::stage_step::ADD_STAGE_ROUTE,
-            web::post().to(add_event_stage::<ES, AS, US>),
+            web::post().to(add_event_stage),
         )
         .route(
             &format!(
                 "{}/{{index}}",
                 ui::event::create::stage_step::REMOVE_STAGE_ROUTE
             ),
-            web::post().to(remove_event_stage::<ES, AS, US>),
+            web::post().to(remove_event_stage),
         );
 }
 
@@ -55,16 +54,12 @@ async fn redirect_to_name_step() -> impl Responder {
         .finish()
 }
 
-async fn stages_step_form<ES, AS, US>(
-    _: UserExtractor<ES, AS, US>,
+#[post("")]
+async fn stages_step_form(
+    _: User,
     form: QsForm<EventCreateStageStep>,
     htmx: Htmx,
-) -> impl Responder
-where
-    ES: EventService,
-    AS: ArtistService,
-    US: UserService,
-{
+) -> impl Responder {
     let mut form = form.into_inner();
     form.populate_stages();
 
@@ -82,16 +77,11 @@ where
     HttpResponse::Ok().content_type("text/html").body(body)
 }
 
-async fn add_event_stage<ES, AS, US>(
-    _: UserExtractor<ES, AS, US>,
+async fn add_event_stage(
+    _: User,
     form: QsForm<EventCreateStageStep>,
     htmx: Htmx,
-) -> impl Responder
-where
-    ES: EventService,
-    AS: ArtistService,
-    US: UserService,
-{
+) -> impl Responder {
     debug!("Adding stage to event {form:?}");
     let stage = EventStage {
         name: String::new(),
@@ -117,17 +107,12 @@ where
 
     HttpResponse::Ok().content_type("text/html").body(body)
 }
-async fn remove_event_stage<ES, AS, US>(
-    _: UserExtractor<ES, AS, US>,
+async fn remove_event_stage(
+    _: User,
     form: QsForm<EventCreateStageStep>,
     index: web::Path<usize>,
     htmx: Htmx,
-) -> impl Responder
-where
-    ES: EventService,
-    AS: ArtistService,
-    US: UserService,
-{
+) -> impl Responder {
     if form.stages.len() <= 1 {
         return HttpResponse::BadRequest()
             .content_type("text/html")

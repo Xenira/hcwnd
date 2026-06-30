@@ -1,4 +1,5 @@
 use actix_web::{
+    get, post,
     web::{self, Data, ServiceConfig},
     HttpResponse, Responder, ResponseError,
 };
@@ -29,15 +30,10 @@ use crate::{
     inbound::http::AppState,
 };
 
-pub fn configure<ES, AS, US>(cfg: &mut ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
-    cfg.route("/add", web::get().to(add_artist_form))
-        .route("/act", web::get().to(search_artist_for_act::<ES, AS, US>))
-        .route("", web::post().to(add_artist::<ES, AS, US>));
+pub fn configure(cfg: &mut ServiceConfig) {
+    cfg.service(add_artist_form)
+        .service(search_artist_for_act)
+        .service(add_artist);
 }
 
 #[derive(Error, Debug)]
@@ -56,6 +52,7 @@ impl ResponseError for HandlerError {
     }
 }
 
+#[get("/add")]
 async fn add_artist_form() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/html")
@@ -68,8 +65,9 @@ struct CreateArtistForm {
     genres: String,
 }
 
-async fn add_artist<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: web::Data<AppState<ES, AS, US>>,
+#[post("")]
+async fn add_artist(
+    app_state: web::Data<AppState>,
     form: web::Form<CreateArtistForm>,
 ) -> Result<impl Responder, HandlerError> {
     let author_id = UserId::new(Uuid::new_v4()); // TODO: Get from session
@@ -99,8 +97,9 @@ struct SearchArtistQuery {
     name: String,
 }
 
-async fn search_artist_for_act<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: web::Data<AppState<ES, AS, US>>,
+#[get("/act")]
+async fn search_artist_for_act(
+    app_state: web::Data<AppState>,
     query: web::Query<SearchArtistQuery>,
 ) -> Result<impl Responder, HandlerError> {
     let artists = app_state

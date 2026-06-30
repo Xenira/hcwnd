@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::domain::{
     artist::models::artist::{
         Artist, ArtistId, CreateArtistError, CreateArtistRequest, GetArtistError,
@@ -6,38 +8,31 @@ use crate::domain::{
     user::models::user::UserId,
 };
 
-pub trait ArtistService: Clone + Sync + Send + 'static {
-    fn create_artist(
+#[async_trait]
+pub trait ArtistService: Sync + Send {
+    async fn create_artist(
         &self,
         req: &CreateArtistRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<Artist, CreateArtistError>>;
+    ) -> Result<Artist, CreateArtistError>;
 
-    fn artists_by_act(
-        &self,
-        act_name: &str,
-    ) -> impl Future<Output = Result<Vec<Artist>, SearchArtistsError>>;
+    async fn artists_by_act(&self, act_name: &str) -> Result<Vec<Artist>, SearchArtistsError>;
 
-    fn get_artist_by_id(
-        &self,
-        id: &ArtistId,
-    ) -> impl Future<Output = Result<Artist, GetArtistError>>;
+    async fn get_artist_by_id(&self, id: &ArtistId) -> Result<Artist, GetArtistError>;
 }
 
+#[async_trait]
 pub trait ArtistRepository: Clone + Sync + Send + 'static {
-    fn create_artist(
+    async fn create_artist(
         &self,
         req: &CreateArtistRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<Artist, CreateArtistError>>;
+    ) -> Result<Artist, CreateArtistError>;
 
-    fn search_artist(
+    async fn search_artist(
         &self,
         query: &SearchArtistsQuery,
-    ) -> impl Future<Output = Result<Vec<Artist>, SearchArtistsError>>;
+    ) -> Result<Vec<Artist>, SearchArtistsError>;
 
-    fn get_artist_by_id(
-        &self,
-        id: &ArtistId,
-    ) -> impl Future<Output = Result<Artist, GetArtistError>>;
+    async fn get_artist_by_id(&self, id: &ArtistId) -> Result<Artist, GetArtistError>;
 }

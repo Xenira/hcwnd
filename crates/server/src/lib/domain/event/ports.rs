@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::domain::{
     event::models::{
         act::{Act, ActId, CreateActError, CreateActRequest, GetActError, ListActsError},
@@ -13,87 +15,80 @@ use crate::domain::{
     user::models::user::UserId,
 };
 
-pub trait EventService: Clone + Sync + Send + 'static {
-    fn create_event(
+#[async_trait]
+pub trait EventService: Sync + Send + 'static {
+    async fn create_event(
         &self,
         req: &CreateEventRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<EventId, CreateEventError>>;
+    ) -> Result<EventId, CreateEventError>;
 
-    fn list_events(&self) -> impl Future<Output = Result<Vec<EventListItem>, ListEventsError>>;
+    async fn list_events(&self) -> Result<Vec<EventListItem>, ListEventsError>;
 
-    fn get_event_by_id(&self, id: &EventId) -> impl Future<Output = Result<Event, GetEventError>>;
+    async fn get_event_by_id(&self, id: &EventId) -> Result<Event, GetEventError>;
 
-    fn create_act(
+    async fn create_act(
         &self,
         event_id: &EventId,
         req: &CreateActRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<Act, CreateActError>>;
+    ) -> Result<Act, CreateActError>;
 }
 
+#[async_trait]
 pub trait EventRepository: Clone + Sync + Send + 'static {
-    fn create_event(
+    async fn create_event(
         &self,
         req: &CreateEventRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<EventId, CreateEventError>>;
+    ) -> Result<EventId, CreateEventError>;
 
-    fn list_events(&self) -> impl Future<Output = Result<Vec<EventListItem>, ListEventsError>>;
+    async fn list_events(&self) -> Result<Vec<EventListItem>, ListEventsError>;
 
-    fn get_event_by_id(&self, id: &EventId) -> impl Future<Output = Result<Event, GetEventError>>;
+    async fn get_event_by_id(&self, id: &EventId) -> Result<Event, GetEventError>;
 }
 
+#[async_trait]
 pub trait ActRepository: Clone + Sync + Send + 'static {
-    fn create_act(
+    async fn create_act(
         &self,
         event_id: &EventId,
         act: &CreateActRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<Act, CreateActError>>;
+    ) -> Result<Act, CreateActError>;
 
-    fn list_acts(
-        &self,
-        event_id: &EventId,
-    ) -> impl Future<Output = Result<Vec<Act>, ListActsError>>;
+    async fn list_acts(&self, event_id: &EventId) -> Result<Vec<Act>, ListActsError>;
 
-    fn get_act_by_id(&self, act_id: &ActId) -> impl Future<Output = Result<Act, GetActError>>;
+    async fn get_act_by_id(&self, act_id: &ActId) -> Result<Act, GetActError>;
 }
 
+#[async_trait]
 pub trait StageRepository: Clone + Sync + Send + 'static {
-    fn create_stage(
+    async fn create_stage(
         &self,
         stage: &CreateStageRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<Stage, CreateStageError>>;
+    ) -> Result<Stage, CreateStageError>;
 
-    fn list_stages(
-        &self,
-        event_id: &EventId,
-    ) -> impl Future<Output = Result<Vec<Stage>, ListStagesError>>;
+    async fn list_stages(&self, event_id: &EventId) -> Result<Vec<Stage>, ListStagesError>;
 
-    fn get_stage_by_id(
-        &self,
-        stage_id: &StageId,
-    ) -> impl Future<Output = Result<Stage, GetStageError>>;
+    async fn get_stage_by_id(&self, stage_id: &StageId) -> Result<Stage, GetStageError>;
 }
 
+#[async_trait]
 pub trait DayRepository: Clone + Sync + Send + 'static {
-    fn create_day(
+    async fn create_day(
         &self,
         event_id: &EventId,
         day: &CreateDayRequest,
         author_id: &UserId,
-    ) -> impl Future<Output = Result<Day, CreateDayError>>;
+    ) -> Result<Day, CreateDayError>;
 
-    fn list_days(
-        &self,
-        event_id: &EventId,
-    ) -> impl Future<Output = Result<Vec<Day>, ListDaysError>>;
+    async fn list_days(&self, event_id: &EventId) -> Result<Vec<Day>, ListDaysError>;
 
-    fn get_day_by_id(&self, day_id: &DayId) -> impl Future<Output = Result<Day, GetDayError>>;
+    async fn get_day_by_id(&self, day_id: &DayId) -> Result<Day, GetDayError>;
 
-    fn get_first_day(&self, event_id: &EventId) -> impl Future<Output = Result<Day, GetDayError>>;
+    async fn get_first_day(&self, event_id: &EventId) -> Result<Day, GetDayError>;
 
-    fn get_last_day(&self, event_id: &EventId) -> impl Future<Output = Result<Day, GetDayError>>;
+    async fn get_last_day(&self, event_id: &EventId) -> Result<Day, GetDayError>;
 }

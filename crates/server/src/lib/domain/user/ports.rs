@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use uuid::Uuid;
 
 use crate::domain::user::models::user::{
@@ -5,38 +6,24 @@ use crate::domain::user::models::user::{
     CreateUserRequest, FindUserError, User, UserEmail, UserId, UserName,
 };
 
-pub trait UserService: Clone + Send + Sync + 'static {
-    fn create_user(
-        &self,
-        req: &CreateUserRequest,
-    ) -> impl Future<Output = Result<User, CreateUserError>>;
-    fn authenticate_user(
+#[async_trait]
+pub trait UserService: Send + Sync + 'static {
+    async fn create_user(&self, req: &CreateUserRequest) -> Result<User, CreateUserError>;
+    async fn authenticate_user(
         &self,
         req: &AuthenticateUserRequest,
-    ) -> impl Future<Output = Result<User, AuthenticateUserError>>;
-    fn confirm_email(
-        &self,
-        name: &UserName,
-        token: Uuid,
-    ) -> impl Future<Output = Result<(), ConfirmEmailError>>;
-    fn get_user(&self, id: &UserId) -> impl Future<Output = Result<Option<User>, FindUserError>>;
+    ) -> Result<User, AuthenticateUserError>;
+    async fn confirm_email(&self, name: &UserName, token: Uuid) -> Result<(), ConfirmEmailError>;
+    async fn get_user(&self, id: &UserId) -> Result<Option<User>, FindUserError>;
 }
 
+#[async_trait]
 pub trait UserRepository: Clone + Send + Sync + 'static {
-    fn create_user(
-        &self,
-        req: &CreateUserRequest,
-    ) -> impl Future<Output = Result<User, CreateUserError>>;
-    fn find_user_by_id(
-        &self,
-        id: &UserId,
-    ) -> impl Future<Output = Result<Option<User>, FindUserError>>;
-    fn find_user_by_username(
+    async fn create_user(&self, req: &CreateUserRequest) -> Result<User, CreateUserError>;
+    async fn find_user_by_id(&self, id: &UserId) -> Result<Option<User>, FindUserError>;
+    async fn find_user_by_username(
         &self,
         username: &UserName,
-    ) -> impl Future<Output = Result<Option<User>, FindUserError>>;
-    fn find_user_by_email(
-        &self,
-        email: &UserEmail,
-    ) -> impl Future<Output = Result<Option<User>, FindUserError>>;
+    ) -> Result<Option<User>, FindUserError>;
+    async fn find_user_by_email(&self, email: &UserEmail) -> Result<Option<User>, FindUserError>;
 }

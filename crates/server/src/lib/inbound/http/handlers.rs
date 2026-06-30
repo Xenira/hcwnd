@@ -1,7 +1,8 @@
 use actix_identity::Identity;
 use actix_web::{
-    HttpResponse, Responder, ResponseError,
+    get,
     web::{self, Data, ServiceConfig},
+    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
 use itertools::Itertools as _;
@@ -24,7 +25,7 @@ use crate::{
             ports::UserService,
         },
     },
-    inbound::http::{AppState, user::UserExtractor},
+    inbound::http::AppState,
 };
 
 pub mod artist;
@@ -35,22 +36,14 @@ pub mod login;
 pub mod logout;
 pub mod signup;
 
-pub fn configure<ES, AS, US>(cfg: &mut ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
-    cfg.route("/", web::get().to(index::<ES, AS, US>))
-        .service(
-            web::scope(ui::event::create::BASE_ROUTE)
-                .configure(create_event::configure::<ES, AS, US>),
-        )
+pub fn configure(cfg: &mut ServiceConfig) {
+    cfg.service(index)
+        .service(web::scope(ui::event::create::BASE_ROUTE).configure(create_event::configure))
         .service(web::scope("/assets").configure(assets::configure))
-        .service(web::scope("/event").configure(event::configure::<ES, AS, US>))
-        .service(web::scope("/artist").configure(artist::configure::<ES, AS, US>))
-        .service(web::scope("/signup").configure(signup::configure::<ES, AS, US>))
-        .service(web::scope("/login").configure(login::configure::<ES, AS, US>))
+        .service(web::scope("/event").configure(event::configure))
+        .service(web::scope("/artist").configure(artist::configure))
+        .service(web::scope("/signup").configure(signup::configure))
+        .service(web::scope("/login").configure(login::configure))
         .service(web::scope("/logout").configure(logout::configure));
 }
 
@@ -88,9 +81,10 @@ impl ResponseError for HandlerError {
     }
 }
 
-async fn index<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: Data<AppState<ES, AS, US>>,
-    user: Option<UserExtractor<ES, AS, US>>,
+#[get("/")]
+async fn index(
+    app_state: Data<AppState>,
+    user: Option<User>,
 ) -> Result<impl Responder, HandlerError> {
     let events = app_state
         .event_service
@@ -104,7 +98,6 @@ async fn index<ES: EventService, AS: ArtistService, US: UserService>(
         .has_more(false)
         .build()
         .expect("Failed to build event list");
-    let user = user.map(|u| u.user);
     // let list = EventListBuilder::default()
     //     .events(list_events(&event_repo, &image_repo, 1, 12).await?)
     //     .page(1)

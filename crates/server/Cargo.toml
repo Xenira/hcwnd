@@ -47,6 +47,7 @@ rust-embed = { version = "8.11.0", features = ["actix-web", "deterministic-times
 mime_guess = "2.0.5"
 serde_qs = { version = "1.1.2", features = ["actix4"] }
 regex = "1.12.4"
+async-trait = "0.1.89"
 
 [build-dependencies]
 grass = "0.13.4"

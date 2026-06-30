@@ -1,5 +1,5 @@
 use actix_htmx::Htmx;
-use actix_web::{web, HttpResponse, Responder, ResponseError};
+use actix_web::{get, web, HttpResponse, Responder, ResponseError};
 use anyhow::Context as _;
 use thiserror::Error;
 use ui::{
@@ -23,15 +23,10 @@ use crate::{
 pub mod act;
 pub mod lineup;
 
-pub fn configure<ES, AS, US>(cfg: &mut web::ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
-    cfg.route("", web::get().to(get_event::<ES, AS, US>))
-        .service(web::scope("/lineup").configure(lineup::configure::<ES, AS, US>))
-        .service(web::scope("/act").configure(act::configure::<ES, AS, US>));
+pub fn configure(cfg: &mut web::ServiceConfig) {
+    cfg.service(get_event)
+        .service(web::scope("/lineup").configure(lineup::configure))
+        .service(web::scope("/act").configure(act::configure));
 }
 
 #[derive(Error, Debug)]
@@ -62,8 +57,9 @@ impl From<Event> for EventDetails {
     }
 }
 
-async fn get_event<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: web::Data<AppState<ES, AS, US>>,
+#[get("")]
+async fn get_event(
+    app_state: web::Data<AppState>,
     path: web::Path<Uuid>,
     htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {

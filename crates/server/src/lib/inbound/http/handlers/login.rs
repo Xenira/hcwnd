@@ -1,6 +1,8 @@
 use actix_htmx::Htmx;
 use actix_identity::Identity;
-use actix_web::{web, HttpMessage as _, HttpRequest, HttpResponse, Responder, ResponseError};
+use actix_web::{
+    get, post, web, HttpMessage as _, HttpRequest, HttpResponse, Responder, ResponseError,
+};
 use anyhow::Context as _;
 use secrecy::SecretString;
 use serde::Deserialize;
@@ -22,14 +24,8 @@ use crate::{
     inbound::http::{handlers::index_markup, AppState},
 };
 
-pub fn configure<ES, AS, US>(cfg: &mut web::ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
-    cfg.route("", web::get().to(login_form))
-        .route("", web::post().to(login::<ES, AS, US>));
+pub fn configure(cfg: &mut web::ServiceConfig) {
+    cfg.service(login_form).service(login);
 }
 
 #[derive(Error, Debug)]
@@ -48,6 +44,7 @@ impl ResponseError for HandlerError {
     }
 }
 
+#[get("")]
 async fn login_form(htmx: Htmx) -> impl Responder {
     let body = if htmx.is_htmx {
         SignIn {}.render_html()
@@ -64,8 +61,9 @@ struct LoginFormData {
     password: String,
 }
 
-async fn login<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: web::Data<AppState<ES, AS, US>>,
+#[post("")]
+async fn login(
+    app_state: web::Data<AppState>,
     request: HttpRequest,
     form: web::Form<LoginFormData>,
     htmx: Htmx,

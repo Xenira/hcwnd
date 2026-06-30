@@ -49,12 +49,7 @@ use crate::{
 pub mod day;
 pub mod details;
 
-pub fn configure<ES, AS, US>(cfg: &mut web::ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
+pub fn configure(cfg: &mut web::ServiceConfig) {
     // cfg.route("", web::post().to(create_event::<ES, AS, US>))
     //     .service(web::scope("/{event_id}").configure(details::configure::<ES, AS, US>));
 }
@@ -168,8 +163,8 @@ impl ResponseError for HandlerError {
     }
 }
 
-async fn create_event<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: web::Data<AppState<ES, AS, US>>,
+async fn create_event(
+    app_state: web::Data<AppState>,
     form: web::Form<HashMap<String, String>>,
     htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
