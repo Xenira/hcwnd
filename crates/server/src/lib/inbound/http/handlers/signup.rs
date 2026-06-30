@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use actix_htmx::Htmx;
 use actix_identity::Identity;
 use actix_web::{
+    get, post,
     web::{self, Redirect},
     HttpMessage, HttpRequest, HttpResponse, Responder, ResponseError,
 };
@@ -27,14 +28,8 @@ use crate::{
     inbound::http::{handlers::index_markup, AppState},
 };
 
-pub fn configure<ES, AS, US>(cfg: &mut web::ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
-    cfg.route("", web::get().to(signup_form))
-        .route("", web::post().to(signup::<ES, AS, US>));
+pub fn configure(cfg: &mut web::ServiceConfig) {
+    cfg.service(signup_form).service(signup);
 }
 
 #[derive(Error, Debug)]
@@ -53,6 +48,7 @@ impl ResponseError for HandlerError {
     }
 }
 
+#[get("")]
 async fn signup_form(htmx: Htmx) -> impl Responder {
     let body = if htmx.is_htmx {
         SignUp {}.render_html()
@@ -72,8 +68,9 @@ struct SignupFormData {
     privacy_policy: bool,
 }
 
-async fn signup<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: web::Data<AppState<ES, AS, US>>,
+#[post("")]
+async fn signup(
+    app_state: web::Data<AppState>,
     request: HttpRequest,
     form: web::Form<SignupFormData>,
     htmx: Htmx,

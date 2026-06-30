@@ -34,12 +34,7 @@ use crate::{
     },
 };
 
-pub fn configure<ES, AS, US>(cfg: &mut web::ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
+pub fn configure(cfg: &mut web::ServiceConfig) {
     // cfg.route("/add", web::get().to(add_artist_form))
     //     .route("/{artist_id}", web::post().to(add_artist::<ES, AS>));
     // .route("/{artist_id}", web::delete().to(delete_artist::<ES, AS>));

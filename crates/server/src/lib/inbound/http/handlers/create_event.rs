@@ -1,5 +1,5 @@
 use actix_htmx::Htmx;
-use actix_web::{HttpResponse, Responder, web};
+use actix_web::{post, web, HttpResponse, Responder};
 use anyhow::Context as _;
 use itertools::Itertools;
 use serde_qs::web::QsForm;
@@ -19,9 +19,12 @@ use crate::{
             ports::EventService,
         },
         proposal::ProposalSource,
-        user::{models::user::UserId, ports::UserService},
+        user::{
+            models::user::{User, UserId},
+            ports::UserService,
+        },
     },
-    inbound::http::{AppState, user::UserExtractor},
+    inbound::http::AppState,
 };
 
 pub mod confirm_step;
@@ -30,33 +33,21 @@ pub mod details_step;
 pub mod name_step;
 pub mod stages_step;
 
-pub fn configure<ES, AS, US>(cfg: &mut web::ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
+pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope(ui::event::create::name_step::BASE_ROUTE)
-            .configure(name_step::configure::<ES, AS, US>),
+        web::scope(ui::event::create::name_step::BASE_ROUTE).configure(name_step::configure),
+    )
+    .service(web::scope(ui::event::create::days_step::BASE_ROUTE).configure(days_step::configure))
+    .service(
+        web::scope(ui::event::create::details_step::BASE_ROUTE).configure(details_step::configure),
     )
     .service(
-        web::scope(ui::event::create::days_step::BASE_ROUTE)
-            .configure(days_step::configure::<ES, AS, US>),
+        web::scope(ui::event::create::stage_step::BASE_ROUTE).configure(stages_step::configure),
     )
     .service(
-        web::scope(ui::event::create::details_step::BASE_ROUTE)
-            .configure(details_step::configure::<ES, AS, US>),
+        web::scope(ui::event::create::confirm_step::BASE_ROUTE).configure(confirm_step::configure),
     )
-    .service(
-        web::scope(ui::event::create::stage_step::BASE_ROUTE)
-            .configure(stages_step::configure::<ES, AS, US>),
-    )
-    .service(
-        web::scope(ui::event::create::confirm_step::BASE_ROUTE)
-            .configure(confirm_step::configure::<ES, AS, US>),
-    )
-    .route("", web::post().to(create_event::<ES, AS, US>));
+    .service(create_event);
 }
 
 impl TryFrom<EventCreateConfirmStep> for CreateEventRequest {
@@ -106,24 +97,20 @@ impl TryFrom<EventDay> for CreateDayRequest {
     }
 }
 
-async fn create_event<ES, AS, US>(
-    app_state: web::Data<AppState<ES, AS, US>>,
-    user: UserExtractor<ES, AS, US>,
+#[post("")]
+async fn create_event(
+    app_state: web::Data<AppState>,
+    user: User,
     form: QsForm<EventCreateConfirmStep>,
     htmx: Htmx,
-) -> impl Responder
-where
-    ES: EventService,
-    AS: ArtistService,
-    US: UserService,
-{
+) -> impl Responder {
     let req = form
         .into_inner()
         .try_into()
         .expect("Failed to convert form into CreateEventRequest");
     let event = app_state
         .event_service
-        .create_event(&req, user.user.id())
+        .create_event(&req, user.id())
         .await
         .expect("Failed to create event");
 

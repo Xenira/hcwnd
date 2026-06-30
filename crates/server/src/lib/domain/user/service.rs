@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::{
     domain::user::{
         models::user::{
@@ -20,6 +22,7 @@ impl<UR: UserRepository> Service<UR> {
     }
 }
 
+#[async_trait]
 impl<UR: UserRepository> UserService for Service<UR> {
     async fn create_user(&self, req: &CreateUserRequest) -> Result<User, CreateUserError> {
         self.user_repository.create_user(req).await

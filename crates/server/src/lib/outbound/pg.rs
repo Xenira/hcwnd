@@ -2,6 +2,7 @@ use std::{ops::Deref, str::FromStr as _};
 
 use anyhow::Context;
 use api::event::EventListEntry;
+use async_trait::async_trait;
 use chrono::Duration;
 use es_entity::DbOp;
 use itertools::Itertools;
@@ -98,6 +99,7 @@ impl Pg {
     }
 }
 
+#[async_trait]
 impl EventRepository for Pg {
     async fn create_event(
         &self,
@@ -218,6 +220,7 @@ impl EventRepository for Pg {
     }
 }
 
+#[async_trait]
 impl DayRepository for Pg {
     async fn create_day(
         &self,
@@ -286,6 +289,7 @@ impl DayRepository for Pg {
     }
 }
 
+#[async_trait]
 impl StageRepository for Pg {
     async fn create_stage(
         &self,
@@ -320,6 +324,7 @@ impl StageRepository for Pg {
     }
 }
 
+#[async_trait]
 impl ActRepository for Pg {
     async fn create_act(
         &self,
@@ -359,6 +364,7 @@ impl ActRepository for Pg {
     }
 }
 
+#[async_trait]
 impl ArtistRepository for Pg {
     async fn create_artist(
         &self,
@@ -401,6 +407,7 @@ impl ArtistRepository for Pg {
     }
 }
 
+#[async_trait]
 impl UserRepository for Pg {
     async fn create_user(&self, req: &CreateUserRequest) -> Result<User, CreateUserError> {
         let new_user =

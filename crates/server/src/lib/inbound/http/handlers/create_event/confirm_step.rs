@@ -1,6 +1,6 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get,
+    get, post,
     web::{self, ServiceConfig},
     HttpResponse, Responder,
 };
@@ -23,18 +23,17 @@ use ui::{
 use url::Url;
 
 use crate::{
-    domain::{artist::ports::ArtistService, event::ports::EventService, user::ports::UserService},
-    inbound::http::{handlers::index_markup, user::UserExtractor, AppState},
+    domain::{
+        artist::ports::ArtistService,
+        event::ports::EventService,
+        user::{models::user::User, ports::UserService},
+    },
+    inbound::http::{handlers::index_markup, AppState},
 };
 
-pub fn configure<ES, AS, US>(cfg: &mut ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
+pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
-        .route("", web::post().to(confirm_step_form::<ES, AS, US>));
+        .service(confirm_step_form);
 }
 
 /// User should not be able to access this step directly, so we redirect them to the first step of the flow
@@ -48,17 +47,13 @@ async fn redirect_to_name_step() -> impl Responder {
         .finish()
 }
 
-async fn confirm_step_form<ES, AS, US>(
+#[post("")]
+async fn confirm_step_form(
     signer: web::Data<SignedUrlRepo>,
-    user: UserExtractor<ES, AS, US>,
+    user: User,
     form: QsForm<EventCreateConfirmStep>,
     htmx: Htmx,
-) -> impl Responder
-where
-    ES: EventService,
-    AS: ArtistService,
-    US: UserService,
-{
+) -> impl Responder {
     let mut form = form.into_inner();
     let image_url = ImageUrl::new(form.image_url.clone()).with_option(ProcessingOption::Resize(
         ResizingOptionsBuilder::default()
@@ -70,7 +65,7 @@ where
     ));
 
     let image_url = &signer.get(&image_url).expect("Failed to sign image URL");
-    let user = user.user.into();
+    let user = user.into();
 
     form.signed_image_url = image_url.to_string();
 

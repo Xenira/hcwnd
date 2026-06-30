@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::domain::{
     artist::{
         models::artist::{
@@ -29,9 +31,10 @@ where
     }
 }
 
+#[async_trait]
 impl<AR> ArtistService for Service<AR>
 where
-    AR: ArtistRepository,
+    AR: ArtistRepository + Send + Sync,
 {
     async fn create_artist(
         &self,

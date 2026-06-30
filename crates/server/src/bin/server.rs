@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use actix_session::storage::RedisSessionStore;
 use hcwnd::{
     config::Config,
@@ -38,9 +40,9 @@ async fn main() -> anyhow::Result<()> {
 
     info!("Starting HTTP server on port {}", config.server_port);
     HttpServer::run(
-        event_service,
-        artist_service,
-        user_service,
+        Arc::new(event_service),
+        Arc::new(artist_service),
+        Arc::new(user_service),
         redis_session_store,
         signer,
     )

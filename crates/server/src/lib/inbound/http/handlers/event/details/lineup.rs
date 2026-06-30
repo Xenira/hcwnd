@@ -1,5 +1,5 @@
 use actix_htmx::Htmx;
-use actix_web::{web, HttpResponse, Responder, ResponseError};
+use actix_web::{get, web, HttpResponse, Responder, ResponseError};
 use anyhow::Context;
 use itertools::Itertools;
 use thiserror::Error;
@@ -27,13 +27,8 @@ use crate::{
     },
 };
 
-pub fn configure<ES, AS, US>(cfg: &mut web::ServiceConfig)
-where
-    ES: EventService + 'static,
-    AS: ArtistService + 'static,
-    US: UserService + 'static,
-{
-    cfg.route("", web::get().to(get_lineup::<ES, AS, US>));
+pub fn configure(cfg: &mut web::ServiceConfig) {
+    // cfg.service(get_lineup);
 }
 
 #[derive(Error, Debug)]
@@ -52,40 +47,41 @@ impl ResponseError for HandlerError {
     }
 }
 
-async fn get_lineup<ES: EventService, AS: ArtistService, US: UserService>(
-    app_state: web::Data<AppState<ES, AS, US>>,
-    path: web::Path<Uuid>,
-    htmx: Htmx,
-) -> Result<impl Responder, HandlerError> {
-    let event_id = EventId::new(path.into_inner());
-    let event = app_state
-        .event_service
-        .get_event_by_id(&event_id)
-        .await
-        .context("Failed to fetch event")?;
-
-    // let stages = stage_repo.get_stage_names(event_id).await?;
-    // let acts = get_act_cards_for_event(&act_repo, &stages, &image_repo, event_id).await?;
-    let lineup = event_lineup(&event, app_state.artist_service.as_ref())
-        .await
-        .context("Failed to build event lineup")?;
-
-    let event_route = EventRoute::Lineup(lineup);
-    let event = ui::event::EventBuilder::default()
-        .id(event_id.into_inner())
-        .outlet(event_route)
-        .build()
-        .expect("Failed to build event page");
-
-    let body = if htmx.is_htmx {
-        event.render_html()
-    } else {
-        let index_route = IndexRoute::Event(event);
-        index_markup("Lineup", index_route, None).render_html()
-    };
-
-    Ok(HttpResponse::Ok().content_type("text/html").body(body))
-}
+// #[get("")]
+// async fn get_lineup(
+//     app_state: web::Data<AppState>,
+//     path: web::Path<Uuid>,
+//     htmx: Htmx,
+// ) -> Result<impl Responder, HandlerError> {
+//     let event_id = EventId::new(path.into_inner());
+//     let event = app_state
+//         .event_service
+//         .get_event_by_id(&event_id)
+//         .await
+//         .context("Failed to fetch event")?;
+//
+//     // let stages = stage_repo.get_stage_names(event_id).await?;
+//     // let acts = get_act_cards_for_event(&act_repo, &stages, &image_repo, event_id).await?;
+//     let lineup = event_lineup(&event, app_state.artist_service.as_ref())
+//         .await
+//         .context("Failed to build event lineup")?;
+//
+//     let event_route = EventRoute::Lineup(lineup);
+//     let event = ui::event::EventBuilder::default()
+//         .id(event_id.into_inner())
+//         .outlet(event_route)
+//         .build()
+//         .expect("Failed to build event page");
+//
+//     let body = if htmx.is_htmx {
+//         event.render_html()
+//     } else {
+//         let index_route = IndexRoute::Event(event);
+//         index_markup("Lineup", index_route, None).render_html()
+//     };
+//
+//     Ok(HttpResponse::Ok().content_type("text/html").body(body))
+// }
 
 pub async fn event_lineup<AS: ArtistService>(
     event: &Event,

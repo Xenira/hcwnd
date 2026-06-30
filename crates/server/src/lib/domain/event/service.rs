@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::domain::{
     event::{
         models::{
@@ -48,6 +50,7 @@ where
     }
 }
 
+#[async_trait]
 impl<ER, DR, SR, AR> EventService for Service<ER, DR, SR, AR>
 where
     ER: EventRepository,
