@@ -1,7 +1,8 @@
-use maud::{html, Markup};
+use maud::{Markup, html};
 
-use crate::component::{icon, Icons, Style};
+use crate::component::{Icons, Style, icon};
 
+#[must_use]
 pub fn menu_item(
     title: &str,
     menu_icon: Option<Icons>,

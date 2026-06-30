@@ -1,7 +1,6 @@
 use actix_web::{
-    get,
+    HttpResponse, Responder, get,
     web::{self, ServiceConfig},
-    HttpResponse, Responder,
 };
 use mime_guess::from_path;
 use rust_embed::{Embed, RustEmbed};

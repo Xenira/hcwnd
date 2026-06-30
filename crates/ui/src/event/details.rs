@@ -2,7 +2,7 @@ use chrono::NaiveDate;
 use derive_builder::Builder;
 use uuid::Uuid;
 
-use crate::component::{icon, Icons};
+use crate::component::{Icons, icon};
 
 #[derive(Builder, Debug)]
 #[builder(pattern = "owned")]

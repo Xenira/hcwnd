@@ -3,9 +3,9 @@ use async_trait::async_trait;
 use crate::domain::{
     event::{
         models::{
-            act::{Act, ActId, CreateActError, CreateActRequest},
+            act::{Act, CreateActError, CreateActRequest},
             event::{
-                CreateEventError, CreateEventRequest, Event, EventId, EventListItem, GetEventError,
+                CreateEventError, CreateEventRequest, Event, EventId, GetEventError,
                 ListEventsError,
             },
         },
@@ -66,7 +66,7 @@ where
         self.event_repository.create_event(req, author_id).await
     }
 
-    async fn list_events(&self) -> Result<Vec<EventListItem>, ListEventsError> {
+    async fn list_events(&self) -> Result<Vec<Event>, ListEventsError> {
         self.event_repository.list_events().await
     }
 

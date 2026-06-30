@@ -1,20 +1,17 @@
-use std::ops::Deref;
+use std::borrow::Cow;
 
 use actix_identity::IdentityExt;
-use actix_utils::future::Ready;
-use actix_web::{dev::Payload, web, FromRequest, HttpMessage, HttpRequest};
+use actix_utils::future::{Ready, ready};
+use actix_web::{FromRequest, HttpRequest, dev::Payload, web};
+use api::UiState;
 use futures::future::LocalBoxFuture;
 use log::{error, info};
 use uuid::Uuid;
 
 use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::ports::EventService,
-        user::{
-            models::user::{User, UserId},
-            ports::UserService,
-        },
+    domain::user::{
+        models::user::{User, UserId},
+        ports::UserService,
     },
     inbound::http::AppState,
 };
@@ -52,5 +49,46 @@ impl FromRequest for User {
                 })?
                 .ok_or_else(|| actix_web::error::ErrorUnauthorized("User not found"))
         })
+    }
+}
+
+pub struct Locale<'a>(Cow<'a, str>);
+
+impl From<Locale<'_>> for UiState {
+    fn from(locale: Locale) -> Self {
+        UiState {
+            user: None,
+            locale: locale.0.into_owned(),
+        }
+    }
+}
+
+impl From<&Locale<'_>> for UiState {
+    fn from(locale: &Locale) -> Self {
+        UiState {
+            user: None,
+            locale: locale.0.clone().into_owned(),
+        }
+    }
+}
+
+impl FromRequest for Locale<'_> {
+    type Error = actix_web::Error;
+    type Future = Ready<Result<Self, Self::Error>>;
+
+    #[inline]
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        let locale = req
+            .headers()
+            .get("Accept-Language")
+            .and_then(|value| {
+                value
+                    .to_str()
+                    .ok()
+                    .map(|s| s.split(',').next().unwrap_or("en").to_string())
+            })
+            .unwrap_or_else(|| "en".to_string());
+
+        ready(Ok(Locale(Cow::Owned(locale))))
     }
 }

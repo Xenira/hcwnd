@@ -1,7 +1,7 @@
 use derive_builder::Builder;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 
-use crate::component::{icon, Icons};
+use crate::component::{Icons, icon};
 
 pub const DIALOG_CONTENT_ID: &str = "dialog_content";
 

@@ -1,28 +1,17 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get, post,
+    HttpResponse, Responder, get, post,
     web::{self, ServiceConfig},
-    HttpResponse, Responder,
 };
-use log::{debug, info};
+use log::debug;
 use serde_qs::web::QsForm;
-use ui::{
-    event::create::{
-        self,
-        days_step::{day_buttons, EventCreateDaysStep, EventDay},
-        name_step, EventCreate,
-    },
-    index::{IndexRoute, UiComponent as _},
+use ui::event::create::{
+    self,
+    days_step::{EventCreateDaysStep, EventDay, day_buttons},
+    name_step,
 };
 
-use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::ports::EventService,
-        user::{models::user::User, ports::UserService},
-    },
-    inbound::http::handlers::index_markup,
-};
+use crate::domain::user::models::user::User;
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
@@ -49,61 +38,67 @@ async fn redirect_to_name_step() -> impl Responder {
 }
 
 #[post("")]
-async fn days_step_form(_: User, form: QsForm<EventCreateDaysStep>, htmx: Htmx) -> impl Responder {
+async fn days_step_form(
+    user: User,
+    form: QsForm<EventCreateDaysStep>,
+    htmx: Htmx,
+) -> impl Responder {
+    let state = api::UiState::from(&user);
+
     let body = if htmx.is_htmx {
-        form.render_html()
+        ui::event::create::days_step::render(&state, &form.into_inner())
     } else {
-        index_markup(
-            "Create Event",
-            IndexRoute::CreateEvent(EventCreate::DaysStep(form.into_inner())),
-            None,
-        )
-        .render_html()
+        ui::event::create::days_step::full_page(&state, &form.into_inner())
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
 
-async fn add_event_day(_: User, form: QsForm<EventCreateDaysStep>, htmx: Htmx) -> impl Responder {
+async fn add_event_day(
+    user: User,
+    form: QsForm<EventCreateDaysStep>,
+    htmx: Htmx,
+) -> impl Responder {
     debug!("Adding event day, current days: {:?}", form.days);
+    let state = api::UiState::from(&user);
+
     let day = EventDay {
         day: form.days.len(),
         start_time: None,
         end_time: None,
     };
+
     let body = if htmx.is_htmx {
-        day.render_html() + &day_buttons(form.days.len() + 1, true).render_html()
+        ui::event::create::days_step::render_day(&state.locale, &day, Some(form.days.len() + 1))
     } else {
         let mut form = form.into_inner();
         form.days.push(day);
-        index_markup(
-            "Create Event",
-            IndexRoute::CreateEvent(EventCreate::DaysStep(form)),
-            None,
-        )
-        .render_html()
+        ui::event::create::days_step::full_page(&state, &form)
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
 
 async fn remove_event_day(
-    _: User,
+    user: User,
     form: QsForm<EventCreateDaysStep>,
     htmx: Htmx,
 ) -> impl Responder {
+    let state = api::UiState::from(&user);
+
     let body = if htmx.is_htmx {
-        day_buttons(form.days.len() - 1, true).render_html()
+        day_buttons(&state.locale, form.days.len() - 1, true)
     } else {
         let mut form = form.into_inner();
         form.days.pop();
-        index_markup(
-            "Create Event",
-            IndexRoute::CreateEvent(EventCreate::DaysStep(form)),
-            None,
-        )
-        .render_html()
+        ui::event::create::days_step::full_page(&state, &form)
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }

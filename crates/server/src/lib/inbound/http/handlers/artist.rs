@@ -1,39 +1,11 @@
-use actix_web::{
-    get, post,
-    web::{self, Data, ServiceConfig},
-    HttpResponse, Responder, ResponseError,
-};
-use anyhow::Context as _;
-use itertools::Itertools as _;
+use actix_web::{HttpResponse, ResponseError, web::ServiceConfig};
 use serde::Deserialize;
 use thiserror::Error;
-use ui::{
-    act::create::ArtistSearchResults,
-    artist::ArtistCreate,
-    event::{card::EventCard, list::EventListBuilder},
-    index::{Index, IndexBuilder, IndexRoute, UiComponent as _},
-};
-use uuid::Uuid;
 
-use crate::{
-    domain::{
-        artist::{
-            models::artist::{ArtistGenre, ArtistName, CreateArtistRequest},
-            ports::ArtistService,
-        },
-        event::{
-            models::event::{Event, EventListItem},
-            ports::EventService,
-        },
-        user::{models::user::UserId, ports::UserService},
-    },
-    inbound::http::AppState,
-};
-
-pub fn configure(cfg: &mut ServiceConfig) {
-    cfg.service(add_artist_form)
-        .service(search_artist_for_act)
-        .service(add_artist);
+pub fn configure(_cfg: &mut ServiceConfig) {
+    // cfg.service(add_artist_form)
+    //     .service(search_artist_for_act)
+    //     .service(add_artist);
 }
 
 #[derive(Error, Debug)]
@@ -52,12 +24,12 @@ impl ResponseError for HandlerError {
     }
 }
 
-#[get("/add")]
-async fn add_artist_form() -> impl Responder {
-    HttpResponse::Ok()
-        .content_type("text/html")
-        .body(ArtistCreate {}.render_html())
-}
+// #[get("/add")]
+// async fn add_artist_form() -> impl Responder {
+//     HttpResponse::Ok()
+//         .content_type("text/html")
+//         .body(ArtistCreate {}.render_html())
+// }
 
 #[derive(Deserialize)]
 struct CreateArtistForm {
@@ -65,56 +37,56 @@ struct CreateArtistForm {
     genres: String,
 }
 
-#[post("")]
-async fn add_artist(
-    app_state: web::Data<AppState>,
-    form: web::Form<CreateArtistForm>,
-) -> Result<impl Responder, HandlerError> {
-    let author_id = UserId::new(Uuid::new_v4()); // TODO: Get from session
-    let name = ArtistName::try_new(form.name.to_string()).context("Invalid artist name")?;
-    let genres = form
-        .genres
-        .split(',')
-        .map(|s| s.trim().to_string())
-        .map(ArtistGenre::try_new)
-        .try_collect()
-        .context("Invalid genres")?;
-    let req = CreateArtistRequest::new(name, genres);
-
-    let artist = app_state
-        .artist_service
-        .create_artist(&req, &author_id)
-        .await
-        .context("Failed to create artist")?;
-
-    dbg!(artist);
-
-    Ok(HttpResponse::Created())
-}
+// #[post("")]
+// async fn add_artist(
+//     app_state: web::Data<AppState>,
+//     form: web::Form<CreateArtistForm>,
+// ) -> Result<impl Responder, HandlerError> {
+//     let author_id = UserId::new(Uuid::new_v4()); // TODO: Get from session
+//     let name = ArtistName::try_new(form.name.to_string()).context("Invalid artist name")?;
+//     let genres = form
+//         .genres
+//         .split(',')
+//         .map(|s| s.trim().to_string())
+//         .map(ArtistGenre::try_new)
+//         .try_collect()
+//         .context("Invalid genres")?;
+//     let req = CreateArtistRequest::new(name, genres);
+//
+//     let artist = app_state
+//         .artist_service
+//         .create_artist(&req, &author_id)
+//         .await
+//         .context("Failed to create artist")?;
+//
+//     dbg!(artist);
+//
+//     Ok(HttpResponse::Created())
+// }
 
 #[derive(Deserialize)]
 struct SearchArtistQuery {
     name: String,
 }
 
-#[get("/act")]
-async fn search_artist_for_act(
-    app_state: web::Data<AppState>,
-    query: web::Query<SearchArtistQuery>,
-) -> Result<impl Responder, HandlerError> {
-    let artists = app_state
-        .artist_service
-        .artists_by_act(&query.name)
-        .await
-        .context("Failed to search artists")?;
-
-    let res = ArtistSearchResults {
-        artists: artists
-            .into_iter()
-            .map(|a| (a.id().clone().into_inner(), a.name().clone().into_inner()))
-            .collect_vec(),
-    }
-    .render_html();
-
-    Ok(HttpResponse::Ok().content_type("text/html").body(res))
-}
+// #[get("/act")]
+// async fn search_artist_for_act(
+//     app_state: web::Data<AppState>,
+//     query: web::Query<SearchArtistQuery>,
+// ) -> Result<impl Responder, HandlerError> {
+//     let artists = app_state
+//         .artist_service
+//         .artists_by_act(&query.name)
+//         .await
+//         .context("Failed to search artists")?;
+//
+//     let res = ArtistSearchResults {
+//         artists: artists
+//             .into_iter()
+//             .map(|a| (a.id().clone().into_inner(), a.name().clone().into_inner()))
+//             .collect_vec(),
+//     }
+//     .render_html();
+//
+//     Ok(HttpResponse::Ok().content_type("text/html").body(res))
+// }

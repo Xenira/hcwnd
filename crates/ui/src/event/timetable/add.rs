@@ -1,9 +1,9 @@
-use chrono::{NaiveDate, NaiveDateTime};
+use chrono::NaiveDateTime;
 use derive_builder::Builder;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use uuid::Uuid;
 
-use crate::{act::card::ActCard, component::dialog};
+use crate::act::card::ActCard;
 
 pub const SEARCH_RESULTS_ID: &str = "search_results";
 pub const ADD_ACT_DIALOG_ID: &str = "add_act_dialog";

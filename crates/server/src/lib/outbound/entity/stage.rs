@@ -1,15 +1,13 @@
 use std::collections::HashMap;
 
-use api::stage::StageDetails;
 use derive_builder::Builder;
 use es_entity::{
-    es_query, EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents,
-    TryFromEvents,
+    EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents, TryFromEvents,
+    es_query,
 };
 use log::info;
 use serde::{Deserialize, Serialize};
 use sqlx::query;
-use ui::event::timetable::StageSearchResult;
 use uuid::Uuid;
 
 use crate::domain::event::models::stage::{

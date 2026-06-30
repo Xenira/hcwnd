@@ -5,8 +5,6 @@ use nutype::nutype;
 use thiserror::Error;
 use uuid::Uuid;
 
-use crate::domain::event::models::event::EventId;
-
 #[derive(Clone, Debug)]
 pub struct Day {
     id: DayId,

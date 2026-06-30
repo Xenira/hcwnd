@@ -39,6 +39,7 @@ impl Render for Event {
 }
 
 impl Event {
+    #[must_use]
     pub fn nav_bar(&self) -> Markup {
         let details_url = format!("/event/{}", self.id);
         let details_active = matches!(self.outlet, EventRoute::Details(_));

@@ -9,18 +9,13 @@ use es_entity::{
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Uuid;
-use ui::event::{card::EventCard, details::EventDetails};
-use url::Url;
+use ui::event::details::EventDetails;
 
 use crate::{
     domain::{
-        event::models::event::{
-            CreateEventRequest, EventDescription, EventId as DomainEventId, EventListItem,
-            EventName, ImageUrl,
-        },
-        user::models::user::UserId as DomainUserId,
+        event::models::event::CreateEventRequest, user::models::user::UserId as DomainUserId,
     },
-    outbound::entity::{day::DayId, user::UserId},
+    outbound::entity::user::UserId,
 };
 
 es_entity::entity_id! { EventId }
@@ -186,8 +181,8 @@ impl TryFromEvents<EventEvent> for Event {
                     start_date,
                     website_url,
                     image_url,
-                    source,
-                    source_url,
+                    source: _,
+                    source_url: _,
                     user_id: _,
                 } => {
                     builder = builder
@@ -216,10 +211,16 @@ impl TryFromEvents<EventEvent> for Event {
                 EventEvent::EventApproved { .. } | EventEvent::EventAutoApproved => {
                     builder = builder.state(EventState::Live);
                 }
-                EventEvent::EventRejected { reason, user_id } => {
+                EventEvent::EventRejected {
+                    reason: _,
+                    user_id: _,
+                } => {
                     builder = builder.state(EventState::Rejected);
                 }
-                EventEvent::EventDeleted { reason, user_id } => {
+                EventEvent::EventDeleted {
+                    reason: _,
+                    user_id: _,
+                } => {
                     builder = builder.state(EventState::Deleted);
                 }
                 EventEvent::EditProposal {
@@ -251,8 +252,8 @@ impl TryFromEvents<EventEvent> for Event {
                 EventEvent::EditVoted {
                     id,
                     power,
-                    comment,
-                    user_id,
+                    comment: _,
+                    user_id: _,
                 } => {
                     if let Some(proposal) = edit_proposals.get_mut(id) {
                         proposal.score += *power;
@@ -281,8 +282,8 @@ impl TryFromEvents<EventEvent> for Event {
                 }
                 EventEvent::EditRejected {
                     id,
-                    reason,
-                    user_id,
+                    reason: _,
+                    user_id: _,
                 } => {
                     edit_proposals.shift_remove(id);
                 }

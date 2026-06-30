@@ -1,35 +1,17 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get, post,
+    HttpResponse, Responder, get, post,
     web::{self, ServiceConfig},
-    HttpResponse, Responder,
 };
-use imgproxy::{
-    ImageUrl, ProcessingOption, ResizeMode, ResizingOptions, ResizingOptionsBuilder, SignedUrlRepo,
-};
-use log::{debug, info};
+use imgproxy::{ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder, SignedUrlRepo};
 use serde_qs::web::QsForm;
-use ui::{
-    event::create::{
-        self,
-        confirm_step::EventCreateConfirmStep,
-        days_step::{day_buttons, EventCreateDaysStep, EventDay},
-        name_step,
-        stage_step::EventCreateStageStep,
-        EventCreate,
-    },
-    index::{IndexRoute, UiComponent as _},
+use ui::event::create::{
+    self,
+    confirm_step::{self, EventCreateConfirmStep},
+    name_step,
 };
-use url::Url;
 
-use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::ports::EventService,
-        user::{models::user::User, ports::UserService},
-    },
-    inbound::http::{handlers::index_markup, AppState},
-};
+use crate::domain::user::models::user::User;
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
@@ -54,6 +36,7 @@ async fn confirm_step_form(
     form: QsForm<EventCreateConfirmStep>,
     htmx: Htmx,
 ) -> impl Responder {
+    let state = api::UiState::from(&user);
     let mut form = form.into_inner();
     let image_url = ImageUrl::new(form.image_url.clone()).with_option(ProcessingOption::Resize(
         ResizingOptionsBuilder::default()
@@ -65,20 +48,16 @@ async fn confirm_step_form(
     ));
 
     let image_url = &signer.get(&image_url).expect("Failed to sign image URL");
-    let user = user.into();
 
     form.signed_image_url = image_url.to_string();
 
     let body = if htmx.is_htmx {
-        form.render(user).into_string()
+        confirm_step::render(&state, &form)
     } else {
-        index_markup(
-            "Stages - Create Event",
-            IndexRoute::CreateEvent(EventCreate::ConfirmStep(form, user)),
-            None,
-        )
-        .render_html()
+        confirm_step::full_page(&state, &form)
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
