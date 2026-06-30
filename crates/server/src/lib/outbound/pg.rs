@@ -1,15 +1,15 @@
-use std::{ops::Deref, str::FromStr as _};
+use std::str::FromStr as _;
 
 use anyhow::Context;
-use api::event::EventListEntry;
 use async_trait::async_trait;
-use chrono::Duration;
 use es_entity::DbOp;
+use futures::future::try_join_all;
 use itertools::Itertools;
 use itertools::Itertools as _;
 use log::info;
-use sqlx::{postgres::PgConnectOptions, PgPool};
-use uuid::Uuid;
+use rayon::iter::ParallelIterator as _;
+use sqlx::{PgPool, postgres::PgConnectOptions};
+use url::Url;
 
 use crate::{
     domain::{
@@ -26,8 +26,8 @@ use crate::{
                 day::{CreateDayError, CreateDayRequest, Day, DayId, GetDayError, ListDaysError},
                 event::{
                     CreateEventError, CreateEventRequest, Event, EventActs, EventDays,
-                    EventDescription, EventId, EventListItem, EventName, EventStages,
-                    GetEventError, ImageUrl, ListEventsError,
+                    EventDescription, EventId, EventName, EventStages, GetEventError, ImageUrl,
+                    ListEventsError, WebsiteUrl,
                 },
                 stage::{
                     CreateStageError, CreateStageRequest, GetStageError, ListStagesError, Stage,
@@ -49,7 +49,7 @@ use crate::{
         artist::NewArtist,
         day::NewDay,
         event::NewEvent,
-        stage::{NewStage, NewStageBuilder},
+        stage::NewStageBuilder,
         user::{NewUser, UserFindError},
     },
 };
@@ -92,7 +92,7 @@ impl Pg {
         })
     }
 
-    async fn start_transaction(&self) -> anyhow::Result<DbOp> {
+    async fn start_transaction(&self) -> anyhow::Result<DbOp<'_>> {
         DbOp::init(&self.pool)
             .await
             .context("Failed to start transaction")
@@ -145,43 +145,23 @@ impl EventRepository for Pg {
         Ok(event_id)
     }
 
-    async fn list_events(&self) -> Result<Vec<EventListItem>, ListEventsError> {
+    async fn list_events(&self) -> Result<Vec<Event>, ListEventsError> {
         let events = self
             .event_repo
             .future_events()
             .await
             .context("Failed to list future events from db")?;
 
-        let mut result = Vec::with_capacity(events.len());
-        for event in &events {
-            let start_date = event.start_date;
-            let event_id = EventId::new(event.id.into());
-            let first_day = self
-                .get_first_day(&event_id)
-                .await
-                .context("Failed to get first day for event")?;
-            let last_day = self
-                .get_last_day(&event_id)
-                .await
-                .context("Failed to get last day for event")?;
+        let events = try_join_all(
+            events
+                .into_iter()
+                .map(|event| EventId::new(event.id.into()))
+                .map(|event| async move { self.get_event_by_id(&event).await }),
+        )
+        .await
+        .context("Failed to fetch events from db")?;
 
-            result.push(EventListItem::new(
-                EventId::new(event.id.into()),
-                EventName::try_new(event.name.clone()).context("Invalid event name")?,
-                EventDescription::try_new(event.description.clone())
-                    .context("Invalid event description")?,
-                ImageUrl::try_new(
-                    url::Url::parse(&event.image_url).context("Invalid event image URL")?,
-                )
-                .context("Invalid event image URL")?,
-                start_date,
-                first_day.start_time(),
-                start_date + Duration::days(last_day.day_number() as i64),
-                last_day.end_time(),
-            ));
-        }
-
-        Ok(result)
+        Ok(events)
     }
 
     async fn get_event_by_id(&self, event_id: &EventId) -> Result<Event, GetEventError> {
@@ -196,7 +176,7 @@ impl EventRepository for Pg {
 
         let event: entity::event::Event = self
             .event_repo
-            .find_by_id(&event_id.as_ref().clone().into())
+            .find_by_id(&(*event_id.as_ref()).into())
             .await
             // TODO: Convert to not found error if the event doesn't exist
             .context("Failed to fetch events from db")?
@@ -207,11 +187,21 @@ impl EventRepository for Pg {
         let event_name = EventName::try_new(event.name).context("Invalid event name")?;
         let event_description =
             EventDescription::try_new(event.description).context("Invalid event description")?;
+        let event_website_url = WebsiteUrl::try_new(
+            Url::parse(event.website_url.as_str()).context("Invalid event website URL")?,
+        )
+        .context("Invalid event website URL")?;
+        let event_image_url = ImageUrl::try_new(
+            Url::parse(event.image_url.as_str()).context("Invalid event image URL")?,
+        )
+        .context("Invalid event image URL")?;
 
         Ok(Event::new(
             event_id,
             event_name,
             event_description,
+            event_website_url,
+            event_image_url,
             stages,
             acts,
             event.start_date,
@@ -243,7 +233,7 @@ impl DayRepository for Pg {
     async fn list_days(&self, event_id: &EventId) -> Result<Vec<Day>, ListDaysError> {
         let days = self
             .day_repo
-            .days_for_event(event_id.as_ref().clone().into())
+            .days_for_event((*event_id.as_ref()).into())
             .await
             .context("Failed to list days for event")?;
 
@@ -257,7 +247,7 @@ impl DayRepository for Pg {
     async fn get_day_by_id(&self, day_id: &DayId) -> Result<Day, GetDayError> {
         let day = self
             .day_repo
-            .find_by_id(&day_id.as_ref().clone().into())
+            .find_by_id(&(*day_id.as_ref()).into())
             .await
             .context("Failed to get day by ID")?;
 
@@ -267,7 +257,7 @@ impl DayRepository for Pg {
     async fn get_first_day(&self, event_id: &EventId) -> Result<Day, GetDayError> {
         let day = self
             .day_repo
-            .get_first_day(&event_id.as_ref().clone().into())
+            .get_first_day(&(*event_id.as_ref()).into())
             .await
             .transpose()
             .ok_or(GetDayError::DayNotFound)?
@@ -279,7 +269,7 @@ impl DayRepository for Pg {
     async fn get_last_day(&self, event_id: &EventId) -> Result<Day, GetDayError> {
         let day = self
             .day_repo
-            .get_last_day(&event_id.as_ref().clone().into())
+            .get_last_day(&(*event_id.as_ref()).into())
             .await
             .transpose()
             .ok_or(GetDayError::DayNotFound)?
@@ -293,8 +283,8 @@ impl DayRepository for Pg {
 impl StageRepository for Pg {
     async fn create_stage(
         &self,
-        stage: &CreateStageRequest,
-        author_id: &UserId,
+        _stage: &CreateStageRequest,
+        _author_id: &UserId,
     ) -> Result<Stage, CreateStageError> {
         // let new_stage = NewStage::f
         unimplemented!()
@@ -423,7 +413,7 @@ impl UserRepository for Pg {
 
     async fn find_user_by_username(
         &self,
-        username: &UserName,
+        _username: &UserName,
     ) -> Result<Option<User>, FindUserError> {
         todo!()
     }

@@ -1,6 +1,5 @@
 use derive_builder::Builder;
-use itertools::Itertools as _;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use uuid::Uuid;
 
 use crate::act::{

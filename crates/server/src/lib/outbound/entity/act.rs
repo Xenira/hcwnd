@@ -1,11 +1,10 @@
-use api::act::ActDetails;
 use chrono::NaiveDateTime;
 use derive_builder::Builder;
 use es_entity::{
-    es_query, idempotency_guard, EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo,
-    Idempotent, IntoEvents, TryFromEvents,
+    EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, Idempotent, IntoEvents,
+    TryFromEvents, es_query, idempotency_guard,
 };
-use indexmap::{IndexMap, IndexSet};
+use indexmap::IndexSet;
 use itertools::Itertools as _;
 use serde::{Deserialize, Serialize};
 use url::Url;

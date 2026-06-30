@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use serde::{de::IntoDeserializer as _, Deserialize as _};
+use serde::{Deserialize as _, de::IntoDeserializer as _};
 
 /// Deserialize a string as an Option<T>, treating empty strings as None.
 ///

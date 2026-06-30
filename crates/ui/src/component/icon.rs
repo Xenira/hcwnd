@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use maud::{html, Markup};
+use maud::{Markup, html};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
@@ -85,6 +85,7 @@ impl Display for Style {
     }
 }
 
+#[must_use]
 pub fn icon(icon: &Icons, icon_style: Option<Style>) -> Markup {
     html! {
         i .(icon) .(icon_style.unwrap_or_default()) {}

@@ -1,31 +1,19 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get, post,
+    HttpResponse, Responder, get, post,
     web::{self, ServiceConfig},
-    HttpResponse, Responder,
 };
-use log::{debug, info};
+use log::debug;
 use serde_qs::web::QsForm;
 use ui::{
     event::create::{
-        self,
-        days_step::{day_buttons, EventCreateDaysStep, EventDay},
-        name_step,
+        self, name_step,
         stage_step::{EventCreateStageStep, EventStage},
-        EventCreate,
     },
-    index::{IndexRoute, UiComponent as _},
     util::SwitchValue,
 };
 
-use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::ports::EventService,
-        user::{models::user::User, ports::UserService},
-    },
-    inbound::http::handlers::index_markup,
-};
+use crate::domain::user::models::user::User;
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
@@ -56,33 +44,34 @@ async fn redirect_to_name_step() -> impl Responder {
 
 #[post("")]
 async fn stages_step_form(
-    _: User,
+    user: User,
     form: QsForm<EventCreateStageStep>,
     htmx: Htmx,
 ) -> impl Responder {
+    let state = api::UiState::from(&user);
+
     let mut form = form.into_inner();
     form.populate_stages();
 
     let body = if htmx.is_htmx {
-        form.render_html()
+        ui::event::create::stage_step::render(&state, &form)
     } else {
-        index_markup(
-            "Stages - Create Event",
-            IndexRoute::CreateEvent(EventCreate::StagesStep(form)),
-            None,
-        )
-        .render_html()
+        ui::event::create::stage_step::full_page(&state, &form)
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
 
 async fn add_event_stage(
-    _: User,
+    user: User,
     form: QsForm<EventCreateStageStep>,
     htmx: Htmx,
 ) -> impl Responder {
     debug!("Adding stage to event {form:?}");
+    let state = api::UiState::from(&user);
+
     let stage = EventStage {
         name: String::new(),
         days: form
@@ -93,26 +82,26 @@ async fn add_event_stage(
             .collect(),
     };
     let body = if htmx.is_htmx {
-        stage.render(form.stages.len()).into_string()
+        ui::event::create::stage_step::render_stage(&state.locale, &stage, form.stages.len())
     } else {
         let mut form = form.into_inner();
         form.stages.push(stage);
-        index_markup(
-            "Create Event",
-            IndexRoute::CreateEvent(EventCreate::StagesStep(form)),
-            None,
-        )
-        .render_html()
+        ui::event::create::stage_step::full_page(&state, &form)
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
+
 async fn remove_event_stage(
-    _: User,
+    user: User,
     form: QsForm<EventCreateStageStep>,
     index: web::Path<usize>,
     htmx: Htmx,
 ) -> impl Responder {
+    let state = api::UiState::from(&user);
+
     if form.stages.len() <= 1 {
         return HttpResponse::BadRequest()
             .content_type("text/html")
@@ -124,13 +113,11 @@ async fn remove_event_stage(
     } else {
         let mut form = form.into_inner();
         form.stages.remove(*index);
-        let body = index_markup(
-            "Create Event",
-            IndexRoute::CreateEvent(EventCreate::StagesStep(form)),
-            None,
-        )
-        .render_html();
 
-        HttpResponse::Ok().content_type("text/html").body(body)
+        let body = ui::event::create::stage_step::full_page(&state, &form);
+
+        HttpResponse::Ok()
+            .content_type("text/html")
+            .body(body.into_string())
     }
 }

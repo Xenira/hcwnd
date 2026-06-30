@@ -1,4 +1,4 @@
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use uuid::Uuid;
 
 use crate::{component::dialog, event::EVENT_CONTENT_CONTAINER_ID};

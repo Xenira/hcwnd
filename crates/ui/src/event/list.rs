@@ -1,26 +1,29 @@
-use derive_builder::Builder;
-use maud::{html, Markup, Render};
+use api::{UiState, event::Event, user::User};
+use maud::{Markup, Render, html};
+use uuid::Uuid;
 
-use crate::event::card::{EventCard, EventSuggestionCard};
+use crate::{
+    event::{self, card::EventSuggestionCard},
+    index,
+};
 
-pub enum EventListRoute {
-    List(EventList),
+#[must_use]
+pub fn full_page(state: &UiState, events: &[Event]) -> Markup {
+    index::full_page(
+        state,
+        t!("app.title.home", locale = &state.locale),
+        render(state, events, 1, false),
+    )
 }
 
-#[derive(Builder, Debug)]
-#[builder(pattern = "owned")]
-pub struct EventList {
-    pub events: Vec<EventCard>,
-    pub page: usize,
-    pub has_more: bool,
-}
-
-impl Render for EventList {
-    fn render(&self) -> Markup {
-        let preview = EventSuggestionCard {
+#[must_use]
+pub fn render(state: &UiState, events: &[Event], page: usize, has_more: bool) -> Markup {
+    let preview = EventSuggestionCard {
             editable: true,
-            suggested_by: crate::user::User {
-                username: "hardcore".to_string(),
+            suggested_by: User {
+                id: Uuid::nil(),
+                name: "hardcore".to_string(),
+                score: 0,
             },
             title: "Preview Event".to_string(),
             description: "This is a preview of an event that you can create.".to_string(),
@@ -32,41 +35,39 @@ impl Render for EventList {
             upvotes: 3,
             downvotes: 1,
         };
-        html! {
-            form {
-                fieldset role="search" {
-                    input type="search" name="query" placeholder="Search events...";
-                    input type="submit" value="Search";
-                }
-                @if self.events.is_empty() {
-                    p {
-                        h2 { "No events found" }
-                        a role="button" href="/create-event/name" hx-target="#main" hx-push-url="true" hx-boost="true" { "Create an event" }
-                    }
+
+    html! {
+        form {
+            fieldset role="search" {
+                input type="search" name="query" placeholder=(t!("event.list.search.placeholder", locale = &state.locale));
+                input type="submit" value=(t!("event.list.search.submit", locale = &state.locale));
+            }
+            @if events.is_empty() {
+                p {
+                    h2 { (t!("event.list.empty", locale = &state.locale)) }
+                    a role="button" href="/create-event/name" hx-target="#main" hx-push-url="true" hx-boost="true" { (t!("event.list.empty.create", locale = &state.locale)) }
                 }
             }
-
-            (preview)
-
-            @for event in &self.events {
-                (event)
-            }
-
-            (self.pagination())
         }
+
+        (preview)
+
+        @for event in events {
+            (event::card::render(state, event))
+        }
+
+        (pagination(page, has_more))
     }
 }
 
-impl EventList {
-    fn pagination(&self) -> Markup {
-        if self.has_more {
-            let next_page = self.page + 1;
-            let url = format!("/events?page={}", next_page);
-            html! {
-                a hx-get=(url) hx-target="#main" { "Load more" }
-            }
-        } else {
-            html! {}
+fn pagination(page: usize, has_more: bool) -> Markup {
+    if has_more {
+        let next_page = page + 1;
+        let url = format!("/events?page={next_page}");
+        html! {
+            a hx-get=(url) hx-target="#main" { "Load more" }
         }
+    } else {
+        html! {}
     }
 }

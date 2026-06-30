@@ -11,7 +11,6 @@ use crate::domain::{
         stage::{ListStagesError, Stage},
     },
     proposal::{ProposalSource, ProposalSourceUrl},
-    user::models::user::UserId,
 };
 
 #[derive(Clone, Debug)]
@@ -19,6 +18,8 @@ pub struct Event {
     id: EventId,
     name: EventName,
     description: EventDescription,
+    website_url: WebsiteUrl,
+    image_url: ImageUrl,
     stages: EventStages,
     acts: EventActs,
     start_date: NaiveDate,
@@ -30,6 +31,8 @@ impl Event {
         id: EventId,
         name: EventName,
         description: EventDescription,
+        website_url: WebsiteUrl,
+        image_url: ImageUrl,
         stages: EventStages,
         acts: EventActs,
         start_date: NaiveDate,
@@ -39,6 +42,8 @@ impl Event {
             id,
             name,
             description,
+            website_url,
+            image_url,
             stages,
             acts,
             start_date,
@@ -56,6 +61,14 @@ impl Event {
 
     pub fn description(&self) -> &EventDescription {
         &self.description
+    }
+
+    pub fn website_url(&self) -> &WebsiteUrl {
+        &self.website_url
+    }
+
+    pub fn image_url(&self) -> &ImageUrl {
+        &self.image_url
     }
 
     pub fn stages(&self) -> &EventStages {

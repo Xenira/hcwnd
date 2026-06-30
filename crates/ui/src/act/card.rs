@@ -1,8 +1,8 @@
 use derive_builder::Builder;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use uuid::Uuid;
 
-use crate::component::{icon, Icons};
+use crate::component::{Icons, icon};
 
 #[derive(Builder, Debug)]
 #[builder(pattern = "owned")]

@@ -1,14 +1,11 @@
 use async_trait::async_trait;
 
-use crate::{
-    domain::user::{
-        models::user::{
-            AuthenticateUserError, AuthenticateUserRequest, ConfirmEmailError, CreateUserError,
-            CreateUserRequest, FindUserError, User, UserId, UserName,
-        },
-        ports::{UserRepository, UserService},
+use crate::domain::user::{
+    models::user::{
+        AuthenticateUserError, AuthenticateUserRequest, ConfirmEmailError, CreateUserError,
+        CreateUserRequest, FindUserError, User, UserId, UserName,
     },
-    outbound::entity::user::UserFindError,
+    ports::{UserRepository, UserService},
 };
 
 #[derive(Debug, Clone)]
@@ -34,11 +31,11 @@ impl<UR: UserRepository> UserService for Service<UR> {
     ) -> Result<User, AuthenticateUserError> {
         let user = self
             .user_repository
-            .find_user_by_email(&req.email())
+            .find_user_by_email(req.email())
             .await
             .map_err(|e| match e {
                 FindUserError::UserNotFound => AuthenticateUserError::InvalidCredentials,
-                FindUserError::Unknown(e) => AuthenticateUserError::Unknown(e.into()),
+                FindUserError::Unknown(e) => AuthenticateUserError::Unknown(e),
             })?
             .ok_or(AuthenticateUserError::InvalidCredentials)?;
 
@@ -50,10 +47,12 @@ impl<UR: UserRepository> UserService for Service<UR> {
 
     async fn confirm_email(
         &self,
-        name: &UserName,
-        token: uuid::Uuid,
+        _name: &UserName,
+        _token: uuid::Uuid,
     ) -> Result<(), ConfirmEmailError> {
-        todo!("Implement email confirmation logic, verifying the provided token and updating the user's validation status.")
+        todo!(
+            "Implement email confirmation logic, verifying the provided token and updating the user's validation status."
+        )
     }
 
     async fn get_user(&self, id: &UserId) -> Result<Option<User>, FindUserError> {

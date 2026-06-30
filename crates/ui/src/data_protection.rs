@@ -1,10 +1,11 @@
-use maud::{html, Markup};
+use maud::{Markup, html};
 
 const NAME: &str = "HCWND";
 const LAST_UPDATED: &str = "2026-03-22";
 const WEBSITE: &str = "https://hardcore-will-never.diy";
 const CONTACT_EMAIL: &str = "privacy@hardcore-will-never.diy";
 
+#[must_use]
 pub fn data_protection() -> Markup {
     html! {
         h1 { "Privacy Policy for " (NAME) }

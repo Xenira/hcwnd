@@ -5,8 +5,7 @@ use crate::domain::{
         act::{Act, ActId, CreateActError, CreateActRequest, GetActError, ListActsError},
         day::{CreateDayError, CreateDayRequest, Day, DayId, GetDayError, ListDaysError},
         event::{
-            CreateEventError, CreateEventRequest, Event, EventId, EventListItem, GetEventError,
-            ListEventsError,
+            CreateEventError, CreateEventRequest, Event, EventId, GetEventError, ListEventsError,
         },
         stage::{
             CreateStageError, CreateStageRequest, GetStageError, ListStagesError, Stage, StageId,
@@ -23,7 +22,7 @@ pub trait EventService: Sync + Send + 'static {
         author_id: &UserId,
     ) -> Result<EventId, CreateEventError>;
 
-    async fn list_events(&self) -> Result<Vec<EventListItem>, ListEventsError>;
+    async fn list_events(&self) -> Result<Vec<Event>, ListEventsError>;
 
     async fn get_event_by_id(&self, id: &EventId) -> Result<Event, GetEventError>;
 
@@ -43,7 +42,7 @@ pub trait EventRepository: Clone + Sync + Send + 'static {
         author_id: &UserId,
     ) -> Result<EventId, CreateEventError>;
 
-    async fn list_events(&self) -> Result<Vec<EventListItem>, ListEventsError>;
+    async fn list_events(&self) -> Result<Vec<Event>, ListEventsError>;
 
     async fn get_event_by_id(&self, id: &EventId) -> Result<Event, GetEventError>;
 }

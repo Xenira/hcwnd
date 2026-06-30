@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine as _};
+use base64::{Engine as _, prelude::BASE64_URL_SAFE_NO_PAD};
 use derive_builder::Builder;
 use hmac::{Hmac, KeyInit as _, Mac as _};
 use itertools::Itertools as _;
@@ -435,7 +435,7 @@ impl FormatProcessingOption for ResizeMode {
         match self {
             ResizeMode::Fit => "fit",
             ResizeMode::Fill => "fill",
-            ResizeMode::FillDown => "fill_down",
+            ResizeMode::FillDown => "fill-down",
             ResizeMode::Force => "force",
             ResizeMode::Auto => "auto",
         }
@@ -499,7 +499,7 @@ impl FormatProcessingOption for GravityOptions {
     fn options(&self) -> String {
         format!(
             "{}:{}:{}",
-            self.gravity.to_string(),
+            self.gravity,
             self.x_offset.map(|x| x.to_string()).unwrap_or_default(),
             self.y_offset.map(|y| y.to_string()).unwrap_or_default()
         )
@@ -769,6 +769,7 @@ impl Display for WatermarkPosition {
     }
 }
 
+#[derive(Clone)]
 pub struct SignedUrlRepo {
     salt: String,
     secret_key: String,

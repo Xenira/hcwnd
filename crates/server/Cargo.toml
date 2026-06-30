@@ -19,7 +19,7 @@ actix-session = { version = "0.11.0", features = ["redis-pool", "redis-session"]
 actix-utils = "3.0.1"
 actix-web = "4.13.0"
 actix-web-helmet = "1.0.0"
-api = { path = "../api" }
+api = { workspace = true }
 chrono = { workspace = true }
 deadpool-redis = "0.22.1"
 derive_builder = { workspace = true }
@@ -48,6 +48,7 @@ mime_guess = "2.0.5"
 serde_qs = { version = "1.1.2", features = ["actix4"] }
 regex = "1.12.4"
 async-trait = "0.1.89"
+rayon = "1.12.0"
 
 [build-dependencies]
 grass = "0.13.4"

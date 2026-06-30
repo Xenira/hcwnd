@@ -1,28 +1,13 @@
 use actix_htmx::Htmx;
-use actix_web::{
-    get, post,
-    web::{self, ServiceConfig},
-    HttpResponse, Responder,
-};
+use actix_web::{HttpResponse, Responder, get, post, web::ServiceConfig};
 use serde_qs::web::QsForm;
-use ui::{
-    event::create::{
-        self,
-        details_step::EventCreateDetailsStep,
-        name_step::{self, EventCreateNameStep, EventCreateNameStepData},
-        EventCreate,
-    },
-    index::{IndexRoute, UiComponent as _},
+use ui::event::create::{
+    self,
+    details_step::EventCreateDetailsStep,
+    name_step::{self},
 };
 
-use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::ports::EventService,
-        user::{models::user::User, ports::UserService},
-    },
-    inbound::http::handlers::index_markup,
-};
+use crate::domain::user::models::user::User;
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
@@ -42,20 +27,18 @@ async fn redirect_to_name_step() -> impl Responder {
 
 #[post("")]
 async fn details_step_form(
-    _: User,
+    user: User,
     htmx: Htmx,
     form: QsForm<EventCreateDetailsStep>,
 ) -> impl Responder {
+    let state = api::UiState::from(&user);
     let body = if htmx.is_htmx {
-        form.render_html()
+        ui::event::create::details_step::render(&state, &form.into_inner())
     } else {
-        index_markup(
-            "Create Event",
-            IndexRoute::CreateEvent(EventCreate::DetailsStep(form.into_inner())),
-            None,
-        )
-        .render_html()
+        ui::event::create::details_step::full_page(&state, &form.into_inner())
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }

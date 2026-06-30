@@ -1,6 +1,5 @@
 use nutype::nutype;
 use thiserror::Error;
-use url::Url;
 use uuid::Uuid;
 
 #[derive(Clone, Debug)]

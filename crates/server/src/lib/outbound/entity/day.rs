@@ -1,4 +1,3 @@
-use api::day::EventDay;
 use chrono::{Duration, NaiveDateTime, NaiveTime};
 use derive_builder::Builder;
 use es_entity::{
@@ -11,10 +10,8 @@ use uuid::Uuid;
 
 use crate::{
     domain::{
-        self,
         event::models::{
-            day::{CreateDayRequest, Day as DomainDay, DayId as DomainDayId, DayRangeError},
-            event::CreateEventRequest,
+            day::{CreateDayRequest, Day as DomainDay, DayId as DomainDayId},
             event::EventId as DomainEventId,
         },
         user::models::user::UserId as DomainUserId,
@@ -195,10 +192,16 @@ impl TryFromEvents<DayEvent> for Day {
                 DayEvent::DayApproved { .. } | DayEvent::DayAutoApproved => {
                     builder = builder.state(DayState::Live);
                 }
-                DayEvent::DayRejected { reason, user_id } => {
+                DayEvent::DayRejected {
+                    reason: _,
+                    user_id: _,
+                } => {
                     builder = builder.state(DayState::Rejected);
                 }
-                DayEvent::DayDeleted { reason, user_id } => {
+                DayEvent::DayDeleted {
+                    reason: _,
+                    user_id: _,
+                } => {
                     builder = builder.state(DayState::Deleted);
                 }
                 DayEvent::EditProposal {
@@ -222,8 +225,8 @@ impl TryFromEvents<DayEvent> for Day {
                 DayEvent::EditVoted {
                     id,
                     power,
-                    comment,
-                    user_id,
+                    comment: _,
+                    user_id: _,
                 } => {
                     if let Some(proposal) = edit_proposals.get_mut(id) {
                         proposal.score += *power;
@@ -243,8 +246,8 @@ impl TryFromEvents<DayEvent> for Day {
                 }
                 DayEvent::EditRejected {
                     id,
-                    reason,
-                    user_id,
+                    reason: _,
+                    user_id: _,
                 } => {
                     edit_proposals.shift_remove(id);
                 }

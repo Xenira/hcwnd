@@ -1,33 +1,14 @@
-use actix_htmx::Htmx;
-use actix_web::{get, web, HttpResponse, Responder, ResponseError};
+use actix_web::{HttpResponse, ResponseError, web};
 use anyhow::Context;
-use itertools::Itertools;
 use thiserror::Error;
-use ui::{
-    event::{
-        lineup::{EventLineup, EventLineupBuilder},
-        EventRoute,
-    },
-    index::{IndexRoute, UiComponent as _},
-};
-use uuid::Uuid;
+use ui::event::lineup::{EventLineup, EventLineupBuilder};
 
 use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::{
-            models::event::{Event, EventId},
-            ports::EventService,
-        },
-        user::ports::UserService,
-    },
-    inbound::http::{
-        handlers::{event::details::act::act_card, index_markup},
-        AppState,
-    },
+    domain::{artist::ports::ArtistService, event::models::event::Event},
+    inbound::http::handlers::event::details::act::act_card,
 };
 
-pub fn configure(cfg: &mut web::ServiceConfig) {
+pub fn configure(_cfg: &mut web::ServiceConfig) {
     // cfg.service(get_lineup);
 }
 
@@ -108,7 +89,7 @@ pub async fn event_lineup<AS: ArtistService>(
             event
                 .stages()
                 .as_ref()
-                .into_iter()
+                .iter()
                 .map(|stage| {
                     (
                         stage.id().clone().into_inner(),

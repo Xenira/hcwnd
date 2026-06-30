@@ -1,27 +1,19 @@
 use actix_htmx::Htmx;
 use actix_identity::Identity;
 use actix_web::{
-    get, post, web, HttpMessage as _, HttpRequest, HttpResponse, Responder, ResponseError,
+    HttpMessage as _, HttpRequest, HttpResponse, Responder, ResponseError, get, post, web,
 };
 use anyhow::Context as _;
 use secrecy::SecretString;
 use serde::Deserialize;
 use thiserror::Error;
-use ui::{
-    index::{IndexRoute, UiComponent},
-    user::{sign_in::SignIn, sign_up::SignUp},
-};
 
 use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::ports::EventService,
-        user::{
-            models::user::{AuthenticateUserRequest, UserEmail, UserPassword},
-            ports::UserService,
-        },
+    domain::user::{
+        models::user::{AuthenticateUserRequest, UserEmail, UserPassword},
+        ports::UserService,
     },
-    inbound::http::{handlers::index_markup, AppState},
+    inbound::http::{AppState, user::Locale},
 };
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
@@ -45,14 +37,18 @@ impl ResponseError for HandlerError {
 }
 
 #[get("")]
-async fn login_form(htmx: Htmx) -> impl Responder {
+async fn login_form(locale: Locale<'_>, htmx: Htmx) -> impl Responder {
+    let state = api::UiState::from(&locale);
+
     let body = if htmx.is_htmx {
-        SignIn {}.render_html()
+        ui::user::sign_in::render(&state.locale)
     } else {
-        index_markup("Sign Up", IndexRoute::Login, None).render_html()
+        ui::user::sign_in::full_page(&state)
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
 
 #[derive(Deserialize)]

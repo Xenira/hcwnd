@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use derive_builder::Builder;
 use es_entity::{
-    es_query, EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents,
-    TryFromEvents,
+    EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents, TryFromEvents,
+    es_query,
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -127,7 +127,7 @@ pub struct NewArtist {
 }
 
 impl NewArtist {
-    pub(crate) fn from_domain(req: &CreateArtistRequest, author_id: &DomainUserId) -> NewArtist {
+    pub(crate) fn from_domain(req: &CreateArtistRequest, _author_id: &DomainUserId) -> NewArtist {
         NewArtist {
             id: Uuid::new_v4().into(),
             name: req.name().as_ref().to_string(),

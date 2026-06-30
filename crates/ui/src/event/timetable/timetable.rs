@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 use chrono::{NaiveDate, NaiveDateTime};
 use derive_builder::Builder;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use uuid::Uuid;
 
-use crate::component::{dialog, icon, menu_item, Icons};
+use crate::component::{Icons, dialog, icon, menu_item};
 
 pub const CONTENT_OUTLET_ID: &str = "timetable_content";
 pub const ADD_ACT_DIALOG_ID: &str = "add-act-dialog";

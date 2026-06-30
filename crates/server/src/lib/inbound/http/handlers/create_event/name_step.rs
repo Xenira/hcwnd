@@ -1,28 +1,9 @@
 use actix_htmx::Htmx;
-use actix_web::{
-    get,
-    guard::{self, Any, Get, Post},
-    post, routes,
-    web::{self, ServiceConfig},
-    HttpResponse, Responder,
-};
+use actix_web::{HttpResponse, Responder, get, routes, web::ServiceConfig};
 use serde_qs::web::QsForm;
-use ui::{
-    event::create::{
-        name_step::{EventCreateNameStep, EventCreateNameStepData},
-        EventCreate,
-    },
-    index::{IndexRoute, UiComponent as _},
-};
+use ui::event::create::name_step::{self, EventCreateNameStep};
 
-use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::ports::EventService,
-        user::{models::user::User, ports::UserService},
-    },
-    inbound::http::handlers::index_markup,
-};
+use crate::domain::user::models::user::User;
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(name_step_form).service(search);
@@ -32,23 +13,21 @@ pub fn configure(cfg: &mut ServiceConfig) {
 #[get("")]
 #[post("")]
 async fn name_step_form(
-    _: User,
+    user: User,
     form: Option<QsForm<EventCreateNameStep>>,
     htmx: Htmx,
 ) -> impl Responder {
+    let state = api::UiState::from(&user);
     let step = form.map(|f| f.into_inner()).unwrap_or_default();
     let body = if htmx.is_htmx {
-        step.render_html()
+        name_step::render(&state, &step)
     } else {
-        index_markup(
-            "Create Event",
-            IndexRoute::CreateEvent(EventCreate::NameStep(step)),
-            None,
-        )
-        .render_html()
+        name_step::full_page(&state, &step)
     };
 
-    HttpResponse::Ok().content_type("text/html").body(body)
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
 
 #[get("/search")]

@@ -1,39 +1,11 @@
-use actix_htmx::Htmx;
-use actix_web::{post, web, HttpResponse, Responder, ResponseError};
-use actix_web_lab::extract::UrlEncodedForm;
-use anyhow::Context;
-use log::info;
+use actix_web::{HttpResponse, ResponseError, web};
 use serde::Deserialize;
-use serde_with::{serde_as, NoneAsEmptyString};
+use serde_with::{NoneAsEmptyString, serde_as};
 use thiserror::Error;
-use ui::{
-    act::card::{ActCard, ActCardBuilder, ActCardBuilderError},
-    event::{lineup::EventLineupBuilder, EventRoute},
-    index::{IndexRoute, UiComponent as _},
-};
-use url::Url;
+use ui::act::card::{ActCard, ActCardBuilder, ActCardBuilderError};
 use uuid::Uuid;
 
-use crate::{
-    domain::{
-        artist::{
-            models::artist::{ArtistId, ArtistName},
-            ports::ArtistService,
-        },
-        event::{
-            models::{
-                act::{Act, ActImg, ActName, CreateActRequest},
-                event::EventId,
-            },
-            ports::EventService,
-        },
-        user::{models::user::UserId, ports::UserService},
-    },
-    inbound::http::{
-        handlers::{event::details::lineup::event_lineup, index_markup},
-        AppState,
-    },
-};
+use crate::domain::{artist::models::artist::ArtistName, event::models::act::Act};
 
 pub mod artist;
 

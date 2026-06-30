@@ -18,6 +18,7 @@ serde_json = { workspace = true }
 url = { workspace = true }
 serde_with = "3.21.0"
 rust-i18n = { workspace = true }
+api = { workspace = true }
 
 [package.metadata.i18n]
 default-locale = "en"

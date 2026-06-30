@@ -1,4 +1,4 @@
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 
 pub const ADD_ARTIST_DIALOG_ID: &str = "add_artist_dialog";
 

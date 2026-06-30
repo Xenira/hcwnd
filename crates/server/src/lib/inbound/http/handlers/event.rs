@@ -2,54 +2,18 @@ use std::collections::HashMap;
 
 use actix_htmx::Htmx;
 use actix_web::{
-    get, post,
-    web::{self, Query},
     HttpResponse, Responder, ResponseError,
+    web::{self},
 };
-use anyhow::Context as _;
-use api::{
-    act::SelectedAct,
-    day::NewEventDay,
-    event::{AddActToTimetable, EventListEntry, NewEvent},
-    stage::SelectedStage,
-    PagedResult,
-};
-use chrono::{Duration, NaiveDate, NaiveTime};
-use es_entity::{DbOp, ListDirection, PaginatedQueryArgs};
-use itertools::Itertools as _;
 use log::info;
-use serde::Deserialize;
 use thiserror::Error;
-use ui::{
-    event::create::days_step::{day_buttons, EventDay},
-    index::UiComponent as _,
-};
-use url::Url;
-use uuid::Uuid;
 
-use crate::{
-    domain::{
-        artist::ports::ArtistService,
-        event::{
-            models::{
-                day::{CreateDayRequest, Day},
-                event::{
-                    CreateEventRequest, EventDays, EventDaysCreateRequests, EventDescription,
-                    EventName, ImageUrl, WebsiteUrl,
-                },
-            },
-            ports::EventService,
-        },
-        proposal::ProposalSource,
-        user::{models::user::UserId, ports::UserService},
-    },
-    inbound::http::AppState,
-};
+use crate::inbound::http::AppState;
 
 pub mod day;
 pub mod details;
 
-pub fn configure(cfg: &mut web::ServiceConfig) {
+pub fn configure(_cfg: &mut web::ServiceConfig) {
     // cfg.route("", web::post().to(create_event::<ES, AS, US>))
     //     .service(web::scope("/{event_id}").configure(details::configure::<ES, AS, US>));
 }
@@ -164,9 +128,9 @@ impl ResponseError for HandlerError {
 }
 
 async fn create_event(
-    app_state: web::Data<AppState>,
+    _app_state: web::Data<AppState>,
     form: web::Form<HashMap<String, String>>,
-    htmx: Htmx,
+    _htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
     info!("Received create event request with form data: {:?}", form);
     // let user_id: UserId = UserId::new(Uuid::new_v4());

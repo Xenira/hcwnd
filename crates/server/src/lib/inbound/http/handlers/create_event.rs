@@ -1,13 +1,11 @@
 use actix_htmx::Htmx;
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{HttpResponse, Responder, post, web};
 use anyhow::Context as _;
-use itertools::Itertools;
 use serde_qs::web::QsForm;
 use ui::event::create::{confirm_step::EventCreateConfirmStep, days_step::EventDay};
 
 use crate::{
     domain::{
-        artist::ports::ArtistService,
         event::{
             models::{
                 day::CreateDayRequest,
@@ -19,10 +17,7 @@ use crate::{
             ports::EventService,
         },
         proposal::ProposalSource,
-        user::{
-            models::user::{User, UserId},
-            ports::UserService,
-        },
+        user::models::user::User,
     },
     inbound::http::AppState,
 };

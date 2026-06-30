@@ -1,44 +1,39 @@
-use chrono::{NaiveDate, NaiveTime};
-use derive_builder::Builder;
-use maud::{Markup, Render, html};
-use url::Url;
-use uuid::Uuid;
-
-use crate::{
-    component::{Icons, icon},
+use api::{
+    UiState,
+    event::{Event, EventState},
     user::User,
 };
+use chrono::{NaiveDate, NaiveTime};
+use maud::{Markup, Render, html};
 
-#[derive(Debug)]
-pub struct EventCard {
-    pub id: Uuid,
-    pub title: String,
-    pub image_url: Url,
-    pub start_date: NaiveDate,
-    pub start_time: Option<NaiveTime>,
-    pub end_date: NaiveDate,
-    pub end_time: Option<NaiveTime>,
-}
+use crate::component::{Icons, icon};
 
-impl Render for EventCard {
-    fn render(&self) -> Markup {
-        html! {
-            a.plain
-                href=(format!("/event/{}", self.id))
-                hx-boost="true"
-                hx-target="#main"
+#[must_use]
+pub fn render(_state: &UiState, event: &Event) -> Markup {
+    let (card_class, section_class) = match event.state {
+        EventState::Suggested { .. } => ("card-warning", "hero-warning"),
+        _ => ("card-primary", "hero-primary"),
+    };
+    dbg!(card_class, section_class);
+
+    html! {
+        a.plain
+            href=(format!("/event/{}", event.id))
+            hx-boost="true"
+            hx-target="#main"
+        {
+            article.event.(card_class)
             {
-                article {
-                    img
-                        fetchpriority="high"
-                        src=(self.image_url)
-                        alt=(self.title)
-                    ;
-                    section.hero.hero-primary {
-                        div.container {
-                            h1 { (self.title) }
-                            (date_line(self.start_date, self.start_time, self.end_date, self.end_time))
-                        }
+                img
+                    fetchpriority="high"
+                    src=(event.image_url)
+                    alt=(event.name)
+                ;
+                section.hero.(section_class)
+                {
+                    div.container {
+                        h1 { (event.name) }
+                        (date_line(event.start_date, event.start_time, event.end_date, event.end_time))
                     }
                 }
             }

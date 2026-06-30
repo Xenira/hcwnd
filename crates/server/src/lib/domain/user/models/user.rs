@@ -1,12 +1,12 @@
-use anyhow::Context as _;
+use api::UiState;
+use api::user::User as ApiUser;
 use argon2::{
-    password_hash::{self, rand_core::OsRng, SaltString},
     Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
+    password_hash::{SaltString, rand_core::OsRng},
 };
 use nutype::nutype;
 use secrecy::{ExposeSecret, SecretString};
 use thiserror::Error;
-use ui::user::User as UiUser;
 use uuid::Uuid;
 
 type ValidationToken = (Uuid, chrono::DateTime<chrono::Utc>);
@@ -15,16 +15,28 @@ type ValidationToken = (Uuid, chrono::DateTime<chrono::Utc>);
 pub struct User {
     id: UserId,
     name: UserName,
+    locale: String,
     email: UserEmail,
     password_hash: String,
     reputation: i32,
     validation: Option<ValidationToken>,
 }
 
-impl From<User> for UiUser {
-    fn from(user: User) -> Self {
+impl From<&User> for ApiUser {
+    fn from(user: &User) -> Self {
         Self {
-            username: user.name().as_ref().to_string(),
+            id: user.id.clone().into_inner(),
+            name: user.name.as_ref().to_string(),
+            score: user.reputation,
+        }
+    }
+}
+
+impl From<&User> for UiState {
+    fn from(value: &User) -> Self {
+        Self {
+            user: Some(value.into()),
+            locale: value.locale.clone(),
         }
     }
 }
@@ -41,6 +53,7 @@ impl User {
         Self {
             id,
             name,
+            locale: "en".to_string(),
             email,
             password_hash,
             reputation,

@@ -1,6 +1,6 @@
 use actix_htmx::Htmx;
 use actix_identity::Identity;
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{HttpResponse, Responder, web};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.route("", web::get().to(logout));
