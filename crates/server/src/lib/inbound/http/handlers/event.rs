@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, ResponseError,
     web::{self},
+    HttpResponse, Responder, ResponseError,
 };
 use log::info;
 use thiserror::Error;
@@ -13,9 +13,9 @@ use crate::inbound::http::AppState;
 pub mod day;
 pub mod details;
 
-pub fn configure(_cfg: &mut web::ServiceConfig) {
-    // cfg.route("", web::post().to(create_event::<ES, AS, US>))
-    //     .service(web::scope("/{event_id}").configure(details::configure::<ES, AS, US>));
+pub fn configure(cfg: &mut web::ServiceConfig) {
+    // cfg.route("", web::post().to(create_event::<ES, AS, US>));
+    cfg.service(web::scope("/{event_id}").configure(details::configure));
 }
 
 // impl TryFrom<(NaiveDate, NewEventDay)> for CreateDayRequest {
