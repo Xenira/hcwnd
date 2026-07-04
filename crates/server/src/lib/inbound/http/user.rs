@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 
 use actix_identity::IdentityExt;
-use actix_utils::future::{Ready, ready};
-use actix_web::{FromRequest, HttpRequest, dev::Payload, web};
+use actix_utils::future::{ready, Ready};
+use actix_web::{dev::Payload, web, FromRequest, HttpRequest};
 use api::UiState;
 use futures::future::LocalBoxFuture;
 use log::{error, info};

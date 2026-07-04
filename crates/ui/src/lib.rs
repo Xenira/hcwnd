@@ -12,6 +12,7 @@ pub mod event;
 pub mod index;
 pub mod user;
 pub mod util;
+pub mod view;
 
 i18n!("locales");
 
