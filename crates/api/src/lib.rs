@@ -8,6 +8,7 @@ use crate::user::User;
 pub mod act;
 pub mod day;
 pub mod event;
+pub mod routes;
 pub mod stage;
 pub mod user;
 

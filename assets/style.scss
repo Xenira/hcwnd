@@ -1,5 +1,26 @@
-body > header {
-  padding-top: 0;
+@import "breakpoints.scss";
+
+$navbar_height: 3.4rem;
+
+html {
+  height: 100%;
+  overflow-y: hidden;
+}
+
+body {
+  height: stretch;
+  overflow-y: auto;
+  margin-top: $navbar_height;
+  &:has(#event) {
+    margin-top: 2 * $navbar_height;
+    @include break("tablet") {
+      margin-top: $navbar_height;
+      margin-bottom: $navbar_height;
+    }
+  }
+  header {
+    padding-top: 0;
+  }
 }
 
 [role="group"] {
@@ -97,4 +118,55 @@ a.plain {
   &:hover {
     --mu-text-decoration: none;
   }
+}
+
+#event {
+  @include break("tablet") {
+    padding-top: 0;
+  }
+
+  > header {
+    position: fixed;
+    top: $navbar_height;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+
+    nav {
+      width: 100%;
+      display: block;
+    }
+    ul {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    li {
+      flex: 1;
+
+      a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @include break("tablet") {
+      position: fixed;
+      top: unset;
+      bottom: 0;
+      width: 100%;
+    }
+
+    @include break("phone") {
+      li span {
+        display: none;
+      }
+    }
+  }
+}
+// Secondary navigation
+
+.backdrop {
+  border-radius: 1rem;
+  backdrop-filter: blur(16px);
 }

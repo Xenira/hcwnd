@@ -1,6 +1,6 @@
-use maud::{Markup, html};
+use maud::{html, Markup};
 
-use crate::component::{Icons, Style, icon};
+use crate::component::{icon, Icons, Style};
 
 #[must_use]
 pub fn menu_item(
@@ -13,26 +13,19 @@ pub fn menu_item(
 ) -> Markup {
     html! {
         li.active[active] title=(title) {
-            @if active {
-                span.flex.center {
-                    @if let Some(menu_icon) = &menu_icon {
-                        (icon(menu_icon, Some(Style::Fill)))
-                    }
-                    span.phone[menu_icon.is_some()] { (title) }
+            a
+                name=(key)
+                href=(url)
+                hx-boost="true"
+                hx-target=(target)
+                hx-push-url="true"
+                hx-swap="outerHTML"
+                aria-current[active]
+            {
+                @if let Some(menu_icon) = &menu_icon {
+                    (icon(menu_icon, None))
                 }
-            } @else {
-                a.flex.center
-                    name=(key)
-                    hx-get=(url)
-                    hx-target=(target)
-                    hx-push-url="true"
-                    hx-swap="outerHTML"
-                {
-                    @if let Some(menu_icon) = &menu_icon {
-                        (icon(menu_icon, None))
-                    }
-                    span.phone[menu_icon.is_some()] { (title) }
-                }
+                span.phone[menu_icon.is_some()] { (title) }
             }
         }
     }
