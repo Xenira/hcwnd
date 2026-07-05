@@ -3,6 +3,7 @@ use maud::{html, Markup};
 
 use crate::{index, view::event::View};
 
+#[must_use]
 pub fn full_page(state: &UiState, event: &Event) -> Markup {
     let title = t!(
         "event.detail.details.title",
@@ -10,22 +11,19 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
         event_name = &event.name
     );
 
-    index::full_page(
-        state,
-        title,
-        html! {
-            (super::nav_bar(state, event.id, View::Detail))
-            (render(state, event))
-        },
-    )
+    index::full_page(state, title, render(state, event))
 }
 
+#[must_use]
 pub fn render(state: &UiState, event: &Event) -> Markup {
     html! {
-        img src=(event.image_url) alt=(event.name);
-        section.hero.hero-primary {
-            div.container {
-                h1 { (event.name) }
+        #event {
+            (super::nav_bar(state, event.id, View::Detail))
+            img src=(event.image_url) alt=(event.name);
+            section.hero.hero-primary {
+                div.container {
+                    h1 { (event.name) (event.description) }
+                }
             }
         }
     }

@@ -21,7 +21,7 @@ pub enum View {
 pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Markup {
     let target = format!("#{EVENT_CONTAINER_ID}");
 
-    let details_url = format!("/event/{event_id}");
+    let details_url = format!("{}/{event_id}", api::routes::EVENT_ROUTE);
     let details_menu = menu_item(
         &t!("event.detail.menu.details", locale = &state.locale),
         Some(Icons::EventDetails),
@@ -31,7 +31,11 @@ pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Marku
         active_view == View::Detail,
     );
 
-    let timetable_url = format!("/event/{event_id}/timetable");
+    let timetable_url = format!(
+        "{}/{event_id}{}",
+        api::routes::EVENT_ROUTE,
+        api::routes::EVENT_TIMETABLE_ROUTE
+    );
     let timetable_menu = menu_item(
         &t!("event.detail.menu.timetable", locale = &state.locale),
         Some(Icons::EventTimetable),
@@ -41,9 +45,13 @@ pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Marku
         active_view == View::Timetable,
     );
 
-    let lineup_url = format!("/event/{event_id}/lineup");
+    let lineup_url = format!(
+        "{}/{event_id}{}",
+        api::routes::EVENT_ROUTE,
+        api::routes::EVENT_LINEUP_ROUTE
+    );
     let lineup_menu = menu_item(
-        "Lineup",
+        &t!("event.detail.menu.lineup", locale = &state.locale),
         Some(Icons::EventLineup),
         &lineup_url,
         &target,
@@ -52,11 +60,13 @@ pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Marku
     );
 
     html! {
-        nav {
-            menu {
-                (details_menu)
-                (timetable_menu)
-                (lineup_menu)
+        header.bg-secondary {
+            nav.container {
+                ul.backdrop {
+                    (details_menu)
+                    (timetable_menu)
+                    (lineup_menu)
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
-use api::{UiState, user::User};
-use maud::{DOCTYPE, Markup, Render, html};
+use api::{user::User, UiState};
+use maud::{html, Markup, Render, DOCTYPE};
 
 use crate::user::{self};
 
@@ -21,7 +21,7 @@ pub fn full_page(state: &UiState, title: impl Display, content: Markup) -> Marku
                 (scripts())
             }
             body {
-                (nav_bar(state.user.as_ref()))
+                (nav_bar(&state))
                 main.container #main {
                     (content)
                 }
@@ -36,8 +36,8 @@ fn format_title(locale: &str, title: impl Display) -> String {
     format!("{title} | {name} - {slogan}")
 }
 
-fn nav_bar(user: Option<&User>) -> Markup {
-    let user = if let Some(user) = user {
+fn nav_bar(state: &UiState) -> Markup {
+    let user = if let Some(user) = &state.user {
         let profile_url = format!("/users/{}", user.name);
         html! {
             li {
@@ -52,7 +52,7 @@ fn nav_bar(user: Option<&User>) -> Markup {
                                 hx-swap="innerHTML"
                                 hx-push-url="true"
                             {
-                                "Profile"
+                                (t!("app.menu.user.profile", locale = &state.locale))
                             }
                         }
                         li {
@@ -62,7 +62,7 @@ fn nav_bar(user: Option<&User>) -> Markup {
                                 hx-push-url="true"
                                 href="/logout"
                             {
-                                "Logout"
+                                (t!("app.menu.user.logout", locale = &state.locale))
                             }
                         }
                     }
@@ -78,7 +78,9 @@ fn nav_bar(user: Option<&User>) -> Markup {
                     hx-push-url="true"
                     href="/login"
                 {
-                    span { "Login" }
+                    span {
+                        (t!("app.menu.user.login", locale = &state.locale))
+                    }
                 }
             }
             li {
@@ -87,20 +89,22 @@ fn nav_bar(user: Option<&User>) -> Markup {
                   hx-swap="innerHTML"
                   hx-push-url="true"
                   href="/signup" {
-                    span { "Sign Up" }
+                    span {
+                        (t!("app.menu.user.sign_up", locale = &state.locale))
+                    }
                 }
             }
         }
     };
     html! {
-        header.container-fluid.sticky-top.bg-primary {
+        header.container-fluid.fixed-top.bg-primary {
             nav
                 hx-boost="true"
             {
                 ul {
                     li {
                         strong {
-                            #home { a.flex href="/" { "❮" span { "HCWND" } "❯" } }
+                            #home { a.flex href="/" { "❮" span { (t!("app.name", locale = &state.locale)) } "❯" } }
                         }
                     }
                 }

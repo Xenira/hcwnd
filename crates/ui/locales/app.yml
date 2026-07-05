@@ -1,4 +1,19 @@
 _version: 2
+app:
+  name:
+    en: "hard.events"
+  slogan:
+    en: "Your home for harder styles events"
+  menu:
+    user:
+      sign_up:
+        en: Sign Up
+      login:
+        en: Login
+      logout:
+        en: Logout
+      profile:
+        en: Profile
 user:
   sign_up:
     username:
@@ -126,3 +141,26 @@ event:
       en: Back
     submit:
       en: Create Event
+  detail:
+    menu:
+      details:
+        en: Details
+      timetable:
+        en: Timetable
+      lineup:
+        en: Line-up
+    details:
+      title:
+        en: "%{name}"
+    timetable:
+      title:
+        en: "Timetable - %{name}"
+    lineup:
+      title:
+        en: "Line-up - %{name}"
+  list:
+    search:
+      placeholder:
+        en: Search events...
+      submit:
+        en: Search
