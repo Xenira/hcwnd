@@ -2,14 +2,13 @@ use std::{fs, sync::Arc, time::Duration};
 
 use actix_htmx::HtmxMiddleware;
 use actix_identity::IdentityMiddleware;
-use actix_session::{SessionMiddleware, storage::SessionStore};
+use actix_session::{storage::SessionStore, SessionMiddleware};
 use actix_web::{
-    App, HttpResponse,
     cookie::Key,
     dev::ServiceResponse,
-    http::{StatusCode, header},
+    http::{header, StatusCode},
     middleware::{Compress, ErrorHandlerResponse, ErrorHandlers},
-    web,
+    web, App, HttpResponse,
 };
 use actix_web_helmet::Helmet;
 use anyhow::Context as _;
@@ -19,10 +18,11 @@ use tracing_actix_web::TracingLogger;
 
 use crate::{
     domain::{artist::ports::ArtistService, event::ports::EventService, user::ports::UserService},
-    inbound::http::mapper::event::EventMapper,
+    inbound::http::mapper::{act::ActMapper, event::EventMapper},
 };
 
 pub mod actix_macro;
+pub mod event;
 pub mod handlers;
 pub mod mapper;
 pub mod user;
