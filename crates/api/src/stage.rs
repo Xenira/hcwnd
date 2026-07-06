@@ -8,7 +8,7 @@ pub enum SelectedStage {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
-pub struct StageDetails {
+pub struct Stage {
     pub id: Uuid,
     pub name: String,
 }

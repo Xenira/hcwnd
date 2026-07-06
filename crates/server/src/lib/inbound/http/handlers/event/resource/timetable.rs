@@ -14,14 +14,8 @@ use crate::{
     inbound::http::{user::Locale, AppState},
 };
 
-// pub mod act;
-pub mod lineup;
-pub mod timetable;
-
 pub fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_event)
-        .service(web::scope(api::routes::EVENT_TIMETABLE_ROUTE).configure(timetable::configure))
-        .service(web::scope(api::routes::EVENT_LINEUP_ROUTE).configure(lineup::configure));
+    cfg.service(get_timetable);
     //     .service(web::scope("/lineup").configure(lineup::configure))
     //     .service(web::scope("/act").configure(act::configure));
 }
@@ -43,7 +37,7 @@ impl ResponseError for HandlerError {
 }
 
 #[get("")]
-async fn get_event(
+async fn get_timetable(
     user: Option<User>,
     locale: Locale<'_>,
     app_state: web::Data<AppState>,
@@ -66,9 +60,9 @@ async fn get_event(
         .context("Failed to map event")?;
 
     let body = if htmx.is_htmx {
-        ui::view::event::detail::render(&ui_state, &event)
+        ui::view::event::timetable::render(&ui_state, &event)
     } else {
-        ui::view::event::detail::full_page(&ui_state, &event)
+        ui::view::event::timetable::full_page(&ui_state, &event)
     };
 
     Ok(HttpResponse::Ok()

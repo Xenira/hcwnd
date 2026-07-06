@@ -2,6 +2,13 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Act {
+    pub id: Uuid,
+    pub name: String,
+    pub image_url: Option<String>,
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
 pub enum SelectedAct {
     Existing(Uuid),

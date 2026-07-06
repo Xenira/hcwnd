@@ -193,7 +193,7 @@ pub struct EventDescription(String);
 )]
 pub struct EventStages(Vec<Stage>);
 
-#[nutype(derive(Debug, Clone, AsRef))]
+#[nutype(derive(Debug, Clone, AsRef, Deref))]
 pub struct EventActs(Vec<Act>);
 
 #[nutype(

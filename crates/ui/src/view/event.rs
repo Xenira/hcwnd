@@ -4,6 +4,8 @@ use uuid::Uuid;
 use crate::component::{menu_item, Icons};
 
 pub mod detail;
+pub mod lineup;
+pub mod timetable;
 
 pub const BASE_ROUTE: &str = "/event";
 

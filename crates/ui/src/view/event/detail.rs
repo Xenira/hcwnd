@@ -8,7 +8,7 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
     let title = t!(
         "event.detail.details.title",
         locale = &state.locale,
-        event_name = &event.name
+        name = &event.name
     );
 
     index::full_page(state, title, render(state, event))
@@ -22,7 +22,15 @@ pub fn render(state: &UiState, event: &Event) -> Markup {
             img src=(event.image_url) alt=(event.name);
             section.hero.hero-primary {
                 div.container {
-                    h1 { (event.name) (event.description) }
+                    h1 { (event.name) }
+                }
+            }
+            section {
+                div.container {
+                    header {
+                        h2 { "Overview" }
+                    }
+                    p { (event.description) }
                 }
             }
         }

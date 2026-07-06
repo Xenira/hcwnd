@@ -158,6 +158,13 @@ event:
     lineup:
       title:
         en: "Line-up - %{name}"
+      search_acts:
+        placeholder:
+          en: Search acts...
+      add_act:
+        en: Add Act
+      all_stages:
+        en: All Stages
   list:
     search:
       placeholder:

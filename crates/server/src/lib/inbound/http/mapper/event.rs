@@ -4,16 +4,20 @@ use imgproxy::{
 };
 use url::Url;
 
-use crate::domain::event::models::event::Event;
+use crate::{domain::event::models::event::Event, inbound::http::mapper::act::ActMapper};
 
 #[derive(Clone)]
 pub struct EventMapper {
     image_signer: SignedUrlRepo,
+    act_mapper: ActMapper,
 }
 
 impl EventMapper {
     pub(crate) fn new(image_signer: SignedUrlRepo) -> Self {
-        Self { image_signer }
+        Self {
+            act_mapper: ActMapper::new(image_signer.clone()),
+            image_signer,
+        }
     }
 
     pub fn map_event(&self, event: &Event) -> anyhow::Result<api::event::Event> {
@@ -32,6 +36,12 @@ impl EventMapper {
             website_url: event.website_url().clone().into_inner(),
             image_url,
             state: api::event::EventState::Online,
+            acts: event
+                .acts()
+                .iter()
+                .map(|act| self.act_mapper.map_act(act))
+                .collect::<anyhow::Result<Vec<_>>>()?,
+            stages: vec![], // TODO: Map stages when available
         };
 
         Ok(event)

@@ -3,7 +3,13 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 use uuid::Uuid;
 
-use crate::{act::SelectedAct, day::NewEventDay, stage::SelectedStage, user::User, PagedResult};
+use crate::{
+    act::{Act, SelectedAct},
+    day::NewEventDay,
+    stage::{SelectedStage, Stage},
+    user::User,
+    PagedResult,
+};
 
 pub type PagedEventList = PagedResult<EventListEntry, (Uuid, NaiveDate)>;
 
@@ -21,6 +27,8 @@ pub struct Event {
     pub end_time: Option<NaiveTime>,
     pub state: EventState,
     // pub days: Vec<EventDay>,
+    pub acts: Vec<Act>,
+    pub stages: Vec<Stage>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
