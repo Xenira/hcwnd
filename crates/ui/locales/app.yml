@@ -14,6 +14,10 @@ app:
         en: Logout
       profile:
         en: Profile
+    events:
+      en: Events
+    artists:
+      en: Artists
 user:
   sign_up:
     username:
@@ -171,3 +175,17 @@ event:
         en: Search events...
       submit:
         en: Search
+artist:
+  list:
+    title:
+      en: Artists
+    search:
+      placeholder:
+        en: Search artists...
+      submit:
+        en: Search
+    empty:
+      alert:
+        en: No artists found.
+      create:
+        en: Create Artist

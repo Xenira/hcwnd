@@ -170,3 +170,7 @@ a.plain {
   border-radius: 1rem;
   backdrop-filter: blur(16px);
 }
+
+div[role="search"] > select {
+  width: fit-content;
+}
