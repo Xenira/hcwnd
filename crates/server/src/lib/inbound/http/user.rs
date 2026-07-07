@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, ops::Deref};
 
 use actix_identity::IdentityExt;
 use actix_utils::future::{ready, Ready};
@@ -90,5 +90,35 @@ impl FromRequest for Locale<'_> {
             .unwrap_or_else(|| "en".to_string());
 
         ready(Ok(Locale(Cow::Owned(locale))))
+    }
+}
+
+pub struct UiStateExtractor(pub UiState);
+
+impl FromRequest for UiStateExtractor {
+    type Error = actix_web::Error;
+    type Future = LocalBoxFuture<'static, Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        let locale_future = Locale::from_request(req, payload);
+        let user_future = User::from_request(req, payload);
+
+        Box::pin(async move {
+            let locale = locale_future.await?;
+            let user = user_future.await.ok();
+
+            Ok(UiStateExtractor(
+                user.as_ref()
+                    .map_or_else(|| UiState::from(&locale), UiState::from),
+            ))
+        })
+    }
+}
+
+impl Deref for UiStateExtractor {
+    type Target = UiState;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

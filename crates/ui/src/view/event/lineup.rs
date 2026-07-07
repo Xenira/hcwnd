@@ -11,9 +11,9 @@ pub const ACTS_LIST_ID: &str = "acts_list";
 
 #[must_use]
 pub fn full_page(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Markup {
-    index::full_page(
+    super::full_page(
         state,
-        t!(
+        &t!(
             "event.detail.lineup.title",
             locale = &state.locale,
             name = &event.name
@@ -37,23 +37,29 @@ pub fn render(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Mar
     };
 
     html! {
-        #event {
-            (menu)
-            section {
-                form.flex.row {
-                    input.grow type="search" name="search" placeholder=(t!("event.detail.lineup.search_acts.placeholder", locale = &state.locale))
-                    select name="stage" value=[stage_filter] {
-                        option value="" { (t!("event.detail.lineup.all_stages", locale = &state.locale)) }
+        (menu)
+        section {
+            form {
+                div role="search" {
+                    select name="stage" {
+                        option value=""
+                        {
+                            (t!("event.detail.lineup.all_stages", locale = &state.locale))
+                        }
                         @for stage in &event.stages {
-                            option value=(stage.id) { (&stage.name) }
+                            option value=(stage.id) selected[Some(stage.id) == stage_filter] { (&stage.name) }
                         }
                     }
+                    input
+                        type="search"
+                        name="search"
+                        placeholder=(t!("event.detail.lineup.search_acts.placeholder", locale = &state.locale));
                 }
-                button command="show-modal" commandfor=(CREATE_ACT_DIALOG_ID) {
-                    (t!("event.detail.lineup.add_act", locale = &state.locale))
-                }
-                (render_act_list(state, acts))
             }
+            button command="show-modal" commandfor=(CREATE_ACT_DIALOG_ID) {
+                (t!("event.detail.lineup.add_act", locale = &state.locale))
+            }
+            (render_act_list(state, acts))
         }
     }
 }

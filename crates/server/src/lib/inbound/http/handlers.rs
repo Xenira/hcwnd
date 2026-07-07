@@ -1,13 +1,15 @@
+use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, ResponseError, get,
+    get,
     web::{self, Data, ServiceConfig},
+    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
 use thiserror::Error;
 
 use crate::{
     domain::{event::ports::EventService, user::models::user::User},
-    inbound::http::{AppState, user::Locale},
+    inbound::http::{user::Locale, AppState},
 };
 
 pub mod artist;
@@ -22,8 +24,8 @@ pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(index)
         .service(web::scope(ui::event::create::BASE_ROUTE).configure(create_event::configure))
         .service(web::scope("/assets").configure(assets::configure))
-        .service(web::scope("/event").configure(event::configure))
-        .service(web::scope("/artist").configure(artist::configure))
+        .service(web::scope(api::routes::EVENT_ROUTE).configure(event::configure))
+        .service(web::scope(api::routes::ARTIST_ROUTE).configure(artist::configure))
         .service(web::scope("/signup").configure(signup::configure))
         .service(web::scope("/login").configure(login::configure))
         .service(web::scope("/logout").configure(logout::configure));
@@ -50,6 +52,7 @@ async fn index(
     app_state: Data<AppState>,
     user: Option<User>,
     locale: Locale<'_>,
+    htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
     let state = user
         .as_ref()
@@ -70,7 +73,11 @@ async fn index(
     //     .has_more(false)
     //     .build()
     //     .expect("Failed to build event list");
-    let body = ui::event::list::full_page(&state, &events);
+    let body = if htmx.is_htmx {
+        ui::event::list::render(&state, &events, 0, false)
+    } else {
+        ui::event::list::full_page(&state, &events)
+    };
     Ok(HttpResponse::Ok()
         .content_type("text/html")
         .body(body.into_string()))

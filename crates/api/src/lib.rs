@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::user::User;
 
 pub mod act;
+pub mod artist;
 pub mod day;
 pub mod event;
 pub mod routes;

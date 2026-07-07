@@ -3,7 +3,10 @@ use std::fmt::Display;
 use api::{user::User, UiState};
 use maud::{html, Markup, Render, DOCTYPE};
 
-use crate::user::{self};
+use crate::{
+    component::menu_item,
+    user::{self},
+};
 
 pub fn full_page(state: &UiState, title: impl Display, content: Markup) -> Markup {
     let hx_config = r#"{"disableInheritance": true}"#;
@@ -109,6 +112,8 @@ fn nav_bar(state: &UiState) -> Markup {
                     }
                 }
                 ul {
+                    (menu_item(&t!("app.menu.events", locale = &state.locale), None, "/", "#main", "home", false))
+                    (menu_item(&t!("app.menu.artists", locale = &state.locale), None, api::routes::ARTIST_ROUTE, "#main", "artists", false))
                     (user)
                 }
             }

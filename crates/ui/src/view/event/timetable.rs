@@ -11,27 +11,25 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
         name = &event.name
     );
 
-    index::full_page(state, title, render(state, event))
+    super::full_page(state, &title, render(state, event))
 }
 
 #[must_use]
 pub fn render(state: &UiState, event: &Event) -> Markup {
     html! {
-        #event {
-            (super::nav_bar(state, event.id, View::Timetable))
-            img src=(event.image_url) alt=(event.name);
-            section.hero.hero-primary {
-                div.container {
-                    h1 { (event.name) }
-                }
+        (super::nav_bar(state, event.id, View::Timetable))
+        img src=(event.image_url) alt=(event.name);
+        section.hero.hero-primary {
+            div.container {
+                h1 { (event.name) }
             }
-            section {
-                div.container {
-                    header {
-                        h2 { "Overview" }
-                    }
-                    p { (event.description) }
+        }
+        section {
+            div.container {
+                header {
+                    h2 { "Overview" }
                 }
+                p { (event.description) }
             }
         }
     }
