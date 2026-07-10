@@ -1,8 +1,12 @@
-use actix_web::{HttpResponse, ResponseError, web::ServiceConfig};
+use actix_htmx::Htmx;
+use actix_web::{get, web::ServiceConfig, HttpResponse, Responder, ResponseError};
 use serde::Deserialize;
 use thiserror::Error;
 
-pub fn configure(_cfg: &mut ServiceConfig) {
+use crate::inbound::http::user::UiStateExtractor;
+
+pub fn configure(cfg: &mut ServiceConfig) {
+    cfg.service(get_artists);
     // cfg.service(add_artist_form)
     //     .service(search_artist_for_act)
     //     .service(add_artist);
@@ -35,6 +39,19 @@ impl ResponseError for HandlerError {
 struct CreateArtistForm {
     name: String,
     genres: String,
+}
+
+#[get("")]
+async fn get_artists(state: UiStateExtractor, htmx: Htmx) -> impl Responder {
+    let body = if htmx.is_htmx {
+        ui::view::artist::list::render(&state, &vec![])
+    } else {
+        ui::view::artist::list::full_page(&state, &vec![])
+    };
+
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
 
 // #[post("")]

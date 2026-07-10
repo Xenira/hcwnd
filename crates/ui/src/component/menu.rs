@@ -19,7 +19,7 @@ pub fn menu_item(
                 hx-boost="true"
                 hx-target=(target)
                 hx-push-url="true"
-                hx-swap="outerHTML"
+                hx-swap="innerHTML"
                 aria-current[active]
             {
                 @if let Some(menu_icon) = &menu_icon {

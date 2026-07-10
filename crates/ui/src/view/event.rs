@@ -1,7 +1,10 @@
 use maud::{html, Markup};
 use uuid::Uuid;
 
-use crate::component::{menu_item, Icons};
+use crate::{
+    component::{menu_item, Icons},
+    index,
+};
 
 pub mod detail;
 pub mod lineup;
@@ -17,6 +20,19 @@ pub enum View {
     Detail,
     Timetable,
     Lineup,
+}
+
+#[must_use]
+pub fn full_page(state: &api::UiState, title: &str, content: Markup) -> Markup {
+    index::full_page(
+        state,
+        title,
+        html! {
+            div id=(EVENT_CONTAINER_ID) {
+                (content)
+            }
+        },
+    )
 }
 
 #[must_use]
