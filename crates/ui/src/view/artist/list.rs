@@ -1,7 +1,7 @@
-use api::{artist::Artist, UiState};
-use maud::{html, Markup};
+use api::{UiState, artist::Artist};
+use maud::{Markup, html};
 
-use crate::index;
+use crate::{index, view::artist::create};
 
 pub fn full_page(state: &UiState, artists: &[Artist]) -> Markup {
     index::full_page(
@@ -21,7 +21,14 @@ pub fn render(state: &UiState, artists: &[Artist]) -> Markup {
             @if artists.is_empty() {
                 p {
                     h2 { (t!("artist.list.empty.alert", locale = &state.locale)) }
-                    a role="button" href="/create-artist/name" hx-target="#main" hx-push-url="true" hx-boost="true" { (t!("artist.list.empty.create", locale = &state.locale)) }
+                    a role="button"
+                        href=(create::BASE_ROUTE)
+                        hx-target="#main"
+                        hx-push-url="true"
+                        hx-boost="true"
+                    {
+                        (t!("artist.list.empty.create", locale = &state.locale))
+                    }
                 }
             }
         }

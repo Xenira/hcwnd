@@ -1,19 +1,19 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get,
+    HttpResponse, Responder, ResponseError, get,
     web::{self, Data, ServiceConfig},
-    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
 use thiserror::Error;
 
 use crate::{
     domain::{event::ports::EventService, user::models::user::User},
-    inbound::http::{user::Locale, AppState},
+    inbound::http::{AppState, user::Locale},
 };
 
 pub mod artist;
 pub mod assets;
+pub mod create_artist;
 pub mod create_event;
 pub mod event;
 pub mod login;
@@ -23,6 +23,9 @@ pub mod signup;
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(index)
         .service(web::scope(ui::event::create::BASE_ROUTE).configure(create_event::configure))
+        .service(
+            web::scope(ui::view::artist::create::BASE_ROUTE).configure(create_artist::configure),
+        )
         .service(web::scope("/assets").configure(assets::configure))
         .service(web::scope(api::routes::EVENT_ROUTE).configure(event::configure))
         .service(web::scope(api::routes::ARTIST_ROUTE).configure(artist::configure))

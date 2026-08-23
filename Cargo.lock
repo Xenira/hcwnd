@@ -470,6 +470,7 @@ name = "api"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "indexmap 2.13.0",
  "serde",
  "url",
  "uuid",

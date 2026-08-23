@@ -8,6 +8,7 @@ uuid = { workspace = true, features = ["v4", "serde"] }
 serde = { workspace = true }
 chrono = { workspace = true }
 url = { workspace = true }
+indexmap = { workspace = true, features = ["serde"] }
 
 [features]
 client = ["uuid/js"]

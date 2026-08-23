@@ -1,15 +1,14 @@
 use actix_htmx::Htmx;
-use actix_web::{get, web::ServiceConfig, HttpResponse, Responder, ResponseError};
+use actix_web::{HttpResponse, Responder, ResponseError, get, web::ServiceConfig};
+use api::artist::ArtistCreateForm;
 use serde::Deserialize;
+use serde_qs::web::QsForm;
 use thiserror::Error;
 
 use crate::inbound::http::user::UiStateExtractor;
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(get_artists);
-    // cfg.service(add_artist_form)
-    //     .service(search_artist_for_act)
-    //     .service(add_artist);
 }
 
 #[derive(Error, Debug)]
@@ -27,13 +26,6 @@ impl ResponseError for HandlerError {
         }
     }
 }
-
-// #[get("/add")]
-// async fn add_artist_form() -> impl Responder {
-//     HttpResponse::Ok()
-//         .content_type("text/html")
-//         .body(ArtistCreate {}.render_html())
-// }
 
 #[derive(Deserialize)]
 struct CreateArtistForm {
@@ -53,33 +45,6 @@ async fn get_artists(state: UiStateExtractor, htmx: Htmx) -> impl Responder {
         .content_type("text/html")
         .body(body.into_string())
 }
-
-// #[post("")]
-// async fn add_artist(
-//     app_state: web::Data<AppState>,
-//     form: web::Form<CreateArtistForm>,
-// ) -> Result<impl Responder, HandlerError> {
-//     let author_id = UserId::new(Uuid::new_v4()); // TODO: Get from session
-//     let name = ArtistName::try_new(form.name.to_string()).context("Invalid artist name")?;
-//     let genres = form
-//         .genres
-//         .split(',')
-//         .map(|s| s.trim().to_string())
-//         .map(ArtistGenre::try_new)
-//         .try_collect()
-//         .context("Invalid genres")?;
-//     let req = CreateArtistRequest::new(name, genres);
-//
-//     let artist = app_state
-//         .artist_service
-//         .create_artist(&req, &author_id)
-//         .await
-//         .context("Failed to create artist")?;
-//
-//     dbg!(artist);
-//
-//     Ok(HttpResponse::Created())
-// }
 
 #[derive(Deserialize)]
 struct SearchArtistQuery {

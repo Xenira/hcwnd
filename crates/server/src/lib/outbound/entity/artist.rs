@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use derive_builder::Builder;
 use es_entity::{
-    es_query, EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents,
-    TryFromEvents,
+    EntityEvents, EntityHydrationError, EsEntity, EsEvent, EsRepo, IntoEvents, TryFromEvents,
+    es_query,
 };
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
@@ -33,6 +33,7 @@ pub enum ArtistEvent {
         name: String,
         description: String,
         image_url: Option<Url>,
+        website_url: Option<Url>,
         genres: Vec<String>,
     },
     Approved {
@@ -119,6 +120,8 @@ pub struct Artist {
     #[builder(default)]
     pub image_url: Option<Url>,
     #[builder(default)]
+    pub website_url: Option<Url>,
+    #[builder(default)]
     pub genres: Vec<String>,
 
     // Approval
@@ -140,13 +143,15 @@ impl TryFrom<Artist> for DomainArtist {
     fn try_from(value: Artist) -> Result<Self, Self::Error> {
         let id = DomainArtistId::new(value.id.into());
         let name = ArtistName::try_new(value.name.clone())?;
+        let image_url = value.image_url.clone();
+        let website_url = value.website_url.clone();
         let genres = value
             .genres
             .into_iter()
             .map(ArtistGenre::try_new)
             .collect::<Result<Vec<_>, _>>()?;
 
-        Ok(DomainArtist::new(id, name, genres))
+        Ok(DomainArtist::new(id, name, image_url, website_url, genres))
     }
 }
 
@@ -168,13 +173,15 @@ impl TryFromEvents<ArtistEvent> for Artist {
                     name,
                     description,
                     image_url,
+                    website_url,
                     genres: g,
                 } => {
                     builder = builder
                         .id(*id)
                         .name(name.clone())
                         .description(description.clone())
-                        .image_url(image_url.clone());
+                        .image_url(image_url.clone())
+                        .website_url(website_url.clone());
                     genres = g.iter().cloned().collect();
                 }
                 ArtistEvent::Voted {
@@ -296,6 +303,7 @@ pub struct NewArtist {
     pub name: String,
     pub description: String,
     pub image_url: Option<Url>,
+    pub website_url: Option<Url>,
     pub genres: Vec<String>,
 }
 
@@ -305,7 +313,8 @@ impl NewArtist {
             id: Uuid::new_v4().into(),
             name: req.name().as_ref().to_string(),
             description: String::new(),
-            image_url: None,
+            image_url: req.image_url().cloned(),
+            website_url: req.website_url().cloned(),
             genres: req
                 .genres()
                 .iter()
@@ -324,6 +333,7 @@ impl IntoEvents<ArtistEvent> for NewArtist {
                 name: self.name,
                 description: self.description,
                 image_url: self.image_url,
+                website_url: self.website_url,
                 genres: self.genres,
             }],
         )
