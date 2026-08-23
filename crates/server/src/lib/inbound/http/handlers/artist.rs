@@ -3,6 +3,7 @@ use actix_web::{
     HttpResponse, Responder, ResponseError, get,
     web::{self, ServiceConfig},
 };
+use anyhow::Context as _;
 use api::artist::ArtistCreateForm;
 use itertools::Itertools;
 use log::debug;
@@ -11,12 +12,12 @@ use serde_qs::web::QsForm;
 use thiserror::Error;
 
 use crate::{
-    domain::artist::models::artist::SearchArtistsQuery,
+    domain::artist::models::artist::{ArtistId, SearchArtistsQuery},
     inbound::http::{AppState, user::UiStateExtractor},
 };
 
 pub fn configure(cfg: &mut ServiceConfig) {
-    cfg.service(get_artists);
+    cfg.service(get_artists).service(artist_detail);
 }
 
 #[derive(Error, Debug)]
@@ -69,6 +70,31 @@ async fn get_artists(
     HttpResponse::Ok()
         .content_type("text/html")
         .body(body.into_string())
+}
+
+#[get("/{artist_id}")]
+async fn artist_detail(
+    state: UiStateExtractor,
+    app_state: web::Data<AppState>,
+    artist_id: web::Path<ArtistId>,
+    htmx: Htmx,
+) -> Result<impl Responder, HandlerError> {
+    let artist = app_state
+        .artist_service
+        .get_artist_by_id(&artist_id)
+        .await
+        .context("Failed to fetch artist")?;
+    let artist = app_state.artist_mapper.map_artist(&artist)?;
+
+    let body = if htmx.is_htmx {
+        ui::view::artist::detail::render(&state, &artist)
+    } else {
+        ui::view::artist::detail::full_page(&state, &artist)
+    };
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string()))
 }
 
 // #[get("/act")]

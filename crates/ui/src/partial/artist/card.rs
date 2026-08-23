@@ -3,7 +3,7 @@ use maud::{Markup, html};
 use crate::component::{Icons, icon, link};
 
 pub fn artist_card(state: &api::UiState, artist: &api::artist::Artist) -> Markup {
-    let content = html! {
+    html! {
         article.artist-card {
             aside {
             @if let Some(image_url) = &artist.image_card {
@@ -18,16 +18,17 @@ pub fn artist_card(state: &api::UiState, artist: &api::artist::Artist) -> Markup
             }
             }
             section {
-            h3 {
-                (artist.name)
-            }
+                h3 {
+                    (artist.name)
+                }
+                @if let Some(website) = &artist.website_url {
+                    (link(
+                        website,
+                        None,
+                        &icon(&Icons::Website, None),
+                    ))
+                }
             }
         }
-    };
-
-    link(
-        &format!("{}/{}", crate::view::artist::BASE_PATH, artist.id),
-        None,
-        &content,
-    )
+    }
 }

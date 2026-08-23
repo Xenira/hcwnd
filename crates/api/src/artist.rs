@@ -9,6 +9,7 @@ pub struct Artist {
     pub id: Uuid,
     pub name: String,
     pub image_card: Option<String>,
+    pub website_url: Option<Url>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
