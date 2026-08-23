@@ -189,3 +189,27 @@ artist:
         en: No artists found.
       create:
         en: Create Artist
+  create:
+    title:
+      en: Create Artist
+    name:
+      label:
+        en: Artist Name
+      placeholder:
+        en: Enter Artist Name
+    image_url:
+      label:
+        en: Artist Image URL
+      placeholder:
+        en: https://example.com/image.jpg
+      hint:
+        en: This should be a link to an image representing the artist (e.g. poster, logo, etc.)
+    website_url:
+      label:
+        en: Artist Website URL
+      placeholder:
+        en: https://example.com
+      hint:
+        en: This should be a link to the artist's official website. If possible, provide a link to the english version of the website.
+    submit:
+      en: Create Artist

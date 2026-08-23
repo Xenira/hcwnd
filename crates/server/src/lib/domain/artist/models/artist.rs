@@ -1,17 +1,32 @@
 use nutype::nutype;
 use thiserror::Error;
+use url::Url;
 use uuid::Uuid;
 
 #[derive(Clone, Debug)]
 pub struct Artist {
     id: ArtistId,
     name: ArtistName,
+    image_url: Option<Url>,
+    website_url: Option<Url>,
     genres: Vec<ArtistGenre>,
 }
 
 impl Artist {
-    pub fn new(id: ArtistId, name: ArtistName, genres: Vec<ArtistGenre>) -> Self {
-        Self { id, name, genres }
+    pub fn new(
+        id: ArtistId,
+        name: ArtistName,
+        image_url: Option<Url>,
+        website_url: Option<Url>,
+        genres: Vec<ArtistGenre>,
+    ) -> Self {
+        Self {
+            id,
+            name,
+            image_url,
+            website_url,
+            genres,
+        }
     }
 
     #[must_use]
@@ -27,6 +42,26 @@ impl Artist {
     #[must_use]
     pub fn genres(&self) -> &[ArtistGenre] {
         &self.genres
+    }
+
+    #[must_use]
+    pub fn image_url(&self) -> Option<&Url> {
+        self.image_url.as_ref()
+    }
+
+    #[must_use]
+    pub fn website_url(&self) -> Option<&Url> {
+        self.website_url.as_ref()
+    }
+}
+
+impl From<Artist> for api::artist::Artist {
+    fn from(artist: Artist) -> Self {
+        Self {
+            id: artist.id().clone().into_inner(),
+            name: artist.name().as_ref().to_string(),
+            image_url: artist.image_url().map(|url| url.as_str().to_string()),
+        }
     }
 }
 
@@ -50,17 +85,39 @@ pub struct ArtistGenre(String);
 #[derive(Clone, Debug)]
 pub struct CreateArtistRequest {
     name: ArtistName,
+    image_url: Option<Url>,
+    website_url: Option<Url>,
     genres: Vec<ArtistGenre>,
 }
 
 impl CreateArtistRequest {
-    pub fn new(name: ArtistName, genres: Vec<ArtistGenre>) -> Self {
-        Self { name, genres }
+    pub fn new(
+        name: ArtistName,
+        image_url: Option<Url>,
+        website_url: Option<Url>,
+        genres: Vec<ArtistGenre>,
+    ) -> Self {
+        Self {
+            name,
+            image_url,
+            website_url,
+            genres,
+        }
     }
 
     #[must_use]
     pub fn name(&self) -> &ArtistName {
         &self.name
+    }
+
+    #[must_use]
+    pub fn image_url(&self) -> Option<&Url> {
+        self.image_url.as_ref()
+    }
+
+    #[must_use]
+    pub fn website_url(&self) -> Option<&Url> {
+        self.website_url.as_ref()
     }
 
     #[must_use]
