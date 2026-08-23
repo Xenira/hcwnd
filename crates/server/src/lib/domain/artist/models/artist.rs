@@ -55,16 +55,6 @@ impl Artist {
     }
 }
 
-impl From<Artist> for api::artist::Artist {
-    fn from(artist: Artist) -> Self {
-        Self {
-            id: artist.id().clone().into_inner(),
-            name: artist.name().as_ref().to_string(),
-            image_url: artist.image_url().map(|url| url.as_str().to_string()),
-        }
-    }
-}
-
 #[nutype(derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef))]
 pub struct ArtistId(Uuid);
 
@@ -134,7 +124,7 @@ pub enum CreateArtistError {
     Unknown(#[from] anyhow::Error),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct SearchArtistsQuery {
     name: Option<String>,
 }

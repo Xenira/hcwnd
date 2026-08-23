@@ -74,4 +74,11 @@ where
     async fn get_artist_by_id(&self, id: &ArtistId) -> Result<Artist, GetArtistError> {
         self.artist_repository.get_artist_by_id(id).await
     }
+
+    async fn search_artists(
+        &self,
+        query: &SearchArtistsQuery,
+    ) -> Result<Vec<Artist>, SearchArtistsError> {
+        self.artist_repository.search_artist(query).await
+    }
 }

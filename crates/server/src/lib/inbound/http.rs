@@ -2,13 +2,14 @@ use std::{fs, sync::Arc, time::Duration};
 
 use actix_htmx::HtmxMiddleware;
 use actix_identity::IdentityMiddleware;
-use actix_session::{storage::SessionStore, SessionMiddleware};
+use actix_session::{SessionMiddleware, storage::SessionStore};
 use actix_web::{
+    App, HttpResponse,
     cookie::Key,
     dev::ServiceResponse,
-    http::{header, StatusCode},
+    http::{StatusCode, header},
     middleware::{Compress, ErrorHandlerResponse, ErrorHandlers},
-    web, App, HttpResponse,
+    web,
 };
 use actix_web_helmet::Helmet;
 use anyhow::Context as _;
@@ -18,7 +19,7 @@ use tracing_actix_web::TracingLogger;
 
 use crate::{
     domain::{artist::ports::ArtistService, event::ports::EventService, user::ports::UserService},
-    inbound::http::mapper::{act::ActMapper, event::EventMapper},
+    inbound::http::mapper::{act::ActMapper, artist::ArtistMapper, event::EventMapper},
 };
 
 pub mod actix_macro;
@@ -33,6 +34,7 @@ pub struct AppState {
     artist_service: Arc<dyn ArtistService + Sync + Send>,
     user_service: Arc<dyn UserService + Sync + Send>,
     event_mapper: EventMapper,
+    artist_mapper: ArtistMapper,
 }
 
 impl AppState {
@@ -40,13 +42,16 @@ impl AppState {
         event_service: Arc<dyn EventService + Sync + Send>,
         artist_service: Arc<dyn ArtistService + Sync + Send>,
         user_service: Arc<dyn UserService + Sync + Send>,
-        event_mapper: EventMapper,
+        signer: SignedUrlRepo,
     ) -> Self {
+        let event_mapper = EventMapper::new(signer.clone());
+        let artist_mapper = ArtistMapper::new(signer.clone());
         Self {
             event_service,
             artist_service,
             user_service,
             event_mapper,
+            artist_mapper,
         }
     }
 }
@@ -61,8 +66,7 @@ impl HttpServer {
         session_store: impl SessionStore + Clone + Sync + Send + 'static,
         signer: SignedUrlRepo,
     ) -> anyhow::Result<()> {
-        let event_mapper = EventMapper::new(signer.clone());
-        let app_state = AppState::new(event_service, artist_service, user_service, event_mapper);
+        let app_state = AppState::new(event_service, artist_service, user_service, signer.clone());
         let app_data = web::Data::new(app_state);
 
         let url_repo = web::Data::new(signer);

@@ -38,7 +38,7 @@ async fn confirm_step_form(
 ) -> impl Responder {
     let state = api::UiState::from(&user);
     let mut form = form.into_inner();
-    let image_url = ImageUrl::new(form.image_url.clone()).with_option(ProcessingOption::Resize(
+    let image_url = ImageUrl::new(&form.image_url).with_option(ProcessingOption::Resize(
         ResizingOptionsBuilder::default()
             .width(1158)
             .height(650)

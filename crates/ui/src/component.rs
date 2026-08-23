@@ -6,3 +6,6 @@ pub use icon::*;
 
 mod menu;
 pub use menu::*;
+
+mod link;
+pub use link::*;

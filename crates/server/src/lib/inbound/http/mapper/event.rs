@@ -23,7 +23,7 @@ impl EventMapper {
     pub fn map_event(&self, event: &Event) -> anyhow::Result<api::event::Event> {
         let image_url = self
             .image_signer
-            .get(&self.card_image(event.image_url().clone().into_inner())?)?;
+            .get(&self.card_image(event.image_url().as_ref())?)?;
 
         let event = api::event::Event {
             id: event.id().clone().into_inner(),
@@ -47,7 +47,7 @@ impl EventMapper {
         Ok(event)
     }
 
-    fn card_image(&self, url: Url) -> anyhow::Result<ImageUrl> {
+    fn card_image(&self, url: &Url) -> anyhow::Result<ImageUrl> {
         Ok(ImageUrl::new(url)
             .with_option(ProcessingOption::Resize(
                 ResizingOptionsBuilder::default()

@@ -1,11 +1,19 @@
 use actix_htmx::Htmx;
-use actix_web::{HttpResponse, Responder, ResponseError, get, web::ServiceConfig};
+use actix_web::{
+    HttpResponse, Responder, ResponseError, get,
+    web::{self, ServiceConfig},
+};
 use api::artist::ArtistCreateForm;
+use itertools::Itertools;
+use log::debug;
 use serde::Deserialize;
 use serde_qs::web::QsForm;
 use thiserror::Error;
 
-use crate::inbound::http::user::UiStateExtractor;
+use crate::{
+    domain::artist::models::artist::SearchArtistsQuery,
+    inbound::http::{AppState, user::UiStateExtractor},
+};
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(get_artists);
@@ -34,21 +42,33 @@ struct CreateArtistForm {
 }
 
 #[get("")]
-async fn get_artists(state: UiStateExtractor, htmx: Htmx) -> impl Responder {
+async fn get_artists(
+    state: UiStateExtractor,
+    app_state: web::Data<AppState>,
+    htmx: Htmx,
+) -> impl Responder {
+    let artists = app_state
+        .artist_service
+        .search_artists(&SearchArtistsQuery::default())
+        .await
+        .unwrap_or_default()
+        .iter()
+        .map(|a| app_state.artist_mapper.map_artist(a))
+        .filter_map(|a| a.ok())
+        .collect_vec();
+
+    debug!("Found {} artists", artists.len());
+    dbg!(&artists);
+
     let body = if htmx.is_htmx {
-        ui::view::artist::list::render(&state, &vec![])
+        ui::view::artist::list::render(&state, &artists)
     } else {
-        ui::view::artist::list::full_page(&state, &vec![])
+        ui::view::artist::list::full_page(&state, &artists)
     };
 
     HttpResponse::Ok()
         .content_type("text/html")
         .body(body.into_string())
-}
-
-#[derive(Deserialize)]
-struct SearchArtistQuery {
-    name: String,
 }
 
 // #[get("/act")]

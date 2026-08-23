@@ -32,7 +32,7 @@ itertools = { workspace = true }
 log = "0.4.29"
 nutype = { version = "0.6.2", features = ["regex"] }
 serde = { workspace = true }
-serde_with = "3.18.0"
+serde_with = { workspace = true }
 sqlx = { version = "0.8.6", features = ["postgres", "macros", "migrate", "uuid", "chrono", "runtime-tokio" ] }
 thiserror = { workspace = true }
 tracing-actix-web = "0.7.21"

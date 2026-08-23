@@ -5,35 +5,36 @@ use imgproxy::{
 };
 use url::Url;
 
-use crate::domain::event::models::{act::Act, event::Event};
+use crate::{
+    domain::{artist::models::artist::Artist, event::models::event::Event},
+    inbound::http::mapper::act::ActMapper,
+};
 
 #[derive(Clone)]
-pub struct ActMapper {
+pub struct ArtistMapper {
     image_signer: SignedUrlRepo,
 }
 
-impl ActMapper {
+impl ArtistMapper {
     pub(crate) fn new(image_signer: SignedUrlRepo) -> Self {
         Self { image_signer }
     }
 
-    pub fn map_act(&self, act: &Act) -> anyhow::Result<api::act::Act> {
-        let img_url = act
-            .act_img()
-            .map(|img| {
+    pub fn map_artist(&self, artist: &Artist) -> anyhow::Result<api::artist::Artist> {
+        let image_card = artist
+            .image_url()
+            .map(|image| {
                 self.image_signer
-                    .get(&self.card_image(img.as_ref())?)
+                    .get(&self.card_image(image)?)
                     .context("Failed to sign image URL")
             })
             .transpose()?;
 
-        let event = api::act::Act {
-            id: act.id().clone().into_inner(),
-            name: act.name().clone().into_inner(),
-            image_url: img_url,
-        };
-
-        Ok(event)
+        Ok(api::artist::Artist {
+            id: artist.id().clone().into_inner(),
+            name: artist.name().as_ref().to_string(),
+            image_card,
+        })
     }
 
     fn card_image(&self, url: &Url) -> anyhow::Result<ImageUrl> {
