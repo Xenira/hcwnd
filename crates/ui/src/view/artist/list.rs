@@ -1,7 +1,7 @@
 use api::{UiState, artist::Artist};
 use maud::{Markup, html};
 
-use crate::{index, view::artist::create};
+use crate::{index, partial::artist::artist_card, view::artist::create};
 
 pub fn full_page(state: &UiState, artists: &[Artist]) -> Markup {
     index::full_page(
@@ -30,6 +30,10 @@ pub fn render(state: &UiState, artists: &[Artist]) -> Markup {
                         (t!("artist.list.empty.create", locale = &state.locale))
                     }
                 }
+            }
+
+            @for artist in artists {
+                (artist_card(state, artist))
             }
         }
     }

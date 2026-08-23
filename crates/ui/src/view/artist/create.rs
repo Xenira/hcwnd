@@ -44,7 +44,7 @@ pub fn render(state: &UiState, step: &ArtistCreateForm) -> Markup {
                     name="image_url"
                     placeholder=(t!("artist.create.image_url.placeholder", locale = &state.locale))
                     value=[&step.image_url]
-                    required {}
+                {}
                 small {
                     (t!("artist.create.image_url.hint", locale = &state.locale))
                 }
@@ -57,7 +57,7 @@ pub fn render(state: &UiState, step: &ArtistCreateForm) -> Markup {
                     name="website_url"
                     placeholder=(t!("artist.create.website_url.placeholder", locale = &state.locale))
                     value=[&step.website_url]
-                    required {}
+                {}
                 small {
                     (t!("artist.create.website_url.hint", locale = &state.locale))
                 }

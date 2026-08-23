@@ -23,6 +23,7 @@ uuid = { version = "1.23.0", features = ["v4"] }
 url = { version = "2.5.8", features = ["serde"] }
 thiserror = "2.0.18"
 rust-i18n = "4.1.0"
+serde_with = "3.22.0"
 
 # workspace
 api = { path = "crates/api" }

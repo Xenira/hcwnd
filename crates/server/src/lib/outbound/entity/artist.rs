@@ -356,11 +356,12 @@ pub struct ArtistRepo {
 
 impl ArtistRepo {
     pub async fn search(&self, query: &SearchArtistsQuery) -> anyhow::Result<Vec<Artist>> {
-        Ok(
-            es_query!("SELECT * FROM artists WHERE LOWER(name) = $1", query.name())
-                .fetch_n(&self.pool, usize::MAX)
-                .await?
-                .0,
+        Ok(es_query!(
+            "SELECT * FROM artists WHERE LOWER(name) like $1 ORDER BY name ASC",
+            query.name().unwrap_or(&"%".to_string()).to_lowercase()
         )
+        .fetch_n(&self.pool, usize::MAX)
+        .await?
+        .0)
     }
 }

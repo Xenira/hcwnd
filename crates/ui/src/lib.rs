@@ -10,6 +10,7 @@ pub mod component;
 pub mod data_protection;
 pub mod event;
 pub mod index;
+pub mod partial;
 pub mod user;
 pub mod util;
 pub mod view;

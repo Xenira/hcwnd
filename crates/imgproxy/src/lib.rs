@@ -70,7 +70,7 @@ pub struct ImageUrl {
 }
 
 impl ImageUrl {
-    pub fn new(image_url: Url) -> Self {
+    pub fn new(image_url: &Url) -> Self {
         let encoded_url = BASE64_URL_SAFE_NO_PAD.encode(image_url.as_str());
         let format = image_url
             .path_segments()
@@ -87,7 +87,7 @@ impl ImageUrl {
 
     pub fn parse(image_url: &str) -> Result<Self> {
         let url = Url::parse(image_url).map_err(|e| Error::InvalidUrl(e.to_string()))?;
-        Ok(Self::new(url))
+        Ok(Self::new(&url))
     }
 
     pub fn with_option(mut self, option: ProcessingOption) -> Self {

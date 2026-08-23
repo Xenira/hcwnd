@@ -9,6 +9,7 @@ serde = { workspace = true }
 chrono = { workspace = true }
 url = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
+serde_with = { workspace = true }
 
 [features]
 client = ["uuid/js"]

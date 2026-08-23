@@ -19,6 +19,11 @@ pub trait ArtistService: Sync + Send {
     async fn artists_by_act(&self, act_name: &str) -> Result<Vec<Artist>, SearchArtistsError>;
 
     async fn get_artist_by_id(&self, id: &ArtistId) -> Result<Artist, GetArtistError>;
+
+    async fn search_artists(
+        &self,
+        query: &SearchArtistsQuery,
+    ) -> Result<Vec<Artist>, SearchArtistsError>;
 }
 
 #[async_trait]

@@ -5,6 +5,7 @@ use actix_web::{
 };
 use api::artist::{ArtistCreateForm, ArtistCreateSubmitForm};
 use itertools::Itertools;
+use log::info;
 use serde::Deserialize;
 use serde_qs::web::QsForm;
 use thiserror::Error;
@@ -58,6 +59,7 @@ async fn create_artist(
     form: QsForm<ArtistCreateSubmitForm>,
     htmx: Htmx,
 ) -> impl Responder {
+    info!("Creating artist: {:?}", form);
     let req = CreateArtistRequest::new(
         ArtistName::try_new(form.name.clone()).expect("Invalid artist name"),
         form.image_url.clone(),
@@ -77,13 +79,14 @@ async fn create_artist(
         .await
         .expect("Failed to create artist");
 
-    let body = if htmx.is_htmx {
-        ui::view::artist::details::render(&state, &artist.into())
+    let id = artist.id().as_ref();
+    let url = format!("{}/{}", ui::view::artist::BASE_PATH, id);
+    if htmx.is_htmx {
+        htmx.redirect_with_swap(url);
+        HttpResponse::Created().finish()
     } else {
-        ui::view::artist::details::full_page(&state, &artist.into())
-    };
-
-    HttpResponse::Ok()
-        .content_type("text/html")
-        .body(body.into_string())
+        HttpResponse::Found()
+            .insert_header(("Location", url))
+            .finish()
+    }
 }

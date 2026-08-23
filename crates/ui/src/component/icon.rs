@@ -7,8 +7,10 @@ use maud::{Markup, html};
 pub enum Icons {
     ActImagePlaceholder,
     AddAct,
+    ArtistImagePlaceholder,
     Close,
     Date,
+    Downvote,
     Edit,
     EditCancel,
     EndDate,
@@ -23,10 +25,9 @@ pub enum Icons {
     Stage,
     StartTime,
     Unlike,
+    Upvote,
     Verified,
     Website,
-    Upvote,
-    Downvote,
 }
 
 impl Display for Icons {
@@ -37,8 +38,10 @@ impl Display for Icons {
         match self {
             Icons::ActImagePlaceholder => write!(f, "vinyl-record"),
             Icons::AddAct => write!(f, "user-circle-plus"),
+            Icons::ArtistImagePlaceholder => write!(f, "vinyl-record"),
             Icons::Close => write!(f, "x"),
             Icons::Date => write!(f, "calendar"),
+            Icons::Downvote => write!(f, "thumbs-down"),
             Icons::Edit => write!(f, "pencil-simple"),
             Icons::EditCancel => write!(f, "pencil-simple-slash"),
             Icons::EndDate => write!(f, "calendar-slash"),
@@ -53,10 +56,9 @@ impl Display for Icons {
             Icons::Stage => write!(f, "map-pin-area"),
             Icons::StartTime => write!(f, "clock"),
             Icons::Unlike => write!(f, "heart-break"),
+            Icons::Upvote => write!(f, "thumbs-up"),
             Icons::Verified => write!(f, "seal-check"),
             Icons::Website => write!(f, "globe"),
-            Icons::Upvote => write!(f, "thumbs-up"),
-            Icons::Downvote => write!(f, "thumbs-down"),
         }
     }
 }
