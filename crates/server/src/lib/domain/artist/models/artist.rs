@@ -55,7 +55,7 @@ impl Artist {
     }
 }
 
-#[nutype(derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef))]
+#[nutype(derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef, Deserialize))]
 pub struct ArtistId(Uuid);
 
 #[nutype(

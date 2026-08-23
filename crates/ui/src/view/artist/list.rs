@@ -1,7 +1,7 @@
 use api::{UiState, artist::Artist};
 use maud::{Markup, html};
 
-use crate::{index, partial::artist::artist_card, view::artist::create};
+use crate::{component::link, index, partial::artist::artist_card, view::artist::create};
 
 pub fn full_page(state: &UiState, artists: &[Artist]) -> Markup {
     index::full_page(
@@ -33,7 +33,11 @@ pub fn render(state: &UiState, artists: &[Artist]) -> Markup {
             }
 
             @for artist in artists {
-                (artist_card(state, artist))
+                (link(
+                    &format!("{}/{}", crate::view::artist::BASE_PATH, artist.id),
+                    None,
+                    &artist_card(state, artist)
+                ))
             }
         }
     }

@@ -34,6 +34,7 @@ impl ArtistMapper {
             id: artist.id().clone().into_inner(),
             name: artist.name().as_ref().to_string(),
             image_card,
+            website_url: artist.website_url().cloned(),
         })
     }
 

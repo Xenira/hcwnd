@@ -1,5 +1,5 @@
 pub mod create;
-pub mod details;
+pub mod detail;
 pub mod list;
 
 pub const BASE_PATH: &str = "/artist";
