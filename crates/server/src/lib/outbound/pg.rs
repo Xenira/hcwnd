@@ -8,7 +8,7 @@ use itertools::Itertools;
 use itertools::Itertools as _;
 use log::info;
 use rayon::iter::ParallelIterator as _;
-use sqlx::{PgPool, postgres::PgConnectOptions};
+use sqlx::{postgres::PgConnectOptions, PgPool};
 use url::Url;
 
 use crate::{
@@ -170,6 +170,7 @@ impl EventRepository for Pg {
 
         let stages = self.list_stages(event_id).await?;
         let stages = EventStages::try_new(stages).context("Failed to parse stages for event")?;
+        dbg!("Fetched stages from db: {:#?}", &stages);
 
         let acts = self.list_acts(event_id).await?;
         let acts = EventActs::new(acts);

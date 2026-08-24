@@ -2,6 +2,7 @@ use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,
 };
+use itertools::Itertools;
 use url::Url;
 
 use crate::{domain::event::models::event::Event, inbound::http::mapper::act::ActMapper};
@@ -41,7 +42,15 @@ impl EventMapper {
                 .iter()
                 .map(|act| self.act_mapper.map_act(act))
                 .collect::<anyhow::Result<Vec<_>>>()?,
-            stages: vec![], // TODO: Map stages when available
+            stages: event
+                .stages()
+                .as_ref()
+                .iter()
+                .map(|stage| api::stage::Stage {
+                    id: stage.id().clone().into_inner(),
+                    name: stage.name().clone().into_inner(),
+                })
+                .collect_vec(),
         };
 
         Ok(event)
