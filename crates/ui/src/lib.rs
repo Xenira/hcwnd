@@ -6,6 +6,7 @@ extern crate rust_i18n;
 
 pub mod act;
 pub mod artist;
+pub mod atom;
 pub mod component;
 pub mod data_protection;
 pub mod event;

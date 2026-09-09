@@ -8,7 +8,7 @@ services:
       - "${HTTPS_PORT:-443}:443"
     command:
       - --entryPoints.web.address=:80
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      # - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
 
@@ -20,6 +20,7 @@ services:
       - --providers.docker.network=proxy
       - --api.dashboard=true
       - --api.insecure=true
+      - --accesslog=true
     networks:
       - traefik
     extra_hosts:
@@ -31,8 +32,8 @@ services:
       - "traefik.http.routers.dashboard.tls=true"
       # Enable self‑routing
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`hardcore.localhost`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.rule=Host(`hardcore.localhost`) || Host(`localhost`)"
+      - "traefik.http.routers.backend.entrypoints=web,websecure"
       # - "traefik.http.services.backend.loadbalancer.server.port=8090"
       - "traefik.http.services.backend.loadbalancer.server.url=http://backend:8090"
       # - traefik.http.routers.backend.middlewares=anubis@docker

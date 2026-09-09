@@ -24,6 +24,7 @@ url = { version = "2.5.8", features = ["serde"] }
 thiserror = "2.0.18"
 rust-i18n = "4.1.0"
 serde_with = "3.22.0"
+maud = "0.27.0"
 
 # workspace
 api = { path = "crates/api" }

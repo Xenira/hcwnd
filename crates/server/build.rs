@@ -7,7 +7,7 @@ pub fn main() {
     println!("cargo:rerun-if-changed=../../bun.lock");
     println!("cargo:rerun-if-changed=../../package.json");
 
-    println!("cargo:rerun-if-changed=../../assets/style.scss");
+    println!("cargo:rerun-if-changed=../../assets/**/*.scss");
     let css = grass::from_path("../../assets/style.scss", &grass::Options::default())
         .expect("Failed to compile SCSS");
     fs::write(out_dir.join("style.css"), css).expect("Failed to write style.css");

@@ -1,5 +1,5 @@
-use api::{act::Act, event::Event, UiState};
-use maud::{html, Markup};
+use api::{UiState, act::Act, event::Event};
+use maud::{Markup, html};
 use uuid::Uuid;
 
 use crate::{
@@ -18,13 +18,41 @@ pub fn full_page(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> 
             locale = &state.locale,
             name = &event.name
         ),
-        render(state, event, stage_filter),
+        event.id,
+        super::View::Lineup,
+        lineup_view(state, event, stage_filter),
     )
 }
 
 #[must_use]
 pub fn render(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Markup {
-    let menu = super::nav_bar(state, event.id, super::View::Lineup);
+    super::render(
+        state,
+        event.id,
+        super::View::Lineup,
+        lineup_view(state, event, stage_filter),
+    )
+}
+
+#[must_use]
+pub fn render_act_list(state: &UiState, acts: &[Act]) -> Markup {
+    html! {
+        div id=(ACTS_LIST_ID) {
+            @for act in acts {
+                (render_act(state, act))
+            }
+        }
+    }
+}
+
+#[must_use]
+pub fn render_act(state: &UiState, act: &Act) -> Markup {
+    html! {
+        (&act.name)
+    }
+}
+
+fn lineup_view(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Markup {
     let acts = if let Some(stage_id) = stage_filter {
         &event
             .acts
@@ -37,7 +65,6 @@ pub fn render(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Mar
     };
 
     html! {
-        (menu)
         section {
             form {
                 div role="search" {
@@ -61,23 +88,5 @@ pub fn render(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Mar
             }
             (render_act_list(state, acts))
         }
-    }
-}
-
-#[must_use]
-pub fn render_act_list(state: &UiState, acts: &[Act]) -> Markup {
-    html! {
-        div id=(ACTS_LIST_ID) {
-            @for act in acts {
-                (render_act(state, act))
-            }
-        }
-    }
-}
-
-#[must_use]
-pub fn render_act(state: &UiState, act: &Act) -> Markup {
-    html! {
-        (&act.name)
     }
 }

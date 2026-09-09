@@ -1,0 +1,23 @@
+@import "colors";
+
+button[type="button"] {
+  display: inline-flex;
+  padding: 0.625rem 1.25rem;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 0.5rem;
+  border-width: 0;
+  background: $interactive-default;
+
+  color: $status-white;
+  /* font-family: Outfit; */
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+
+  &:hover {
+    background: $interactive-hover;
+  }
+}

@@ -1,8 +1,8 @@
-use maud::{html, Markup};
+use maud::{Markup, html};
 use uuid::Uuid;
 
 use crate::{
-    component::{menu_item, Icons},
+    component::{Icons, menu_item},
     index,
 };
 
@@ -23,16 +23,24 @@ pub enum View {
 }
 
 #[must_use]
-pub fn full_page(state: &api::UiState, title: &str, content: Markup) -> Markup {
-    index::full_page(
-        state,
-        title,
-        html! {
-            div id=(EVENT_CONTAINER_ID) {
-                (content)
-            }
-        },
-    )
+pub fn full_page(
+    state: &api::UiState,
+    title: &str,
+    event_id: Uuid,
+    active_view: View,
+    content: Markup,
+) -> Markup {
+    index::full_page(state, title, render(state, event_id, active_view, content))
+}
+
+#[must_use]
+pub fn render(state: &api::UiState, event_id: Uuid, active_view: View, content: Markup) -> Markup {
+    html! {
+        div id=(EVENT_CONTAINER_ID) {
+            (nav_bar(state, event_id, active_view))
+            (content)
+        }
+    }
 }
 
 #[must_use]

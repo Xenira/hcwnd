@@ -49,6 +49,7 @@ tracing-actix-web = "0.7.21"
 ui = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true }
+maud = { workspace = true, features = ["actix-web"] }
 
 [build-dependencies]
 grass = "0.13.4"
