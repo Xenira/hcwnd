@@ -1,43 +1,48 @@
 use actix_web::{
-    get,
+    HttpResponse, Responder, get,
     web::{self, Query},
-    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
-use maud::{Markup, Render as _};
+use maud::{Markup, Render as _, html};
 use serde::{Deserialize, Serialize};
-use ui::atom::button::Button;
+use ui::{
+    atom::{chip::Chip, tag::Tag},
+    component::Icons,
+};
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(primary);
+    cfg.service(tags);
 }
 
 #[derive(Deserialize)]
-struct ButtonParams {
+struct TagParams {
     label: String,
 }
 
-#[get("/primary")]
-async fn primary(query: Query<ButtonParams>) -> Markup {
-    Button::builder()
-        .label(query.label.clone())
-        .build()
-        .render()
+#[get("/tags")]
+async fn tags(query: Query<TagParams>) -> Markup {
+    html! {
+        (Tag::builder().label(query.label.clone()).build())
+
+        @for i in 0..12 {
+            (Tag::builder().label(format!("{i}: {}", query.label.clone())).index(i).build())
+        }
+    }
 }
 
 pub fn stories() -> Vec<Story> {
     vec![Story {
-        id: "button",
-        name: "Button",
+        id: "tag",
+        name: "Tags",
         group: "Atoms",
         variants: vec![Variant::Metadata {
-            name: "primary",
+            name: "tags",
             controls: vec![Control {
                 name: "label",
                 value: ControlValue::String {
-                    default: Some("Click Me"),
+                    default: Some("Tag, you're it!"),
                 },
             }],
             docs: None,

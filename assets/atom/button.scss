@@ -11,7 +11,7 @@ button[type="button"] {
   background: $interactive-default;
 
   color: $status-white;
-  /* font-family: Outfit; */
+  font-family: inherit;
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 600;
@@ -19,5 +19,6 @@ button[type="button"] {
 
   &:hover {
     background: $interactive-hover;
+    color: $status-black;
   }
 }

@@ -1,0 +1,14 @@
+img {
+  object-fit: cover;
+}
+
+img.circle,
+small img {
+  border-radius: 50%;
+  border: 1.5px solid var(--background-card, #12131a);
+}
+
+small img {
+  width: 1.5rem;
+  height: 1.5rem;
+}

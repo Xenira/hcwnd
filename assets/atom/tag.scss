@@ -1,0 +1,45 @@
+@use "sass:color";
+
+@import "colors";
+
+.tag {
+  display: inline-flex;
+  padding: 0.25rem 0.625rem;
+  margin: 0.125rem;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 0.25rem;
+  border: 1px solid var(--tag, $accent-primary);
+  background: var(--tag-bg, rgba($accent-primary, 0.15));
+
+  color: var(--tag, $accent-primary);
+  font-size: 0.6875rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+@mixin tag-color($name, $color) {
+  :root {
+    --#{$name}-tag: #{$color};
+    --#{$name}-tag-bg: #{rgba($color, 0.15)};
+  }
+
+  .tag-#{$name} {
+    --tag: var(--#{$name}-tag, #{$color});
+    --tag-bg: var(--#{$name}-tag-bg, #{rgba($color, 0.15)});
+  }
+}
+@include tag-color("0", #00ccff);
+@include tag-color("1", #5c87ff);
+@include tag-color("2", #b554f5);
+@include tag-color("3", #66d9a6);
+@include tag-color("4", #ffb833);
+@include tag-color("5", #ff664d);
+@include tag-color("6", #ff8c00);
+@include tag-color("7", #ff6699);
+@include tag-color("8", #d9a64d);
+@include tag-color("9", #b2bfd9);
+@include tag-color("10", #a6cc73);
+@include tag-color("11", #bf4d4d);

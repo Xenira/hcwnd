@@ -100,6 +100,23 @@ services:
       - "traefik.http.routers.imgproxy.tls=true"
       - "traefik.http.services.imgproxy.loadbalancer.server.port=8080"
 
+  swapbook:
+    build:
+      dockerfile: Dockerfile
+      target: swapbook
+    restart: unless-stopped
+    extra_hosts:
+      - "backend:${IP_ADDRESS:?}"
+    command:
+      - "-target=http://backend:8090"
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.swapbook.rule=Host(`swapbook.localhost`)"
+      - "traefik.http.routers.swapbook.entrypoints=websecure,web"
+      - "traefik.http.services.swapbook.loadbalancer.server.port=7007"
+
 networks:
   traefik:
 

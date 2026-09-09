@@ -10,7 +10,7 @@ website.workspace = true
 [dependencies]
 base64 = { workspace = true }
 derive_builder.workspace = true
-hmac = "0.13.0-rc.6"
+hmac = "0.13.0"
 itertools.workspace = true
 sha2 = "0.11.0"
 thiserror = { workspace = true }

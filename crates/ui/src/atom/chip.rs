@@ -1,13 +1,32 @@
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
+use typed_builder::TypedBuilder;
 
-pub struct Button {
+use crate::component::{icon, Icons};
+
+#[derive(TypedBuilder)]
+pub struct Chip {
     pub label: String,
+    #[builder(default, setter(strip_option))]
+    pub icon: Option<Icons>,
 }
 
-impl Render for Button {
+impl Render for Chip {
     fn render(&self) -> Markup {
+        let icon = if let Some(i) = &self.icon {
+            icon(i, None)
+        } else {
+            html! {}
+        };
+
         html! {
-            span { (self.label) }
+            div.chip
+                title=(self.label)
+            {
+                (icon)
+                span {
+                    (self.label)
+                }
+            }
         }
     }
 }

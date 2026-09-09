@@ -1,0 +1,49 @@
+@import "colors";
+
+nav {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1rem 3rem;
+  justify-content: space-between;
+  align-items: center;
+
+  border-bottom: 1px solid var(--border-default, #{$border-default});
+  background: var(--background-page, #{$background-page});
+
+  ul {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+
+    li {
+      list-style: none;
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--text-secondary, #{$text-secondary});
+      font-size: 0.875rem;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+
+      &:hover {
+        text-decoration: underline;
+        color: var(--accent-primary, #{$accent-primary});
+      }
+      &[href="/"] {
+        color: var(--accent-primary, #{$accent-primary});
+
+        font-size: 1.125rem;
+        font-weight: 700;
+
+        &:hover {
+          color: var(--text-primary, #{$text-primary});
+        }
+      }
+    }
+  }
+}

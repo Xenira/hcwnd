@@ -1,9 +1,10 @@
 use std::fmt::Display;
 
-use api::{user::User, UiState};
-use maud::{html, Markup, Render, DOCTYPE};
+use api::{UiState, user::User};
+use maud::{DOCTYPE, Markup, Render, html};
 
 use crate::{
+    atom::nav::{Nav, NavEntry, NavEntryAlignment},
     component::menu_item,
     user::{self},
 };
@@ -40,85 +41,36 @@ fn format_title(locale: &str, title: impl Display) -> String {
 }
 
 fn nav_bar(state: &UiState) -> Markup {
-    let user = if let Some(user) = &state.user {
-        let profile_url = format!("/users/{}", user.name);
-        html! {
-            li {
-                details.dropdown {
-                    summary {
-                        (user::handle(user))
-                    }
-                    ul dir="rtl" {
-                        li {
-                            a hx-get=(profile_url)
-                                hx-target="#main"
-                                hx-swap="innerHTML"
-                                hx-push-url="true"
-                            {
-                                (t!("app.menu.user.profile", locale = &state.locale))
-                            }
-                        }
-                        li {
-                            a hx-get="/logout"
-                                hx-target="#main"
-                                hx-swap="innerHTML"
-                                hx-push-url="true"
-                                href="/logout"
-                            {
-                                (t!("app.menu.user.logout", locale = &state.locale))
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    let mut entries = if let Some(user) = &state.user {
+        vec![]
     } else {
-        html! {
-            li {
-                a hx-get="/login"
-                    hx-target="#main"
-                    hx-swap="innerHTML"
-                    hx-push-url="true"
-                    href="/login"
-                {
-                    span {
-                        (t!("app.menu.user.login", locale = &state.locale))
-                    }
-                }
-            }
-            li {
-                a hx-get="/signup"
-                  hx-target="#main"
-                  hx-swap="innerHTML"
-                  hx-push-url="true"
-                  href="/signup" {
-                    span {
-                        (t!("app.menu.user.sign_up", locale = &state.locale))
-                    }
-                }
-            }
-        }
+        vec![
+            NavEntry::builder()
+                .label(t!("app.menu.user.login", locale = &state.locale))
+                .href("/login")
+                .alignment(NavEntryAlignment::Right)
+                .build(),
+            NavEntry::builder()
+                .label(t!("app.menu.user.sign_up", locale = &state.locale))
+                .href("/signup")
+                .alignment(NavEntryAlignment::Right)
+                .build(),
+        ]
     };
-    html! {
-        header.container-fluid.fixed-top.bg-primary {
-            nav
-                hx-boost="true"
-            {
-                ul {
-                    li {
-                        strong {
-                            #home { a.flex href="/" { "❮" span { (t!("app.name", locale = &state.locale)) } "❯" } }
-                        }
-                    }
-                }
-                ul {
-                    (menu_item(&t!("app.menu.events", locale = &state.locale), None, "/", "#main", "home", false))
-                    (menu_item(&t!("app.menu.artists", locale = &state.locale), None, api::routes::ARTIST_ROUTE, "#main", "artists", false))
-                    (user)
-                }
-            }
-        }
-    }
+    entries.push(
+        NavEntry::builder()
+            .label(t!("app.name", locale = &state.locale))
+            .href("/")
+            .build(),
+    );
+    entries.push(
+        NavEntry::builder()
+            .label(t!("app.menu.artists", locale = &state.locale))
+            .href(api::routes::ARTIST_ROUTE)
+            .build(),
+    );
+
+    Nav::builder().entries(entries).build().render()
 }
 
 fn scripts() -> Markup {
@@ -129,10 +81,6 @@ fn scripts() -> Markup {
 
 fn styles() -> Markup {
     html! {
-        link rel="stylesheet" href="/assets/mu.css";
         link rel="stylesheet" href="/assets/style.css";
-        link rel="stylesheet" href="/assets/icons/regular/style.css";
-        link rel="stylesheet" href="/assets/icons/fill/style.css";
-        link rel="stylesheet" href="/assets/fonts/index.css";
     }
 }

@@ -1,8 +1,19 @@
+@use "../node_modules/@fontsource/outfit/index.css";
+@use "../node_modules/@phosphor-icons/web/src/regular/style.css" as
+  phosphor-regular;
+@use "../node_modules/@phosphor-icons/web/src/fill/style.css" as phosphor-fill;
+
 @import "breakpoints.scss";
-@import "atom/button.scss";
-@import "atom/chip.scss";
+@import "atom";
+@import "component";
 
 $navbar_height: 3.4rem;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 html {
   height: 100%;
@@ -10,9 +21,10 @@ html {
 }
 
 body {
-  height: stretch;
-  overflow-y: auto;
-  margin-top: $navbar_height;
+  /* height: stretch; */
+  /* overflow-y: auto; */
+  margin: 0;
+  background-color: var(--background-page, #{$background-page});
   &:has(#event) {
     margin-top: 2 * $navbar_height;
     @include break("tablet") {
@@ -51,7 +63,7 @@ i.ph {
   vertical-align: middle;
 
   &:not(:last-child) {
-    margin-right: 0.5rem;
+    /* margin-right: 0.5rem; */
   }
 }
 

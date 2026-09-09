@@ -44,3 +44,11 @@ FROM alpine
 WORKDIR /app
 USER 1000
 COPY --from=combiner /app .
+
+FROM golang:1.27.1-alpine AS swapbook-builder
+RUN go install github.com/Aejkatappaja/swapbook/cmd/swapbook@v0.6.0
+
+FROM alpine AS swapbook
+WORKDIR /app
+COPY --from=swapbook-builder /go/bin/swapbook /usr/local/bin/swapbook
+ENTRYPOINT ["/usr/local/bin/swapbook"]

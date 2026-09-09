@@ -28,6 +28,7 @@ pub enum Icons {
     Upvote,
     Verified,
     Website,
+    OpenCard,
 }
 
 impl Display for Icons {
@@ -59,6 +60,7 @@ impl Display for Icons {
             Icons::Upvote => write!(f, "thumbs-up"),
             Icons::Verified => write!(f, "seal-check"),
             Icons::Website => write!(f, "globe"),
+            Icons::OpenCard => write!(f, "caret-right"),
         }
     }
 }

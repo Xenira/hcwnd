@@ -1,0 +1,62 @@
+select {
+  // A reset of styles, including removing the default dropdown arrow
+  outline: none;
+  // Additional resets for further consistency
+  height: 2.75rem;
+  padding: 0 1rem;
+  align-items: center;
+  gap: 0.5rem;
+
+  border-radius: 0.75rem;
+  border: 0.5px solid var(--border-default, #{$border-default});
+  background: var(--background-surface, #{$background-surface});
+
+  color: var(--text-primary, #{$text-primary});
+  &:has(option[value=""]:checked) {
+    color: var(--text-tertiary, #{$text-tertiary});
+  }
+
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+
+  &::picker-icon {
+    content: "\e136";
+    font-family: "Phosphor";
+  }
+  &:open::picker-icon {
+    rotate: 180deg;
+  }
+
+  option {
+    color: var(--text-primary, #{$text-primary});
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+
+    &::checkmark {
+      display: none;
+    }
+  }
+
+  option[value=""] {
+    color: var(--text-tertiary, #{$text-tertiary});
+  }
+}
+
+select,
+::picker(select) {
+  appearance: base-select;
+}
+
+::picker(select) {
+  padding: 0.375rem 0;
+  margin-top: 0.375rem;
+
+  border-radius: 0.75rem;
+  border: 0.5px solid var(--border-subtle, #{$border-subtle});
+  background: var(--background-elevated, #{$background-elevated});
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+}

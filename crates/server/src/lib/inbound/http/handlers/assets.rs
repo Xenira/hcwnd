@@ -1,17 +1,26 @@
 use actix_web::{
-    HttpResponse, Responder, get,
+    get,
     web::{self, ServiceConfig},
+    HttpResponse, Responder,
 };
 use mime_guess::from_path;
 use rust_embed::{Embed, RustEmbed};
 
 #[derive(Embed)]
-#[folder = "../../node_modules/@phosphor-icons/web/src/"]
-#[include = "**/*.woff2"]
-#[include = "**/*.woff"]
-#[include = "**/*.ttf"]
-#[include = "**/*.css"]
-struct Icons;
+#[folder = "../../node_modules/@phosphor-icons/web/src/regular/"]
+#[include = "*.woff2"]
+#[include = "*.woff"]
+#[include = "*.ttf"]
+#[include = "*.css"]
+struct IconsRegular;
+
+#[derive(Embed)]
+#[folder = "../../node_modules/@phosphor-icons/web/src/fill/"]
+#[include = "*.woff2"]
+#[include = "*.woff"]
+#[include = "*.ttf"]
+#[include = "*.css"]
+struct IconsFill;
 
 #[derive(Embed)]
 #[folder = "../../node_modules/@fontsource/open-sans/"]
@@ -19,6 +28,12 @@ struct Icons;
 #[include = "files/*.woff"]
 #[include = "index.css"]
 struct OpenSans;
+
+#[derive(Embed)]
+#[folder = "../../node_modules/@fontsource/outfit/files/"]
+#[include = "*.woff2"]
+#[include = "*.woff"]
+struct Geist;
 
 const MU_CSS: &str =
     include_str!("../../../../../../../node_modules/@digicreon/mucss/dist/mu.slate.css");
@@ -29,8 +44,20 @@ pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(mu_css)
         .service(style_css)
         .service(htmx_js)
-        .service(icons)
-        .service(fonts);
+        .service(fonts)
+        .service(geist_font)
+        .service(icons_fill_index)
+        .service(icons_index);
+}
+
+#[get("{_:.*-Fill.*}")]
+async fn icons_fill_index(path: web::Path<String>) -> impl Responder {
+    handle_embedded_file::<IconsFill>(&path)
+}
+
+#[get("{_:.*}")]
+async fn icons_index(path: web::Path<String>) -> impl Responder {
+    handle_embedded_file::<IconsRegular>(&path)
 }
 
 #[get("/mu.css")]
@@ -50,14 +77,19 @@ async fn htmx_js() -> impl Responder {
         .body(HTMX_JS)
 }
 
-#[get("/icons/{_:.*}")]
-async fn icons(path: web::Path<String>) -> impl Responder {
-    handle_embedded_file::<Icons>(&path)
-}
+// #[get("/icons/{_:.*}")]
+// async fn icons(path: web::Path<String>) -> impl Responder {
+//     handle_embedded_file::<Icons>(&path)
+// }
 
 #[get("/fonts/{_:.*}")]
 async fn fonts(path: web::Path<String>) -> impl Responder {
     handle_embedded_file::<OpenSans>(&path)
+}
+
+#[get("/files/{_:.*}")]
+async fn geist_font(path: web::Path<String>) -> impl Responder {
+    handle_embedded_file::<Geist>(&path)
 }
 
 fn handle_embedded_file<T: RustEmbed>(path: &str) -> HttpResponse {

@@ -16,9 +16,10 @@ itertools = { workspace = true }
 indexmap = { workspace = true }
 serde_json = { workspace = true }
 url = { workspace = true }
-serde_with = "3.21.0"
+serde_with = "3.23.0"
 rust-i18n = { workspace = true }
 api = { workspace = true }
+typed-builder = "0.23.2"
 
 [package.metadata.i18n]
 default-locale = "en"

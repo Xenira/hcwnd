@@ -1,8 +1,11 @@
 {
   "dependencies": {
     "@digicreon/mucss": "^1.4.8",
+    "@fontsource-utils/scss": "^0.2.4",
     "@fontsource/alexandria": "^5.2.8",
+    "@fontsource/geist": "^5.3.0",
     "@fontsource/open-sans": "^5.2.7",
+    "@fontsource/outfit": "^5.3.0",
     "@phosphor-icons/web": "^2.1.2",
     "@picocss/pico": "^2.1.1",
     "htmx.org": "^2.0.8"

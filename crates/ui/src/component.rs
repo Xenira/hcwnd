@@ -9,3 +9,6 @@ pub use menu::*;
 
 mod link;
 pub use link::*;
+
+mod event_card;
+pub use event_card::*;

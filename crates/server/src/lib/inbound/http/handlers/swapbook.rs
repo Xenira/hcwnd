@@ -83,7 +83,18 @@ pub struct Step {
 
 #[get("/manifest.json")]
 async fn manifest() -> impl Responder {
-    let stories = preview::button::stories();
+    let stories = preview::button::stories()
+        .into_iter()
+        .chain(preview::chip::stories().into_iter())
+        .chain(preview::input::stories().into_iter())
+        .chain(preview::typography::stories().into_iter())
+        .chain(preview::card::stories().into_iter())
+        .chain(preview::event_card::stories().into_iter())
+        .chain(preview::tag::stories().into_iter())
+        .chain(preview::nav::stories().into_iter())
+        .chain(preview::select::stories().into_iter())
+        .collect();
+
     let manifest = Manifest {
         htmx_src: "/assets/htmx.min.js",
         css_src: "/assets/style.css",

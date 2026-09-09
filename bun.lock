@@ -5,8 +5,11 @@
     "": {
       "dependencies": {
         "@digicreon/mucss": "^1.4.8",
+        "@fontsource-utils/scss": "^0.2.4",
         "@fontsource/alexandria": "^5.2.8",
+        "@fontsource/geist": "^5.3.0",
         "@fontsource/open-sans": "^5.2.7",
+        "@fontsource/outfit": "^5.3.0",
         "@phosphor-icons/web": "^2.1.2",
         "@picocss/pico": "^2.1.1",
         "htmx.org": "^2.0.8",
@@ -16,9 +19,15 @@
   "packages": {
     "@digicreon/mucss": ["@digicreon/mucss@1.4.8", "", {}, "sha512-tROK1G/PulvT2QGZHdMjQUKuHznne/cVpPxoCDpmEWWa1VdXnT1L9UiSEHkHs7T4KcHyJ9aI/nAyEhB5cWy6nQ=="],
 
+    "@fontsource-utils/scss": ["@fontsource-utils/scss@0.2.4", "", {}, "sha512-QmfdOQG4jE/LNM7N/i2OGz0MJhizdUkIVwCxT3d1IiFPH1Up9QTS6rtVvnaoYF7CQTnDq5inwNzAhu+tR+rSCQ=="],
+
     "@fontsource/alexandria": ["@fontsource/alexandria@5.2.8", "", {}, "sha512-fEG//tSkzPcPcP443PHxXHxZCIQgIQxuHYB/TXOhjo4s0jeNZvUbPgsgpQSVDIQCtCJ+ZuOl4OUSdjCUd4SB0g=="],
 
+    "@fontsource/geist": ["@fontsource/geist@5.3.0", "", {}, "sha512-u03ftlfVwb05uijq2jGDJ03/HKGqMKaNFk7KOhkpBUex8+BhrAOfMs/XciJ2UUNUX9fEsZbZQld/RWMA2oFU7g=="],
+
     "@fontsource/open-sans": ["@fontsource/open-sans@5.2.7", "", {}, "sha512-8yfgDYjE5O0vmTPdrcjV35y4yMnctsokmi9gN49Gcsr0sjzkMkR97AnKDe6OqZh2SFkYlR28fxOvi21bYEgMSw=="],
+
+    "@fontsource/outfit": ["@fontsource/outfit@5.3.0", "", {}, "sha512-0AVHzTTVJSxWDOxPKSfMeHhZeBFDU3cmgrcOb76ZEyhGo0+xgyG3GsLF3h9+X8w0IX7G4jzjJgFQEBiWdX6VgA=="],
 
     "@phosphor-icons/web": ["@phosphor-icons/web@2.1.2", "", {}, "sha512-rPAR9o/bEcp4Cw4DEeZHXf+nlGCMNGkNDRizYHM47NLxz9vvEHp/Tt6FMK1NcWadzw/pFDPnRBGi/ofRya958A=="],
 

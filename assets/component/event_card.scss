@@ -1,0 +1,21 @@
+@import "../atom/colors.scss";
+.event-card {
+  display: inline-block;
+
+  article {
+    position: relative;
+    max-width: 23.75rem;
+
+    .flair {
+      --tag-bg: var(--accent-primary, #{$accent-primary});
+
+      .tag {
+        color: var(--text-primary, #{$text-primary});
+      }
+
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+    }
+  }
+}
