@@ -86,6 +86,7 @@ async fn index(
     } else {
         view.full_page(&state)
     };
+
     Ok(HttpResponse::Ok()
         .content_type("text/html")
         .body(body.into_string()))

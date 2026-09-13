@@ -28,44 +28,12 @@ pub fn render(state: &UiState, event: &Event) -> Markup {
 fn detail_view(state: &UiState, event: &Event) -> Markup {
     html! {
         h2 {
-            (t!("event.detail.details.title", locale = &state.locale))
+            (t!("event.detail.details.about", locale = &state.locale))
         }
         p {
             (event.description)
         }
+        aside {
+        }
     }
 }
-// impl maud::Render for EventDetails {
-//     fn render(&self) -> maud::Markup {
-//         maud::html! {
-//             h1 { (self.title) }
-//             img src=(self.image_url) alt=(self.title);
-//             (self.overview())
-//             (self.about())
-//         }
-//     }
-// }
-//
-// impl EventDetails {
-//     fn overview(&self) -> maud::Markup {
-//         maud::html! {
-//             section {
-//                 header {
-//                     h2 { "Overview" }
-//                 }
-//                 (icon(&Icons::Date, None)) (self.start_date.format("%d.%m.%Y").to_string())
-//             }
-//         }
-//     }
-//
-//     fn about(&self) -> maud::Markup {
-//         maud::html! {
-//             section {
-//                 header {
-//                     h2 { "About" }
-//                 }
-//                 p { (self.description) }
-//             }
-//         }
-//     }
-// }

@@ -1,10 +1,10 @@
 use std::fmt::Display;
 
-use api::{UiState, user::User};
-use maud::{DOCTYPE, Markup, Render, html};
+use api::{user::User, UiState};
+use maud::{html, Markup, Render, DOCTYPE};
 
 use crate::{
-    atom::nav::{Nav, NavEntry, NavEntryAlignment},
+    atom::nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
     component::menu_item,
     user::{self},
 };
@@ -42,32 +42,52 @@ fn format_title(locale: &str, title: impl Display) -> String {
 
 fn nav_bar(state: &UiState) -> Markup {
     let mut entries = if let Some(user) = &state.user {
-        vec![]
+        vec![NavEntryDropdown::builder()
+            .label(&user.name)
+            .entries(vec![
+                NavEntrySimple::builder()
+                    .label(t!("app.menu.user.profile", locale = &state.locale))
+                    .href(format!("/user/{}", user.id))
+                    .build()
+                    .into(),
+                NavEntrySimple::builder()
+                    .label(t!("app.menu.user.logout", locale = &state.locale))
+                    .href("/logout")
+                    .build()
+                    .into(),
+            ])
+            .alignment(NavEntryAlignment::Right)
+            .build()
+            .into()]
     } else {
         vec![
-            NavEntry::builder()
+            NavEntrySimple::builder()
                 .label(t!("app.menu.user.login", locale = &state.locale))
                 .href("/login")
                 .alignment(NavEntryAlignment::Right)
-                .build(),
-            NavEntry::builder()
+                .build()
+                .into(),
+            NavEntrySimple::builder()
                 .label(t!("app.menu.user.sign_up", locale = &state.locale))
                 .href("/signup")
                 .alignment(NavEntryAlignment::Right)
-                .build(),
+                .build()
+                .into(),
         ]
     };
     entries.push(
-        NavEntry::builder()
+        NavEntrySimple::builder()
             .label(t!("app.name", locale = &state.locale))
             .href("/")
-            .build(),
+            .build()
+            .into(),
     );
     entries.push(
-        NavEntry::builder()
+        NavEntrySimple::builder()
             .label(t!("app.menu.artists", locale = &state.locale))
             .href(api::routes::ARTIST_ROUTE)
-            .build(),
+            .build()
+            .into(),
     );
 
     Nav::builder().entries(entries).build().render()

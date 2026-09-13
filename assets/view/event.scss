@@ -1,3 +1,5 @@
+@import "../atom/colors.scss";
+
 #event {
   > header {
     display: flex;
@@ -30,25 +32,29 @@
     > hgroup {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
+      align-items: flex-start;
+      gap: 1rem;
+      align-self: stretch;
 
       > h1 {
-        color: var(--text-primary, #f3f4f6);
-
-        font-size: 3.5rem;
-        font-weight: 700;
-        line-height: 4rem;
-        letter-spacing: -0.0625rem;
+        color: var(--text-primary, #{$text-primary});
+        font-size: 3rem;
+        font-weight: 800;
       }
-      > p {
-        color: var(--text-secondary, #9ca3af);
+      > div {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
 
-        font-size: 1.125rem;
-        font-weight: 400;
-        line-height: 150%;
+        span:not(.tag) {
+          color: var(--text-secondary, #{$text-secondary});
+          font-size: 0.875rem;
+          font-weight: 400;
 
-        max-width: 42.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+        }
       }
     }
 

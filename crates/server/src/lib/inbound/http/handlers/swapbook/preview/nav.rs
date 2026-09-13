@@ -10,7 +10,7 @@ use ui::{
     atom::{
         card::Card,
         chip::Chip,
-        nav::{Nav, NavEntry, NavEntryAlignment},
+        nav::{Nav, NavEntry, NavEntryAlignment, NavEntrySimple},
     },
     component::Icons,
 };
@@ -25,32 +25,48 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 async fn card() -> Markup {
     let main = Nav::builder()
         .entries(vec![
-            NavEntry::builder().label("Home").href("/").build(),
-            NavEntry::builder().label("About").href("/about").build(),
-            NavEntry::builder()
+            NavEntrySimple::builder()
+                .label("Home")
+                .href("/")
+                .build()
+                .into(),
+            NavEntrySimple::builder()
+                .label("About")
+                .href("/about")
+                .build()
+                .into(),
+            NavEntrySimple::builder()
                 .label("Contact")
                 .href("/contact")
                 .alignment(NavEntryAlignment::Right)
-                .build(),
+                .build()
+                .into(),
         ])
         .build();
     let tab = Nav::builder()
         .entries(vec![
-            NavEntry::builder()
+            NavEntrySimple::builder()
                 .label("Details")
                 .href("/details")
                 .active(true)
-                .build(),
-            NavEntry::builder()
+                .build()
+                .into(),
+            NavEntrySimple::builder()
                 .label("Timetable")
                 .href("/timetable")
-                .build(),
-            NavEntry::builder().label("Lineup").href("/lineup").build(),
-            NavEntry::builder()
+                .build()
+                .into(),
+            NavEntrySimple::builder()
+                .label("Lineup")
+                .href("/lineup")
+                .build()
+                .into(),
+            NavEntrySimple::builder()
                 .label("Pending Edits (8)")
                 .href("/suggestions")
                 .alignment(NavEntryAlignment::Right)
-                .build(),
+                .build()
+                .into(),
         ])
         .build();
 

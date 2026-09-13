@@ -15,10 +15,76 @@ nav {
 
     li {
       list-style: none;
+      display: flex;
+      align-items: center;
 
       a {
         text-decoration: none;
         color: var(--text-secondary, #{$text-secondary});
+      }
+
+      details {
+        position: relative;
+
+        summary {
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+
+          list-style-type: none;
+          cursor: pointer;
+          color: var(--text-secondary, #{$text-secondary});
+        }
+
+        &[open] > summary::before {
+          display: block;
+          z-index: 1;
+          position: fixed;
+          width: 100vw;
+          height: 100vh;
+          inset: 0;
+          background: none;
+          content: "";
+          cursor: default;
+        }
+
+        ul {
+          display: flex;
+          width: 17.5rem;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0;
+
+          position: absolute;
+          top: 2rem;
+          right: -2rem;
+          z-index: 10;
+
+          border-radius: 0.75rem;
+          border: 1px solid var(--border-default, #{$border-default});
+          background: var(--background-card, #{$background-card});
+          box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.4);
+
+          li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            align-self: stretch;
+
+            a {
+              padding: 0.75rem 1rem;
+              width: 100%;
+
+              &:hover {
+                background: var(--background-elevated, #{$background-elevated});
+              }
+            }
+
+            &:not(:last-child) {
+              border-bottom: 1px solid var(--border-default, #{$border-default});
+            }
+          }
+        }
       }
     }
   }
@@ -32,6 +98,10 @@ body > nav {
   ul {
     align-items: center;
     gap: 2rem;
+
+    summary:hover {
+      color: var(--accent-primary, #{$accent-primary});
+    }
 
     a {
       font-size: 0.875rem;
@@ -61,20 +131,33 @@ div[role="tablist"] > nav {
   padding: 0 3rem;
   align-self: stretch;
 
-  ul {
+  > ul {
     gap: 1.5rem;
 
-    li {
+    > li {
+      details,
+      summary {
+        height: 100%;
+      }
+
+      details[open] > ul {
+        top: 3rem;
+      }
+
+      summary:hover {
+        color: var(--text-primary, #{$text-primary});
+      }
+
       > a {
         display: inline-block;
         padding: 1rem 0;
 
         font-size: 0.9375rem;
         font-weight: 600;
+      }
 
-        &:hover {
-          color: var(--text-primary, #{$text-primary});
-        }
+      a:hover {
+        color: var(--text-primary, #{$text-primary});
       }
 
       &:has(> a[aria-selected="true"]) {
