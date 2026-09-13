@@ -1,9 +1,10 @@
 use actix_web::{
-    HttpResponse, Responder, get,
+    get,
     web::{self, Query},
+    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
-use maud::{Markup, Render as _, html};
+use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
 use ui::{
     atom::{
@@ -22,7 +23,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 
 #[get("/main")]
 async fn card() -> Markup {
-    Nav::builder()
+    let main = Nav::builder()
         .entries(vec![
             NavEntry::builder().label("Home").href("/").build(),
             NavEntry::builder().label("About").href("/about").build(),
@@ -32,8 +33,33 @@ async fn card() -> Markup {
                 .alignment(NavEntryAlignment::Right)
                 .build(),
         ])
-        .build()
-        .render()
+        .build();
+    let tab = Nav::builder()
+        .entries(vec![
+            NavEntry::builder()
+                .label("Details")
+                .href("/details")
+                .active(true)
+                .build(),
+            NavEntry::builder()
+                .label("Timetable")
+                .href("/timetable")
+                .build(),
+            NavEntry::builder().label("Lineup").href("/lineup").build(),
+            NavEntry::builder()
+                .label("Pending Edits (8)")
+                .href("/suggestions")
+                .alignment(NavEntryAlignment::Right)
+                .build(),
+        ])
+        .build();
+
+    html! {
+        (main)
+        div role="tablist" {
+            (tab)
+        }
+    }
 }
 
 pub fn stories() -> Vec<Story> {

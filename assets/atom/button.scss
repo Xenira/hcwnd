@@ -1,6 +1,7 @@
 @import "colors";
 
-button[type="button"] {
+button[type="button"],
+a[role="button"] {
   display: inline-flex;
   padding: 0.625rem 1.25rem;
   justify-content: center;

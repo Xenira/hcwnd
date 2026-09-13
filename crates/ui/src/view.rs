@@ -7,7 +7,9 @@ use crate::index;
 
 pub mod artist;
 pub mod event;
-pub mod home;
+
+mod home;
+pub use home::Home;
 
 pub trait View {
     fn render(&self, state: &UiState) -> maud::Markup;

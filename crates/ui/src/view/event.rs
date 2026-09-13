@@ -1,8 +1,13 @@
-use maud::{Markup, html};
+use api::event::Event;
+use maud::{html, Markup};
 use uuid::Uuid;
 
 use crate::{
-    component::{Icons, menu_item},
+    atom::{
+        nav::{Nav, NavEntry},
+        tag::Tag,
+    },
+    component::{menu_item, Icons},
     index,
 };
 
@@ -26,74 +31,75 @@ pub enum View {
 pub fn full_page(
     state: &api::UiState,
     title: &str,
-    event_id: Uuid,
+    event: &Event,
     active_view: View,
     content: Markup,
 ) -> Markup {
-    index::full_page(state, title, render(state, event_id, active_view, content))
+    index::full_page(state, title, render(state, event, active_view, content))
 }
 
 #[must_use]
-pub fn render(state: &api::UiState, event_id: Uuid, active_view: View, content: Markup) -> Markup {
+pub fn render(state: &api::UiState, event: &Event, active_view: View, content: Markup) -> Markup {
     html! {
         div id=(EVENT_CONTAINER_ID) {
-            (nav_bar(state, event_id, active_view))
-            (content)
-        }
-    }
-}
+            header {
+                (header(state, event))
+            }
+            div role="tablist" {
+                (nav_bar(state, event.id, active_view))
+            }
 
-#[must_use]
-pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Markup {
-    let target = format!("#{EVENT_CONTAINER_ID}");
-
-    let details_url = format!("{}/{event_id}", api::routes::EVENT_ROUTE);
-    let details_menu = menu_item(
-        &t!("event.detail.menu.details", locale = &state.locale),
-        Some(Icons::EventDetails),
-        &details_url,
-        &target,
-        "event_menu",
-        active_view == View::Detail,
-    );
-
-    let timetable_url = format!(
-        "{}/{event_id}{}",
-        api::routes::EVENT_ROUTE,
-        api::routes::EVENT_TIMETABLE_ROUTE
-    );
-    let timetable_menu = menu_item(
-        &t!("event.detail.menu.timetable", locale = &state.locale),
-        Some(Icons::EventTimetable),
-        &timetable_url,
-        &target,
-        "event_menu",
-        active_view == View::Timetable,
-    );
-
-    let lineup_url = format!(
-        "{}/{event_id}{}",
-        api::routes::EVENT_ROUTE,
-        api::routes::EVENT_LINEUP_ROUTE
-    );
-    let lineup_menu = menu_item(
-        &t!("event.detail.menu.lineup", locale = &state.locale),
-        Some(Icons::EventLineup),
-        &lineup_url,
-        &target,
-        "event_menu",
-        active_view == View::Lineup,
-    );
-
-    html! {
-        header.bg-secondary {
-            nav.container {
-                ul.backdrop {
-                    (details_menu)
-                    (timetable_menu)
-                    (lineup_menu)
-                }
+            div id=(EVENT_CONTENT_CONTAINER_ID) {
+                (content)
             }
         }
     }
+}
+
+#[must_use]
+fn header(state: &api::UiState, event: &Event) -> Markup {
+    let genres = ["Hardcore", "Uptempo"]; // TODO: Replace with actual genres from the event
+    html! {
+        img src=(event.image_url) alt="Header image" {}
+        div {
+            @for (i, genre) in genres.iter().enumerate().take(5) {
+                (Tag::builder()
+                    .label(*genre)
+                    .index(i as u8)
+                    .build())
+            }
+        }
+        h1 { (event.name) }
+    }
+}
+
+#[must_use]
+pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Nav {
+    Nav::builder()
+        .entries(vec![
+            NavEntry::builder()
+                .href(format!("{}/{event_id}", api::routes::EVENT_ROUTE))
+                .label(t!("event.detail.menu.details", locale = &state.locale).to_string())
+                .active(active_view == View::Detail)
+                .build(),
+            NavEntry::builder()
+                .href(format!(
+                    "{}/{event_id}{}",
+                    api::routes::EVENT_ROUTE,
+                    api::routes::EVENT_TIMETABLE_ROUTE
+                ))
+                .label(t!("event.detail.menu.timetable", locale = &state.locale).to_string())
+                .active(active_view == View::Timetable)
+                .build(),
+            NavEntry::builder()
+                .href(format!(
+                    "{}/{event_id}{}",
+                    api::routes::EVENT_ROUTE,
+                    api::routes::EVENT_LINEUP_ROUTE
+                ))
+                .label(t!("event.detail.menu.lineup", locale = &state.locale).to_string())
+                .active(active_view == View::Lineup)
+                .build(),
+        ])
+        .build()
 }

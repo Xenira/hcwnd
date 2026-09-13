@@ -1,5 +1,5 @@
-use api::{UiState, event::Event};
-use maud::{Markup, html};
+use api::{event::Event, UiState};
+use maud::{html, Markup};
 
 use crate::{index, view::event::View};
 
@@ -14,7 +14,7 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
     super::full_page(
         state,
         &title,
-        event.id,
+        event,
         View::Detail,
         detail_view(state, event),
     )
@@ -22,24 +22,16 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
 
 #[must_use]
 pub fn render(state: &UiState, event: &Event) -> Markup {
-    super::render(state, event.id, View::Detail, detail_view(state, event))
+    super::render(state, event, View::Detail, detail_view(state, event))
 }
 
 fn detail_view(state: &UiState, event: &Event) -> Markup {
     html! {
-        img src=(event.image_url) alt=(event.name);
-        section.hero.hero-primary {
-            div.container {
-                h1 { (event.name) }
-            }
+        h2 {
+            (t!("event.detail.details.title", locale = &state.locale))
         }
-        section {
-            div.container {
-                header {
-                    h2 { (t!("event.detail.overview.title", locale = &state.locale)) }
-                }
-                p { (event.description) }
-            }
+        p {
+            (event.description)
         }
     }
 }

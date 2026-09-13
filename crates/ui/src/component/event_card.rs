@@ -1,5 +1,6 @@
 use std::ops::Not as _;
 
+use api::event::Event;
 use chrono::{DateTime, Local};
 use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
@@ -58,12 +59,28 @@ impl Render for EventCard {
                         }
                     }))
                     .footer(html! {
-                        (icon(&Icons::OpenCard, None))
+                        a role="button" href=(format!("/event/{}", self.id)) hx-boost="true" hx-target="main" hx-push-url="true" {
+                            (icon(&Icons::OpenCard, None))
+                        }
                     })
                     .build()
                     .render())
             }
         }
+    }
+}
+
+impl From<&Event> for EventCard {
+    fn from(event: &Event) -> Self {
+        Self::builder()
+            .id(event.id)
+            .name(&event.name)
+            .location("TBD")
+            .start_time(Local::now())
+            .end_time(Local::now())
+            .image(&event.image_url)
+            .saved(false)
+            .build()
     }
 }
 

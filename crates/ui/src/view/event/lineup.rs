@@ -1,5 +1,5 @@
-use api::{UiState, act::Act, event::Event};
-use maud::{Markup, html};
+use api::{act::Act, event::Event, UiState};
+use maud::{html, Markup};
 use uuid::Uuid;
 
 use crate::{
@@ -18,7 +18,7 @@ pub fn full_page(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> 
             locale = &state.locale,
             name = &event.name
         ),
-        event.id,
+        event,
         super::View::Lineup,
         lineup_view(state, event, stage_filter),
     )
@@ -28,7 +28,7 @@ pub fn full_page(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> 
 pub fn render(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Markup {
     super::render(
         state,
-        event.id,
+        event,
         super::View::Lineup,
         lineup_view(state, event, stage_filter),
     )

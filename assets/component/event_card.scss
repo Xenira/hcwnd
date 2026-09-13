@@ -1,10 +1,10 @@
 @import "../atom/colors.scss";
 .event-card {
   display: inline-block;
+  width: 100%;
 
   article {
     position: relative;
-    max-width: 23.75rem;
 
     .flair {
       --tag-bg: var(--accent-primary, #{$accent-primary});

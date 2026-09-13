@@ -2,9 +2,6 @@
 
 nav {
   display: flex;
-  box-sizing: border-box;
-  width: 100%;
-  padding: 1rem 3rem;
   justify-content: space-between;
   align-items: center;
 
@@ -13,18 +10,30 @@ nav {
 
   ul {
     display: flex;
-    align-items: center;
-    gap: 2rem;
     margin: 0;
     padding: 0;
 
     li {
       list-style: none;
+
+      a {
+        text-decoration: none;
+        color: var(--text-secondary, #{$text-secondary});
+      }
     }
+  }
+}
+
+body > nav {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1rem 3rem;
+
+  ul {
+    align-items: center;
+    gap: 2rem;
 
     a {
-      text-decoration: none;
-      color: var(--text-secondary, #{$text-secondary});
       font-size: 0.875rem;
       font-style: normal;
       font-weight: 500;
@@ -41,6 +50,37 @@ nav {
         font-weight: 700;
 
         &:hover {
+          color: var(--text-primary, #{$text-primary});
+        }
+      }
+    }
+  }
+}
+
+div[role="tablist"] > nav {
+  padding: 0 3rem;
+  align-self: stretch;
+
+  ul {
+    gap: 1.5rem;
+
+    li {
+      > a {
+        display: inline-block;
+        padding: 1rem 0;
+
+        font-size: 0.9375rem;
+        font-weight: 600;
+
+        &:hover {
+          color: var(--text-primary, #{$text-primary});
+        }
+      }
+
+      &:has(> a[aria-selected="true"]) {
+        border-bottom: 2px solid var(--accent-primary, #{$accent-primary});
+
+        > a {
           color: var(--text-primary, #{$text-primary});
         }
       }

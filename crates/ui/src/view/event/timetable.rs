@@ -1,5 +1,5 @@
-use api::{UiState, event::Event};
-use maud::{Markup, html};
+use api::{event::Event, UiState};
+use maud::{html, Markup};
 
 use crate::{index, view::event::View};
 
@@ -14,7 +14,7 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
     super::full_page(
         state,
         &title,
-        event.id,
+        event,
         View::Timetable,
         timetable_view(state, event),
     )
@@ -22,12 +22,7 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
 
 #[must_use]
 pub fn render(state: &UiState, event: &Event) -> Markup {
-    super::render(
-        state,
-        event.id,
-        View::Timetable,
-        timetable_view(state, event),
-    )
+    super::render(state, event, View::Timetable, timetable_view(state, event))
 }
 
 fn timetable_view(state: &UiState, event: &Event) -> Markup {

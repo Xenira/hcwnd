@@ -1,14 +1,16 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, ResponseError, get,
+    get,
     web::{self, Data, ServiceConfig},
+    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
 use thiserror::Error;
+use ui::view::{Home, View};
 
 use crate::{
     domain::{event::ports::EventService, user::models::user::User},
-    inbound::http::{AppState, user::Locale},
+    inbound::http::{user::Locale, AppState},
 };
 
 pub mod artist;
@@ -78,10 +80,11 @@ async fn index(
     //     .has_more(false)
     //     .build()
     //     .expect("Failed to build event list");
+    let view = Home::builder().events(events).build();
     let body = if htmx.is_htmx {
-        ui::event::list::render(&state, &events, 0, false)
+        view.render(&state)
     } else {
-        ui::event::list::full_page(&state, &events)
+        view.full_page(&state)
     };
     Ok(HttpResponse::Ok()
         .content_type("text/html")

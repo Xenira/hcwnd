@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 #[derive(TypedBuilder)]
@@ -49,12 +49,24 @@ pub struct NavEntry {
     href: String,
     #[builder(default)]
     alignment: NavEntryAlignment,
+    #[builder(default)]
+    active: bool,
+    #[builder(default="main".to_string())]
+    target: String,
 }
 
 impl Render for NavEntry {
     fn render(&self) -> Markup {
         html! {
-            a href=(self.href) hx-boost hx-push-url { (self.label) }
+            a
+                href=(self.href)
+                aria-selected=(self.active)
+                hx-boost="true"
+                hx-push-url="true"
+                hx-target=(self.target)
+            {
+                (self.label)
+            }
         }
     }
 }

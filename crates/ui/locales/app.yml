@@ -18,6 +18,30 @@ app:
       en: Events
     artists:
       en: Artists
+  title:
+    home:
+      en: "Home"
+home:
+  title:
+    en: "Your home for harder styles events"
+  subtitle:
+    en: "Discover lineups, explore timetables, and coordinate plans with your friends. Completely community-driven."
+  search:
+    placeholder:
+      en: Search by festival name, artist, genre, or country…
+    title:
+      upcoming:
+        en: Upcoming Festivals
+      trending:
+        en: Trending Festivals
+    sort:
+      date:
+        en: Sort by Date
+      trending:
+        en: Sort by Trending
+    genre:
+      all:
+        en: All Genres
 user:
   sign_up:
     username:
@@ -156,6 +180,22 @@ event:
     details:
       title:
         en: "%{name}"
+      about:
+        en: About the Festival
+      key_information:
+        title:
+          en: Key Information
+        Website:
+          en: Website
+      attendance:
+        title:
+          en: Attendance
+        attend:
+          en: Mark as Attending
+        do_not_attend:
+          en: Mark as Not Attending
+        friends_attending:
+          en: Friends Attending (%{count})
     timetable:
       title:
         en: "Timetable - %{name}"
