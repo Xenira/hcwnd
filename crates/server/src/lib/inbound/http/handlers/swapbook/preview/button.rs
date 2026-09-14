@@ -4,9 +4,9 @@ use actix_web::{
     HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
-use maud::{Markup, Render as _};
+use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
-use ui::atom::button::Button;
+use ui::atom::button::{Button, ButtonType, LinkButton};
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};
 
@@ -21,10 +21,41 @@ struct ButtonParams {
 
 #[get("/primary")]
 async fn primary(query: Query<ButtonParams>) -> Markup {
-    Button::builder()
+    let primary = Button::builder().label(query.label.clone()).build();
+    let secondary = Button::builder()
         .label(query.label.clone())
-        .build()
-        .render()
+        .button_type(ButtonType::Secondary)
+        .build();
+    let flat = Button::builder()
+        .label(query.label.clone())
+        .button_type(ButtonType::Flat)
+        .build();
+
+    let link_primary = LinkButton::builder()
+        .label(query.label.clone())
+        .button_type(ButtonType::Primary)
+        .href("https://example.com")
+        .build();
+    let link_secondary = LinkButton::builder()
+        .label(query.label.clone())
+        .button_type(ButtonType::Secondary)
+        .href("https://example.com")
+        .build();
+    let link_flat = LinkButton::builder()
+        .label(query.label.clone())
+        .button_type(ButtonType::Flat)
+        .href("https://example.com")
+        .build();
+
+    html! {
+        (primary)
+        (secondary)
+        (flat)
+        hr;
+        (link_primary)
+        (link_secondary)
+        (link_flat)
+    }
 }
 
 pub fn stories() -> Vec<Story> {

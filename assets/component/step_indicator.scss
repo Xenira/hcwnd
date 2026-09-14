@@ -1,9 +1,16 @@
 @import "../atom/colors.scss";
 
 form > header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  margin-bottom: 1.5rem;
+
   ol {
     list-style: none;
     display: flex;
+    gap: 2rem;
 
     li {
       color: var(--text-tertiary, #{$text-tertiary});
@@ -13,11 +20,13 @@ form > header {
       display: flex;
       align-items: center;
       justify-content: space-around;
+      gap: 2rem;
 
       > div {
         display: flex;
         gap: 0.5rem;
         align-items: center;
+        white-space: nowrap;
 
         span {
           display: inline-flex;

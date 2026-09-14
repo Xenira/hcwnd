@@ -7,7 +7,11 @@ use typed_builder::TypedBuilder;
 use uuid::Uuid;
 
 use crate::{
-    atom::{card::Card, tag::Tag},
+    atom::{
+        button::{ButtonType, LinkButton},
+        card::Card,
+        tag::Tag,
+    },
     component::{icon, Icons},
 };
 
@@ -24,10 +28,27 @@ pub struct EventCard {
     saved: bool,
     #[builder(default)]
     genres: Vec<String>,
+    #[builder(default)]
+    flair: Option<String>,
+    #[builder(setter(!strip_option,strip_bool))]
+    non_interactive: bool,
 }
 
 impl Render for EventCard {
     fn render(&self) -> Markup {
+        let details_button = LinkButton::builder()
+            .label("")
+            .icon(Icons::OpenCard)
+            .href(format!("/event/{}", self.id))
+            .button_type(ButtonType::Flat)
+            .build();
+
+        let footer = html! {
+            @if !self.non_interactive {
+                (details_button)
+            }
+        };
+
         html! {
             .event-card {
                 (Card::builder()
@@ -43,10 +64,12 @@ impl Render for EventCard {
                     })
                     .body_opt(self.genres.is_empty().not().then(|| {
                         html! {
-                            .flair {
-                                (Tag::builder()
-                                    .label("Preview")
-                                    .build())
+                            @if let Some(flair) = &self.flair {
+                                .flair {
+                                    (Tag::builder()
+                                        .label(flair)
+                                        .build())
+                                }
                             }
                             div {
                                 @for (i, genre) in self.genres.iter().enumerate().take(5) {
@@ -58,11 +81,7 @@ impl Render for EventCard {
                             }
                         }
                     }))
-                    .footer(html! {
-                        a role="button" href=(format!("/event/{}", self.id)) hx-boost="true" hx-target="main" hx-push-url="true" {
-                            (icon(&Icons::OpenCard, None))
-                        }
-                    })
+                    .footer(footer)
                     .build()
                     .render())
             }

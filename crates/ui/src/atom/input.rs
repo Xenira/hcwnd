@@ -1,5 +1,5 @@
 use api::UiState;
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 use crate::component::Icons;
@@ -18,6 +18,8 @@ pub struct TextField {
     required: bool,
     #[builder(default)]
     input_type: InputType,
+    #[builder(setter(!strip_option,strip_bool))]
+    hx_preserve: bool,
 }
 
 impl Render for TextField {
@@ -42,7 +44,6 @@ impl Render for TextField {
 
         let input = html! {
             input
-                type="text"
                 name=(self.name)
                 type=(input_type)
                 placeholder=[&self.placeholder]
@@ -50,6 +51,7 @@ impl Render for TextField {
                 required[self.required]
                 multiple[multiple]
                 accept=[accept]
+                hx-preserve[self.hx_preserve]
             {}
         };
 
@@ -107,6 +109,7 @@ impl Render for ImageInput<'_> {
                 accept: Some(self.accept.clone()),
                 multiple: self.multiple,
             })
+            .required()
             .build();
 
         let input = html! {
@@ -120,7 +123,7 @@ impl Render for ImageInput<'_> {
                         (t!("input.file.details",
                             file_type = self.file_type_label,
                             max_size = self.max_size_label,
-                            preferred_aspect_ratio = self.preferred_aspect_ratio_label,
+                            aspect_ratio = self.preferred_aspect_ratio_label,
                             locale = &self.ui_state.locale
                         ))
                     }
@@ -207,26 +210,6 @@ impl Render for Search {
                 placeholder=[&self.placeholder]
                 value=[&self.value]
             {}
-        }
-    }
-}
-
-#[derive(TypedBuilder)]
-#[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
-pub struct ImageUpload {
-    name: String,
-    image_name: String,
-    #[builder(default)]
-    preferred_aspect_ratio: Option<(u32, u32)>,
-}
-
-impl ImageUpload {
-    pub fn render(&self, state: &UiState) -> Markup {
-        html! {
-            input
-                type="file"
-                name=(self.name)
-                accept="image/jpeg,image/png,image/webp";
         }
     }
 }

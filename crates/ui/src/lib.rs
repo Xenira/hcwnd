@@ -10,6 +10,7 @@ pub mod atom;
 pub mod component;
 pub mod data_protection;
 pub mod event;
+pub mod htmx;
 pub mod index;
 pub mod partial;
 pub mod user;

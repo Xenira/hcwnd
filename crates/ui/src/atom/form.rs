@@ -1,10 +1,14 @@
 use std::fmt::Display;
 
 use api::UiState;
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
-use crate::component::{Icons, icon};
+use crate::{
+    atom::button::Button,
+    component::{icon, Icons},
+    htmx::HxEncoding,
+};
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -22,39 +26,44 @@ pub struct Form {
     #[builder(default)]
     header: Option<Markup>,
     #[builder(default="main".to_string())]
-    target: String,
+    hx_target: String,
     #[builder(default = true)]
-    boost: bool,
+    hx_boost: bool,
     #[builder(default = true)]
-    push_url: bool,
+    hx_push_url: bool,
+    #[builder(default)]
+    hx_encoding: Option<HxEncoding>,
 }
 
 impl Render for Form {
     fn render(&self) -> Markup {
+        let submit_button = Button::builder()
+            .label(&self.submit_label)
+            .icon_opt(self.submit_icon.clone())
+            .build();
+
         html! {
             form id=(self.id)
                 action=(self.url)
                 method=(self.method.to_string())
-                hx-target=(self.target)
-                hx-boost="true"
-                hx-push-url="true"
+                hx-target=(self.hx_target)
+                hx-boost=(self.hx_boost)
+                hx-push-url=(self.hx_push_url)
+                hx-encoding=[self.hx_encoding.as_ref().map(ToString::to_string)]
             {
                 @if let Some(header) = &self.header {
                     (header)
                 }
                 (self.content)
 
-                div.form-actions {
+                footer {
                     @if let Some(back_action) = &self.back_action {
                         (back_action)
+                    } @else {
+                        span {}
                     }
 
-                    button type="submit" {
-                        (self.submit_label)
-                        @if let Some(i) = &self.submit_icon {
-                            (icon(i, None))
-                        }
-                    }
+                    (submit_button)
                 }
             }
         }

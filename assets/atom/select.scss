@@ -30,6 +30,7 @@ select {
   }
 
   option {
+    padding: 0.625rem 1rem;
     color: var(--text-primary, #{$text-primary});
     font-size: 0.875rem;
     font-style: normal;

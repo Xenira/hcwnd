@@ -1,5 +1,5 @@
 use actix_htmx::Htmx;
-use actix_web::{HttpResponse, Responder, post, web};
+use actix_web::{post, web, HttpResponse, Responder};
 use anyhow::Context as _;
 use serde_qs::web::QsForm;
 use ui::event::create::{confirm_step::EventCreateConfirmStep, days_step::EventDay};
@@ -30,7 +30,7 @@ pub mod stages_step;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope(ui::event::create::details_step::BASE_ROUTE).configure(details_step::configure),
+        web::scope(ui::view::event::new::details::BASE_ROUTE).configure(details_step::configure),
     )
     .service(
         web::scope(ui::event::create::stage_step::BASE_ROUTE).configure(stages_step::configure),

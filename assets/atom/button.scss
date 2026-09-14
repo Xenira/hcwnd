@@ -6,20 +6,49 @@ a[role="button"] {
   padding: 0.625rem 1.25rem;
   justify-content: center;
   align-items: center;
+  margin: 0.25rem;
+
+  cursor: pointer;
+  text-decoration: none;
 
   border-radius: 0.5rem;
   border-width: 0;
-  background: $interactive-default;
+  background: var(--interactive-default, #{$interactive-default});
 
-  color: $status-white;
+  color: var(--status-white, #{$status-white});
   font-family: inherit;
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
 
-  &:hover {
-    background: $interactive-hover;
-    color: $status-black;
+  &:hover,
+  &:focus {
+    background: var(--interactive-hover, #{$interactive-hover});
+    color: var(--status-black, #{$status-black});
+  }
+
+  &.secondary {
+    border: 1px solid var(--border-default, #{$border-default});
+    background: var(--background-surface, #{$background-surface});
+    color: var(--text-primary, #{$text-primary});
+
+    &:hover,
+    &:focus {
+      background: var(--background-elevated, #{$background-elevated});
+    }
+  }
+
+  &.flat {
+    background: transparent;
+    color: var(--text-primary, #{$text-primary});
+    border: 1px solid transparent;
+
+    &:hover,
+    &:focus {
+      background: var(--background-surface, #{$background-surface});
+      color: var(--interactive-default, #{$interactive-default});
+      border: 1px solid var(--interactive-default, #{$interactive-default});
+    }
   }
 }

@@ -1,0 +1,33 @@
+@import "colors.scss";
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  align-self: stretch;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    align-self: stretch;
+
+    color: var(--text-primary, #{$text-primary});
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+    }
+  }
+
+  > footer {
+    display: flex;
+    align-self: stretch;
+    justify-content: space-between;
+  }
+}

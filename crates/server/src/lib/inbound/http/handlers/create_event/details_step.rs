@@ -1,41 +1,52 @@
 use actix_htmx::Htmx;
-use actix_web::{HttpResponse, Responder, get, post, web::ServiceConfig};
+use actix_web::{get, post, web::ServiceConfig, HttpResponse, Responder};
+use api::{event::new::EventCreateDetailsStep, UiState};
 use serde_qs::web::QsForm;
-use ui::event::create::{
-    self,
-    details_step::EventCreateDetailsStep,
-    name_step::{self},
+use ui::{
+    event::create::{
+        self,
+        name_step::{self},
+    },
+    view::{event::new::details::DetailsStep, View as _},
 };
 
-use crate::domain::user::models::user::User;
+use crate::{domain::user::models::user::User, inbound::http::user::UiStateExtractor};
 
 pub fn configure(cfg: &mut ServiceConfig) {
-    cfg.service(redirect_to_name_step)
-        .service(details_step_form);
+    cfg.service(details_step).service(details_step_form);
 }
 
 /// User should not be able to access this step directly, so we redirect them to the first step of the flow
 #[get("")]
-async fn redirect_to_name_step() -> impl Responder {
-    HttpResponse::Found()
-        .append_header((
-            "Location",
-            format!("{}{}", create::BASE_ROUTE, name_step::BASE_ROUTE),
-        ))
-        .finish()
+async fn details_step(user: User, state: UiStateExtractor, htmx: Htmx) -> impl Responder {
+    let details = EventCreateDetailsStep::default();
+    let details_view = DetailsStep::builder().details_step(&details).build();
+
+    let body = if htmx.is_htmx {
+        details_view.render(&state)
+    } else {
+        details_view.full_page(&state)
+    };
+
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(body.into_string())
 }
 
 #[post("")]
 async fn details_step_form(
-    user: User,
+    _: User,
+    state: UiStateExtractor,
     htmx: Htmx,
     form: QsForm<EventCreateDetailsStep>,
 ) -> impl Responder {
-    let state = api::UiState::from(&user);
+    let details = form.into_inner();
+    let details_view = DetailsStep::builder().details_step(&details).build();
+
     let body = if htmx.is_htmx {
-        ui::event::create::details_step::render(&state, &form.into_inner())
+        details_view.render(&state)
     } else {
-        ui::event::create::details_step::full_page(&state, &form.into_inner())
+        details_view.full_page(&state)
     };
 
     HttpResponse::Ok()

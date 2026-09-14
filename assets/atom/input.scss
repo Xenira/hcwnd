@@ -1,6 +1,7 @@
 @import "colors";
 
-input {
+input,
+textarea {
   padding: 0.75rem 1rem;
 
   border-radius: 0.5rem;
@@ -24,6 +25,11 @@ input {
   }
 }
 
+textarea {
+  width: 100% !important;
+  min-height: 2.75rem;
+}
+
 input[type="search"] {
   height: 3.5rem;
   font-size: 0.9375rem;
@@ -43,6 +49,7 @@ input[type="search"] {
 
 .file-container {
   position: relative;
+  width: 100%;
 
   input[type="file"] {
     position: absolute;
@@ -52,13 +59,18 @@ input[type="search"] {
     height: 100%;
     opacity: 0;
     cursor: pointer;
+    background: transparent;
+    border: none;
 
     &::file-selector-button,
     &::-webkit-file-upload-button {
       opacity: 0;
+      width: 0;
+      margin: 0;
+      padding: 0;
     }
 
-    &::valid {
+    &:valid {
       opacity: 1;
 
       + div .file-selected {
@@ -69,7 +81,6 @@ input[type="search"] {
 
   & > div {
     display: flex;
-    width: 53.75rem;
     padding: 1.5rem;
     flex-direction: column;
     justify-content: center;
@@ -77,11 +88,12 @@ input[type="search"] {
     gap: 0.75rem;
 
     border-radius: 0.75rem;
-    border: 1.5px dashed var(--border-subtle, #{$border-subtle});
+    border: 2px dashed var(--border-subtle, #{$border-subtle});
     background: var(--background-surface, #{$background-surface});
 
     &:hover {
       border-color: var(--border-default, #{$border-default});
+      background: var(--background-elevated, #{$background-elevated});
     }
   }
 }

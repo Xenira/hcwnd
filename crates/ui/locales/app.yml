@@ -93,7 +93,14 @@ event:
           en: Enter Event Name
     details_step:
       title:
-        en: “%{name}” - Details
+        en: Create Event - Details
+      step_name:
+        en: Event Details
+      name:
+        label:
+          en: Event Name
+        placeholder:
+          en: Enter Event Name
       subtitle:
         en: Great! Now let's add some details about the event.
       description:
@@ -117,6 +124,11 @@ event:
           en: https://example.com/image.jpg
         hint:
           en: This should be a link to an image representing the event (e.g. poster, logo, etc.)
+    schedule_step:
+      title:
+        en: “%{name}” - Schedule
+      step_name:
+        en: Schedule
     days_step:
       title:
         en: “%{name}” - Day(s) and Time
@@ -140,6 +152,8 @@ event:
     stage_step:
       title:
         en: “%{name}” - Stage
+      step_name:
+        en: Stages
       subtitle:
         en: Which stages does your event have? If there is no information about stages, just keep the default stage and click next.
       add_stage:
@@ -149,6 +163,8 @@ event:
     confirm_step:
       title:
         en: “%{name}” - Confirmation
+      step_name:
+        en: Review
       subtitle:
         en: Almost there! Check that the information you provided is correct, and let us know where you found the information about this event. This will help us ensure that the events listed on our platform are accurate and reliable.
       source:
