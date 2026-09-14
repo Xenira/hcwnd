@@ -14,6 +14,8 @@ app:
         en: Logout
       profile:
         en: Profile
+      create_event:
+        en: Create Event
     events:
       en: Events
     artists:
@@ -253,3 +255,9 @@ artist:
         en: This should be a link to the artist's official website. If possible, provide a link to the english version of the website.
     submit:
       en: Create Artist
+input:
+  file:
+    title:
+      en: Click to upload %{kind}
+    details:
+      en: "%{file_type} up to %{max_size} (%{aspect_ratio} ratio preferred)"

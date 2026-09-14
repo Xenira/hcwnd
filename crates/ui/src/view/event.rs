@@ -1,5 +1,5 @@
 use api::event::Event;
-use maud::{html, Markup};
+use maud::{Markup, html};
 use uuid::Uuid;
 
 use crate::{
@@ -7,12 +7,13 @@ use crate::{
         nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
         tag::Tag,
     },
-    component::{icon, menu_item, Icons},
+    component::{Icons, icon, menu_item},
     index,
 };
 
 pub mod detail;
 pub mod lineup;
+pub mod new;
 pub mod timetable;
 
 pub const BASE_ROUTE: &str = "/event";
@@ -130,11 +131,13 @@ pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Nav {
             NavEntryDropdown::builder()
                 .label("")
                 .icon(Icons::MoreMenu)
-                .entries(vec![NavEntrySimple::builder()
-                    .href(format!("{}/{event_id}/history", api::routes::EVENT_ROUTE))
-                    .label(t!("event.detail.menu.history", locale = &state.locale).to_string())
-                    .build()
-                    .into()])
+                .entries(vec![
+                    NavEntrySimple::builder()
+                        .href(format!("{}/{event_id}/history", api::routes::EVENT_ROUTE))
+                        .label(t!("event.detail.menu.history", locale = &state.locale).to_string())
+                        .build()
+                        .into(),
+                ])
                 .chevron(false)
                 .alignment(NavEntryAlignment::Right)
                 .build()

@@ -30,10 +30,6 @@ pub mod stages_step;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope(ui::event::create::name_step::BASE_ROUTE).configure(name_step::configure),
-    )
-    .service(web::scope(ui::event::create::days_step::BASE_ROUTE).configure(days_step::configure))
-    .service(
         web::scope(ui::event::create::details_step::BASE_ROUTE).configure(details_step::configure),
     )
     .service(

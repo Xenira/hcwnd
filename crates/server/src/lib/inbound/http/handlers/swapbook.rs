@@ -93,6 +93,7 @@ async fn manifest() -> impl Responder {
         .chain(preview::tag::stories().into_iter())
         .chain(preview::nav::stories().into_iter())
         .chain(preview::select::stories().into_iter())
+        .chain(preview::step_indicator::stories().into_iter())
         .collect();
 
     let manifest = Manifest {

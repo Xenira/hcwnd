@@ -12,6 +12,7 @@ pub mod event_card;
 pub mod input;
 pub mod nav;
 pub mod select;
+pub mod step_indicator;
 pub mod tag;
 pub mod typography;
 
@@ -24,5 +25,6 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .service(web::scope("/event_card").configure(event_card::configure))
         .service(web::scope("/tag").configure(tag::configure))
         .service(web::scope("/nav").configure(nav::configure))
-        .service(web::scope("/select").configure(select::configure));
+        .service(web::scope("/select").configure(select::configure))
+        .service(web::scope("/step_indicator").configure(step_indicator::configure));
 }

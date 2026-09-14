@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use maud::{html, Markup};
+use maud::{Markup, html};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
@@ -33,6 +33,9 @@ pub enum Icons {
     Dropdown,
     Attendees,
     Location,
+    FormStepComplete,
+    FormStepArrow,
+    Create,
 }
 
 impl Display for Icons {
@@ -69,6 +72,9 @@ impl Display for Icons {
             Icons::Dropdown => write!(f, "caret-down"),
             Icons::Attendees => write!(f, "users"),
             Icons::Location => write!(f, "map-pin"),
+            Icons::FormStepComplete => write!(f, "check"),
+            Icons::FormStepArrow => write!(f, "arrow-right"),
+            Icons::Create => write!(f, "plus"),
         }
     }
 }

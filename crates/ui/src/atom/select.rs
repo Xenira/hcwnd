@@ -10,12 +10,19 @@ pub struct Select {
     placeholder: Option<String>,
     #[builder(default)]
     value: Option<String>,
+    #[builder(default)]
+    label: Option<String>,
+    #[builder(setter(!strip_option,strip_bool))]
+    required: bool,
 }
 
 impl Render for Select {
     fn render(&self) -> Markup {
-        html! {
-            select name=(self.name) {
+        let select = html! {
+            select
+                name=(self.name)
+                required[self.required]
+            {
                 @if let Some(placeholder) = &self.placeholder {
                     option value="" { (placeholder) }
                 }
@@ -28,6 +35,17 @@ impl Render for Select {
                     }
                 }
             }
+        };
+
+        if let Some(label) = &self.label {
+            html! {
+                label {
+                    (label)
+                    (select)
+                }
+            }
+        } else {
+            select
         }
     }
 }

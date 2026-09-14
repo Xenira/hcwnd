@@ -10,6 +10,7 @@ pub mod artist;
 pub mod day;
 pub mod event;
 pub mod routes;
+pub mod serde_utils;
 pub mod stage;
 pub mod user;
 

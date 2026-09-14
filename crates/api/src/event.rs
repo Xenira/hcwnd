@@ -11,6 +11,8 @@ use crate::{
     PagedResult,
 };
 
+pub mod new;
+
 pub type PagedEventList = PagedResult<EventListEntry, (Uuid, NaiveDate)>;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

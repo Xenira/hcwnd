@@ -1,0 +1,58 @@
+@import "../atom/colors.scss";
+
+form > header {
+  ol {
+    list-style: none;
+    display: flex;
+
+    li {
+      color: var(--text-tertiary, #{$text-tertiary});
+      font-size: 0.8125rem;
+      font-weight: 500;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+
+      > div {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+
+        span {
+          display: inline-flex;
+          width: 1.75rem;
+          height: 1.75rem;
+          justify-content: center;
+          align-items: center;
+
+          border-radius: 0.875rem;
+
+          background: var(--background-surface, #{$background-surface});
+        }
+      }
+
+      &.active,
+      &.completed {
+        font-size: 0.8125rem;
+        font-weight: 600;
+
+        > div span {
+          color: var(--text-primary, #{$text-primary});
+          background: var(--accent-primary, #{$accent-primary});
+        }
+      }
+      &.active {
+        color: var(--text-primary, #{$text-primary});
+      }
+
+      > i:last-child {
+        color: var(--text-tertiary, #{$text-tertiary});
+      }
+
+      &:last-child > i:last-child {
+        visibility: hidden;
+      }
+    }
+  }
+}

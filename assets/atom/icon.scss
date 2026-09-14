@@ -4,3 +4,10 @@ button {
     font-family: "Phosphor-Fill" !important;
   }
 }
+
+a:has(i.ph),
+button:has(i.ph) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}

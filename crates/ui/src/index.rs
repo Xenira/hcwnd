@@ -1,11 +1,12 @@
 use std::fmt::Display;
 
-use api::{user::User, UiState};
-use maud::{html, Markup, Render, DOCTYPE};
+use api::{UiState, user::User};
+use maud::{DOCTYPE, Markup, Render, html};
 
 use crate::{
     atom::nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
-    component::menu_item,
+    component::{Icons, menu_item},
+    event,
     user::{self},
 };
 
@@ -42,23 +43,25 @@ fn format_title(locale: &str, title: impl Display) -> String {
 
 fn nav_bar(state: &UiState) -> Markup {
     let mut entries = if let Some(user) = &state.user {
-        vec![NavEntryDropdown::builder()
-            .label(&user.name)
-            .entries(vec![
-                NavEntrySimple::builder()
-                    .label(t!("app.menu.user.profile", locale = &state.locale))
-                    .href(format!("/user/{}", user.id))
-                    .build()
-                    .into(),
-                NavEntrySimple::builder()
-                    .label(t!("app.menu.user.logout", locale = &state.locale))
-                    .href("/logout")
-                    .build()
-                    .into(),
-            ])
-            .alignment(NavEntryAlignment::Right)
-            .build()
-            .into()]
+        vec![
+            NavEntryDropdown::builder()
+                .label(&user.name)
+                .entries(vec![
+                    NavEntrySimple::builder()
+                        .label(t!("app.menu.user.profile", locale = &state.locale))
+                        .href(format!("/user/{}", user.id))
+                        .build()
+                        .into(),
+                    NavEntrySimple::builder()
+                        .label(t!("app.menu.user.logout", locale = &state.locale))
+                        .href("/logout")
+                        .build()
+                        .into(),
+                ])
+                .alignment(NavEntryAlignment::Right)
+                .build()
+                .into(),
+        ]
     } else {
         vec![
             NavEntrySimple::builder()
@@ -86,6 +89,19 @@ fn nav_bar(state: &UiState) -> Markup {
         NavEntrySimple::builder()
             .label(t!("app.menu.artists", locale = &state.locale))
             .href(api::routes::ARTIST_ROUTE)
+            .build()
+            .into(),
+    );
+    entries.push(
+        NavEntrySimple::builder()
+            .label(t!("app.menu.create_event", locale = &state.locale))
+            .href(format!(
+                "{}{}",
+                event::create::BASE_ROUTE,
+                event::create::details_step::BASE_ROUTE
+            ))
+            .alignment(NavEntryAlignment::Right)
+            .icon(Icons::Create)
             .build()
             .into(),
     );

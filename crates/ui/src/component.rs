@@ -12,3 +12,6 @@ pub use link::*;
 
 mod event_card;
 pub use event_card::*;
+
+mod step_indicator;
+pub use step_indicator::*;
