@@ -38,6 +38,12 @@ pub struct DetailsStep<'a> {
     // schedule_step: Option<&'a EventCreateScheduleStep>,
 }
 
+impl<'a> DetailsStep<'a> {
+    fn url(child_route: &str) -> String {
+        format!("{}{BASE_ROUTE}/{child_route}", create::BASE_ROUTE)
+    }
+}
+
 impl<'a> View for DetailsStep<'a> {
     fn render(&self, state: &UiState) -> Markup {
         let next_url = format!("{}{}", create::BASE_ROUTE, days_step::BASE_ROUTE);
@@ -68,6 +74,7 @@ impl<'a> View for DetailsStep<'a> {
                 locale = &state.locale
             ))
             .value_opt(self.details_step.name.clone())
+            .validation_endpoint(Self::url("validate_name"))
             .required()
             .build();
         let event_type = Select::builder()
@@ -108,10 +115,12 @@ impl<'a> View for DetailsStep<'a> {
                 locale = &state.locale
             ))
             .value_opt(self.details_step.description.clone())
+            .validation_endpoint(Self::url("validate_description"))
             .required()
             .build();
         let image = ImageInput::builder()
             .name("image")
+            .upload_url(Self::url("upload_image"))
             .ui_state(state)
             .kind_label(t!(
                 "event.create.details_step.image.label",
