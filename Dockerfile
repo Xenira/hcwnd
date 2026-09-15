@@ -52,3 +52,10 @@ FROM alpine AS swapbook
 WORKDIR /app
 COPY --from=swapbook-builder /go/bin/swapbook /usr/local/bin/swapbook
 ENTRYPOINT ["/usr/local/bin/swapbook"]
+
+FROM rustfs/rc:latest AS rustfs
+USER root
+RUN apk add --no-cache jq openssl
+COPY --chmod=755 rustfs.entrypoint.sh /entrypoint.sh
+COPY ./storage /storage
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,0 +1,10 @@
+valkey_url = "redis://localhost:6379"
+database_url = "postgresql://postgres:example@localhost:5432/timetable"
+server_port = "8090"
+
+[image_proxy]
+signing_salt = "hello"
+signing_key = "secret"
+
+[s3]
+endpoint = "http://localhost:9000"

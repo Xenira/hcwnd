@@ -50,6 +50,13 @@ ui = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true }
 maud = { workspace = true, features = ["actix-web"] }
+config = "0.15.25"
+aws-config = "1.12.0"
+aws-sdk-s3 = "1.146.1"
+# https://github.com/smithy-lang/smithy-rs/issues/4853
+aws-smithy-json = "=0.63.0"
+aws-smithy-types = "=1.6.3"
+image = "0.25.10"
 
 [build-dependencies]
 grass = "0.13.4"

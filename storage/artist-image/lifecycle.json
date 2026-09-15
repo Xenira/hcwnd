@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "id": "rule-cleanup-temp-form-uploads",
+      "status": "Enabled",
+      "prefix": "form/",
+      "expiration": {
+        "days": 1
+      }
+    }
+  ]
+}

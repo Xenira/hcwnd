@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use url::Url;
 
 use crate::domain::{
     event::models::{
@@ -32,6 +33,11 @@ pub trait EventService: Sync + Send + 'static {
         req: &CreateActRequest,
         author_id: &UserId,
     ) -> Result<Act, CreateActError>;
+
+    async fn upload_form_image(
+        &self,
+        image_bytes: &[u8],
+    ) -> Result<Url, Box<dyn std::error::Error + Send + Sync>>;
 }
 
 #[async_trait]
@@ -90,4 +96,18 @@ pub trait DayRepository: Clone + Sync + Send + 'static {
     async fn get_first_day(&self, event_id: &EventId) -> Result<Day, GetDayError>;
 
     async fn get_last_day(&self, event_id: &EventId) -> Result<Day, GetDayError>;
+}
+
+#[async_trait]
+pub trait ImageRepository: Clone + Sync + Send + 'static {
+    async fn upload_form_image(
+        &self,
+        image_bytes: &[u8],
+    ) -> Result<Url, Box<dyn std::error::Error + Send + Sync>>;
+
+    async fn persist_form_image(
+        &self,
+        event_id: &EventId,
+        image_url: &Url,
+    ) -> Result<Url, Box<dyn std::error::Error + Send + Sync>>;
 }

@@ -12,10 +12,10 @@ watch = [
 scroll_anchor = "auto"
 
 [jobs.webserver.env]
-VALKEY_URL = "redis://localhost:6379"
-DATABASE_URL = "postgresql://postgres:example@localhost:5432/timetable"
-SERVER_PORT = "8090"
+HC_VALKEY_URL = "redis://localhost:6379"
+HC_DATABASE_URL = "postgresql://postgres:example@localhost:5432/timetable"
+HC_SERVER_PORT = "8090"
 RUST_LOG = "debug"
 RUST_LOG_STYLE = "always"
-URL_SIGNING_SALT = "hello"
-URL_SIGNING_KEY = "secret"
+HC_IMAGE_PROXY__SIGNING_SALT = "hello"
+HC_IMAGE_PROXY__SIGNING_KEY = "secret"

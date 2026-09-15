@@ -7,4 +7,6 @@ export IMGPROXY_SALT="68656c6c6f"
 export HTTP_PORT=8080
 export HTTPS_PORT=8443
 export IP_ADDRESS=$(ip addr show scope global | awk '$1 ~ /^inet/ {print $2}' | cut -d/ -f1 | head -n 1)
-docker compose up $@
+export RUSTFS_ACCESS_KEY=$(openssl rand -hex 16)
+export RUSTFS_SECRET_KEY=$(openssl rand -hex 32)
+docker compose up --build --force-recreate $@

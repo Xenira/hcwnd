@@ -78,12 +78,17 @@ services:
     image: valkey/valkey:9.0.3-alpine
     ports:
       - "6379:6379"
+
   imgproxy:
     image: ghcr.io/imgproxy/imgproxy:v3.30.1
     restart: always
+    depends_on:
+      rustfs_setup:
+        condition: service_completed_successfully
     environment:
       IMGPROXY_PATH_PREFIX: /image
       IMGPROXY_ALLOW_PRIVATE_SOURCE_ADDRESSES: false
+      IMGPROXY_S3_ENDPOINT: http://rustfs:9000
     secrets:
       - imgproxy_key
       - imgproxy_salt
@@ -91,8 +96,11 @@ services:
       - imgproxy
       - "--keypath=/run/secrets/imgproxy_key"
       - "--saltpath=/run/secrets/imgproxy_salt"
+    volumes:
+      - imagepoxy_secrets:/home/imgproxy/:ro
     networks:
       - traefik
+      - rustfs
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.imgproxy.rule=Host(`hardcore.localhost`) && PathPrefix(`/image`)"
@@ -117,11 +125,81 @@ services:
       - "traefik.http.routers.swapbook.entrypoints=websecure,web"
       - "traefik.http.services.swapbook.loadbalancer.server.port=7007"
 
+  rustfs_perms:
+    image: alpine
+    user: root
+    volumes:
+      - ./data/rustfs:/fix_path
+    command: chown -R 10001:10001 /fix_path
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    depends_on:
+      rustfs_perms:
+        condition: service_completed_successfully
+    volumes:
+      - ./data/rustfs/data:/data
+      - ./data/rustfs/logs:/var/log/rustfs/
+    ports:
+      - "9000:9000"
+    environment:
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ENABLE: false
+      RUSTFS_OBS_LOGGER_LEVEL: error
+      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
+      RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
+    networks:
+      - rustfs
+    secrets:
+      - source: rustfs_access_key
+        mode: 0o755
+      - source: rustfs_secret_key
+    healthcheck:
+      # Default behavior:
+      # - HTTP when RUSTFS_TLS_PATH is unset
+      # - HTTPS when RUSTFS_TLS_PATH is set
+      # - loopback TLS uses `-k` unless strict host+CA values are provided
+      #
+      # Strict TLS example:
+      # - set RUSTFS_HEALTHCHECK_HOST to a SAN-covered hostname
+      # - optionally set RUSTFS_HEALTHCHECK_CA (defaults to /opt/tls/ca.crt when present)
+      test: ["CMD", "sh", "-ec", 'curl -fsS "http://127.0.0.1:9000/health"']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  rustfs_setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: rustfs
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    volumes:
+      - imagepoxy_secrets:/secrets/image-proxy:rw
+      - ./crates/server/.aws:/secrets/app:rw
+    networks:
+      - rustfs
+    secrets:
+      - rustfs_access_key
+      - rustfs_secret_key
+
 networks:
   traefik:
+  rustfs:
+
+volumes:
+  imagepoxy_secrets:
 
 secrets:
   imgproxy_key:
     environment: IMGPROXY_KEY
   imgproxy_salt:
     environment: IMGPROXY_SALT
+  rustfs_access_key:
+    environment: RUSTFS_ACCESS_KEY
+  rustfs_secret_key:
+    environment: RUSTFS_SECRET_KEY
