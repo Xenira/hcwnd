@@ -36,6 +36,11 @@ pub enum Icons {
     FormStepComplete,
     FormStepArrow,
     Create,
+    ValidationError,
+    ValidationSuccess,
+    ValidationWarning,
+    ValidationInfo,
+    ValidationRequired,
 }
 
 impl Display for Icons {
@@ -75,6 +80,11 @@ impl Display for Icons {
             Icons::FormStepComplete => write!(f, "check"),
             Icons::FormStepArrow => write!(f, "arrow-right"),
             Icons::Create => write!(f, "plus"),
+            Icons::ValidationError => write!(f, "x"),
+            Icons::ValidationSuccess => write!(f, "check"),
+            Icons::ValidationWarning => write!(f, "warning"),
+            Icons::ValidationInfo => write!(f, "info"),
+            Icons::ValidationRequired => write!(f, "asterisk"),
         }
     }
 }

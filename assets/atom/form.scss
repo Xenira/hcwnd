@@ -1,5 +1,16 @@
 @import "colors.scss";
 
+@mixin validation-state($state, $colors) {
+  *:has(> .status > .#{$state}) {
+    --text-primary: var(--status-#{$state}, #{map-get($colors, "color")});
+    --border-default: var(
+      --status-#{$state}-border,
+      #{map-get($colors, "border")}
+    );
+    --background-surface: var(--status-#{$state}-bg, #{map-get($colors, "bg")});
+  }
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -30,4 +41,22 @@ form {
     align-self: stretch;
     justify-content: space-between;
   }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    i {
+      font-size: 0.75rem;
+    }
+  }
+
+  @include validation-state("error", $status-error);
+  @include validation-state("success", $status-success);
+  @include validation-state("warning", $status-warning);
+  @include validation-state("info", $status-info);
 }

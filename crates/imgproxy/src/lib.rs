@@ -104,7 +104,12 @@ impl Display for ImageUrl {
             .iter()
             .map(|option| option.format())
             .join("/");
-        write!(f, "{options_str}/{}.{}", self.image_url, self.format)
+        write!(f, "{}", options_str)?;
+        if !options_str.is_empty() {
+            write!(f, "/")?;
+        }
+
+        write!(f, "{}.{}", self.image_url, self.format)
     }
 }
 

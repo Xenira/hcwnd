@@ -1,9 +1,9 @@
 use api::{
-    event::new::{EventCreateDetailsStep, EventType},
     UiState,
+    event::new::{EventCreateDetailsStep, EventType},
 };
 use chrono::{Local, NaiveDate};
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use serde::Deserialize;
 use typed_builder::TypedBuilder;
 use url::Url;
@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 use crate::{
     atom::{
-        form::{Form, Method},
+        form::{Form, FormValidation, Method},
         input::{ImageInput, TextArea, TextField},
         select::Select,
     },
@@ -24,7 +24,7 @@ use crate::{
         stage_step::{self, EventStage},
     },
     index,
-    view::{event::new::step_indicator, View},
+    view::{View, event::new::step_indicator},
 };
 
 const CURRENT_STEP: usize = 0;
@@ -38,7 +38,39 @@ pub struct DetailsStep<'a> {
     // schedule_step: Option<&'a EventCreateScheduleStep>,
 }
 
-impl<'a> View for DetailsStep<'a> {
+impl DetailsStep<'_> {
+    fn url(child_route: &str) -> String {
+        format!("{}{BASE_ROUTE}/{child_route}", create::BASE_ROUTE)
+    }
+
+    #[must_use]
+    pub fn validate_name(state: &UiState, name: &str) -> Markup {
+        if name.trim().is_empty() {
+            FormValidation::Required(
+                t!("event.create.details.name.required", locale = &state.locale).to_string(),
+            )
+            .render()
+        } else if (1..=5).contains(&name.chars().count()) {
+            FormValidation::Invalid(
+                t!(
+                    "event.create.details.name.too_short",
+                    locale = &state.locale
+                )
+                .to_string(),
+            )
+            .render()
+        } else if name.chars().count() > 100 {
+            FormValidation::Invalid(
+                t!("event.create.details.name.too_long", locale = &state.locale).to_string(),
+            )
+            .render()
+        } else {
+            FormValidation::Valid(None).render()
+        }
+    }
+}
+
+impl View for DetailsStep<'_> {
     fn render(&self, state: &UiState) -> Markup {
         let next_url = format!("{}{}", create::BASE_ROUTE, days_step::BASE_ROUTE);
 
@@ -68,6 +100,7 @@ impl<'a> View for DetailsStep<'a> {
                 locale = &state.locale
             ))
             .value_opt(self.details_step.name.clone())
+            .validation_endpoint(Self::url("validate_name"))
             .required()
             .build();
         let event_type = Select::builder()
@@ -108,10 +141,12 @@ impl<'a> View for DetailsStep<'a> {
                 locale = &state.locale
             ))
             .value_opt(self.details_step.description.clone())
+            .validation_endpoint(Self::url("validate_description"))
             .required()
             .build();
         let image = ImageInput::builder()
             .name("image")
+            .upload_url(Self::url("upload_image"))
             .ui_state(state)
             .kind_label(t!(
                 "event.create.details_step.image.label",
@@ -147,16 +182,18 @@ impl<'a> View for DetailsStep<'a> {
                 h2 {
                     (t!("event.create.details_step.preview.title", locale = &state.locale))
                 }
-                (EventCard::builder()
-                    .id(Uuid::nil())
-                    .name(self.details_step.name.as_deref().unwrap_or_default())
-                    .location(t!("event.create.details_step.preview.location", locale = &state.locale).to_string())
-                    .start_time(Local::now())
-                    .end_time(Local::now())
-                    .image(self.details_step.image_url.as_ref().map(Url::to_string).unwrap_or_default())
-                    .flair(t!("event.create.details_step.preview.flair", locale = &state.locale).to_string())
-                    .non_interactive()
-                    .build())
+                #preview {
+                    (EventCard::builder()
+                        .id(Uuid::nil())
+                        .name(self.details_step.name.as_deref().unwrap_or_default())
+                        .location(t!("event.create.details_step.preview.location", locale = &state.locale).to_string())
+                        .start_time(Local::now())
+                        .end_time(Local::now())
+                        .image(self.details_step.image_url.as_ref().map(Url::to_string).unwrap_or_default())
+                        .flair(t!("event.create.details_step.preview.flair", locale = &state.locale).to_string())
+                        .non_interactive()
+                        .build())
+                }
             }
         }
     }

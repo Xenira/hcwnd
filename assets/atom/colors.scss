@@ -23,3 +23,39 @@ $interactive-hover: #ff7a7e;
 
 $status-white: #ffffff;
 $status-black: #000000;
+
+$status-success-color: #22c55e;
+$status-success-bg: rgba($status-success-color, 0.1);
+$status-success-border: rgba($status-success-color, 0.5);
+$status-success: (
+  "color": $status-success-color,
+  "bg": $status-success-bg,
+  "border": $status-success-border,
+);
+
+$status-warning-color: #f59e0b;
+$status-warning-bg: rgba($status-warning-color, 0.1);
+$status-warning-border: rgba($status-warning-color, 0.5);
+$status-warning: (
+  "color": $status-warning-color,
+  "bg": $status-warning-bg,
+  "border": $status-warning-border,
+);
+
+$status-error-color: #ef4444;
+$status-error-bg: rgba($status-error-color, 0.1);
+$status-error-border: rgba($status-error-color, 0.5);
+$status-error: (
+  "color": $status-error-color,
+  "bg": $status-error-bg,
+  "border": $status-error-border,
+);
+
+$status-info-color: #3b82f6;
+$status-info-bg: rgba($status-info-color, 0.1);
+$status-info-border: rgba($status-info-color, 0.5);
+$status-info: (
+  "color": $status-info-color,
+  "bg": $status-info-bg,
+  "border": $status-info-border,
+);

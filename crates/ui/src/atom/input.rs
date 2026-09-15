@@ -1,8 +1,8 @@
 use api::UiState;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use typed_builder::TypedBuilder;
 
-use crate::component::Icons;
+use crate::{component::Icons, htmx::HxEncoding};
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -20,6 +20,10 @@ pub struct TextField {
     input_type: InputType,
     #[builder(setter(!strip_option,strip_bool))]
     hx_preserve: bool,
+    #[builder(default)]
+    validation_endpoint: Option<String>,
+    #[builder(default)]
+    encoding: Option<HxEncoding>,
 }
 
 impl Render for TextField {
@@ -41,6 +45,11 @@ impl Render for TextField {
             InputType::File { multiple, .. } => *multiple,
             _ => false,
         };
+        let hx_trigger = self
+            .validation_endpoint
+            .is_some()
+            .then_some("input changed delay:300ms");
+        let hx_target = self.validation_endpoint.is_some().then_some("next span");
 
         let input = html! {
             input
@@ -51,8 +60,15 @@ impl Render for TextField {
                 required[self.required]
                 multiple[multiple]
                 accept=[accept]
+                hx-encoding=[&self.encoding]
+                hx-post=[&self.validation_endpoint]
                 hx-preserve[self.hx_preserve]
+                hx-target=[hx_target]
+                hx-trigger=[hx_trigger]
             {}
+            @if self.validation_endpoint.is_some() {
+                span.status {}
+            }
         };
 
         if let Some(label) = &self.label {
@@ -86,6 +102,7 @@ pub enum InputType {
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
 pub struct ImageInput<'a> {
     name: String,
+    upload_url: String,
     ui_state: &'a UiState,
     kind_label: String,
     preferred_aspect_ratio_label: String,
@@ -109,6 +126,8 @@ impl Render for ImageInput<'_> {
                 accept: Some(self.accept.clone()),
                 multiple: self.multiple,
             })
+            .validation_endpoint(&self.upload_url)
+            .encoding(HxEncoding::MultipartFormData)
             .required()
             .build();
 
@@ -160,10 +179,18 @@ pub struct TextArea {
     label: Option<String>,
     #[builder(setter(!strip_option,strip_bool))]
     required: bool,
+    #[builder(default)]
+    validation_endpoint: Option<String>,
 }
 
 impl Render for TextArea {
     fn render(&self) -> Markup {
+        let hx_trigger = self
+            .validation_endpoint
+            .is_some()
+            .then_some("input changed delay:300ms");
+        let hx_target = self.validation_endpoint.is_some().then_some("next span");
+
         let area = html! {
             textarea
                 name=(self.name)
@@ -171,10 +198,17 @@ impl Render for TextArea {
                 rows=(self.rows)
                 autofocus[self.autofocus]
                 required[self.required]
+                hx-post=[&self.validation_endpoint]
+                hx-target=[hx_target]
+                hx-trigger=[hx_trigger]
+                hx-include="this"
             {
                 @if let Some(value) = &self.value {
                     (value)
                 }
+            }
+            @if self.validation_endpoint.is_some() {
+                span.status {}
             }
         };
 

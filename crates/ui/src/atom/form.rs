@@ -1,12 +1,12 @@
 use std::fmt::Display;
 
 use api::UiState;
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use typed_builder::TypedBuilder;
 
 use crate::{
     atom::button::Button,
-    component::{icon, Icons},
+    component::{Icons, icon},
     htmx::HxEncoding,
 };
 
@@ -108,6 +108,54 @@ impl Display for Method {
         match self {
             Method::Get => write!(f, "get"),
             Method::Post => write!(f, "post"),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum FormValidation {
+    Invalid(String),
+    Valid(Option<String>),
+    Required(String),
+    Warning(String),
+    Info(String),
+}
+
+impl Render for FormValidation {
+    fn render(&self) -> Markup {
+        match self {
+            FormValidation::Invalid(msg) => html! {
+                span.error {
+                    (icon(&Icons::ValidationError, None))
+                    (msg)
+                }
+            },
+            FormValidation::Valid(msg) => html! {
+                span.success {
+                    (icon(&Icons::ValidationSuccess, None))
+                    @if let Some(msg) = msg  {
+                        (msg)
+                    }
+                }
+            },
+            FormValidation::Required(msg) => html! {
+                span.error {
+                    (icon(&Icons::ValidationRequired, None))
+                    (msg)
+                }
+            },
+            FormValidation::Warning(msg) => html! {
+                span.warning {
+                    (icon(&Icons::ValidationWarning, None))
+                    (msg)
+                }
+            },
+            FormValidation::Info(msg) => html! {
+                span.info {
+                    (icon(&Icons::ValidationInfo, None))
+                    (msg)
+                }
+            },
         }
     }
 }

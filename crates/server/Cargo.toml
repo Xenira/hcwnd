@@ -57,6 +57,7 @@ aws-sdk-s3 = "1.146.1"
 aws-smithy-json = "=0.63.0"
 aws-smithy-types = "=1.6.3"
 image = "0.25.10"
+actix-multipart = "0.8.1"
 
 [build-dependencies]
 grass = "0.13.4"
