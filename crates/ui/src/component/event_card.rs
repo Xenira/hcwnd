@@ -1,6 +1,9 @@
 use std::ops::Not as _;
 
-use api::event::Event;
+use api::{
+    event::{new::EventCreateDetailsStep, Event},
+    UiState,
+};
 use chrono::{DateTime, Local};
 use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
@@ -8,7 +11,7 @@ use uuid::Uuid;
 
 use crate::{
     atom::{
-        button::{ButtonType, LinkButton},
+        button::{ButtonClass, LinkButton},
         card::Card,
         tag::Tag,
     },
@@ -34,13 +37,45 @@ pub struct EventCard {
     non_interactive: bool,
 }
 
+impl EventCard {
+    #[must_use]
+    pub fn from_details_step(
+        state: &UiState,
+        step: &EventCreateDetailsStep,
+        imag_url: Option<String>,
+    ) -> Self {
+        Self::builder()
+            .id(Uuid::nil())
+            .name(step.name.as_deref().unwrap_or_default())
+            .location(
+                t!(
+                    "event.create.details_step.preview.location",
+                    locale = &state.locale
+                )
+                .to_string(),
+            )
+            .start_time(Local::now())
+            .end_time(Local::now())
+            .image(imag_url.unwrap_or_default())
+            .flair(
+                t!(
+                    "event.create.details_step.preview.flair",
+                    locale = &state.locale
+                )
+                .to_string(),
+            )
+            .non_interactive()
+            .build()
+    }
+}
+
 impl Render for EventCard {
     fn render(&self) -> Markup {
         let details_button = LinkButton::builder()
             .label("")
             .icon(Icons::OpenCard)
             .href(format!("/event/{}", self.id))
-            .button_type(ButtonType::Flat)
+            .button_class(ButtonClass::Flat)
             .build();
 
         let footer = html! {

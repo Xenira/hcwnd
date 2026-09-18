@@ -2,14 +2,14 @@ use std::{fs, sync::Arc, time::Duration};
 
 use actix_htmx::HtmxMiddleware;
 use actix_identity::IdentityMiddleware;
-use actix_session::{SessionMiddleware, storage::SessionStore};
+use actix_multipart::form::MultipartFormConfig;
+use actix_session::{storage::SessionStore, SessionMiddleware};
 use actix_web::{
-    App, HttpResponse,
     cookie::Key,
     dev::ServiceResponse,
-    http::{StatusCode, header},
+    http::{header, StatusCode},
     middleware::{Compress, ErrorHandlerResponse, ErrorHandlers},
-    web,
+    web, App, HttpResponse,
 };
 use actix_web_helmet::Helmet;
 use anyhow::Context as _;
@@ -102,6 +102,7 @@ impl HttpServer {
             App::new()
                 .app_data(app_data.clone())
                 .app_data(url_repo.clone())
+                .app_data(MultipartFormConfig::default().total_limit(10 * 1024 * 1024)) // 10 MB
                 .wrap(helmet.clone())
                 .wrap(ErrorHandlers::new().handler(StatusCode::UNAUTHORIZED, handle_unauthorized))
                 .wrap(identity_middleware)

@@ -1,32 +1,38 @@
+use std::fs;
+
 use actix_htmx::{Htmx, SwapType};
-use actix_multipart::form::{MultipartForm, bytes::Bytes, tempfile::TempFile};
+use actix_multipart::form::{bytes::Bytes, tempfile::TempFile, MultipartForm};
 use actix_web::{
-    HttpResponse, Responder, get, post,
+    get, post,
     web::{self, ServiceConfig},
+    HttpResponse, Responder,
 };
-use api::{UiState, event::new::EventCreateDetailsStep};
+use api::{event::new::EventCreateDetailsStep, UiState};
 use imgproxy::{ImageUrl, SignedUrlRepo};
+use log::info;
 use maud::html;
 use serde::Deserialize;
 use serde_qs::web::QsForm;
 use ui::{
     atom::form::FormValidation,
+    component::EventCard,
     event::create::{
         self,
         name_step::{self},
     },
-    view::{View as _, event::new::details::DetailsStep},
+    view::{event::new::details::DetailsStep, View as _},
 };
 
 use crate::{
     domain::user::models::user::User,
-    inbound::http::{AppState, user::UiStateExtractor},
+    inbound::http::{user::UiStateExtractor, AppState},
 };
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(details_step)
         .service(details_step_form)
         .service(validate_name)
+        .service(validate_description)
         .service(upload_image);
 }
 
@@ -56,15 +62,29 @@ struct ValidateNameForm {
 async fn validate_name(
     _: User,
     state: UiStateExtractor,
-    form: QsForm<ValidateNameForm>,
+    image_repo: web::Data<SignedUrlRepo>,
+    form: QsForm<EventCreateDetailsStep>,
 ) -> impl Responder {
-    DetailsStep::validate_name(&state, &form.name)
+    let card = EventCard::from_details_step(
+        &state,
+        &form,
+        form.image_url
+            .as_ref()
+            .map(|url| image_repo.get(&ImageUrl::new(url)).unwrap()),
+    );
+
+    html! {
+        (DetailsStep::validate_name(&state, &form.name.clone().unwrap_or_default()))
+        hx-partial hx-target="#preview" {
+            (card)
+        }
+    }
 }
 
 #[derive(Debug, MultipartForm)]
 struct UploadImageForm {
     #[multipart(limit = "5MB")]
-    image: Bytes,
+    image: TempFile,
 }
 
 #[post("/upload_image")]
@@ -76,17 +96,31 @@ async fn upload_image(
     htmx: Htmx,
     MultipartForm(form): MultipartForm<UploadImageForm>,
 ) -> impl Responder {
+    info!("Received image upload request: {:?}", form.image);
+    let bytes = fs::read(form.image.file.path()).unwrap();
     let url = app_state
         .event_service
-        .upload_form_image(&form.image.data)
+        .upload_form_image(&bytes)
         .await
         .unwrap();
 
     let img = ImageUrl::new(&url);
     let href = image_repo.get(&img).unwrap();
-    htmx.retarget("#preview img");
-    htmx.reswap(SwapType::OuterHtml);
-    html! { img src=(href) {} }
+    html! {
+        (DetailsStep::image_success(&state, &url))
+        hx-partial hx-target="#preview img" hx-swap="outerHTML"{
+            img src=(href);
+        }
+    }
+}
+
+#[post("/validate_description")]
+async fn validate_description(
+    _: User,
+    state: UiStateExtractor,
+    form: QsForm<EventCreateDetailsStep>,
+) -> impl Responder {
+    DetailsStep::validate_description(&state, &form.description.clone().unwrap_or_default())
 }
 
 #[post("")]

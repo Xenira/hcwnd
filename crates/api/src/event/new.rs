@@ -3,20 +3,26 @@ use std::{collections::HashMap, fmt::Display};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use url::Url;
+use uuid::Uuid;
 
 use crate::{day::EventDay, serde_utils::SwitchValue};
 
 #[derive(Debug, Deserialize)]
 pub struct EventCreateDetailsStep {
+    // Details Step
     pub name: Option<String>,
     pub event_type: EventType,
     pub description: Option<String>,
-    pub website: Option<Url>,
+    pub venue: Option<String>,
     pub image_url: Option<Url>,
-    #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
+    // Schedule Step
     pub start_date: Option<NaiveDate>,
     pub days: Option<Vec<EventDay>>,
+    // Stages Step
     pub stages: Option<Vec<EventStage>>,
+    pub website: Option<Url>,
+    #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
+    // Review Step
     pub source: Option<String>,
     #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
     pub source_url: Option<Url>,
@@ -29,6 +35,7 @@ impl EventCreateDetailsStep {
             name: None,
             event_type: EventType::Indoor,
             description: None,
+            venue: None,
             website: None,
             image_url: None,
             start_date: None,
@@ -82,3 +89,24 @@ pub struct EventStage {
 //         }
 //     }
 // }
+
+#[derive(Debug, Deserialize)]
+pub struct EventCreateScheduleStep {
+    // Details Step
+    pub name: String,
+    pub event_type: EventType,
+    pub description: String,
+    pub venue: Uuid,
+    pub image_url: Url,
+    // Schedule Step
+    pub start_date: Option<NaiveDate>,
+    pub days: Option<Vec<EventDay>>,
+    // Stages Step
+    pub stages: Option<Vec<EventStage>>,
+    pub website: Option<Url>,
+    #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
+    // Review Step
+    pub source: Option<String>,
+    #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
+    pub source_url: Option<Url>,
+}

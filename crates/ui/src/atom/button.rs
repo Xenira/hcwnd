@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
@@ -11,6 +13,8 @@ pub struct Button {
     icon: Option<Icons>,
     #[builder(default)]
     #[allow(clippy::struct_field_names)]
+    button_class: ButtonClass,
+    #[builder(default)]
     button_type: ButtonType,
 }
 
@@ -18,8 +22,8 @@ impl Render for Button {
     fn render(&self) -> Markup {
         html! {
             button
-                type="button"
-                class=(self.button_type.as_str())
+                type=(self.button_type)
+                class=(self.button_class.as_str())
             {
                 (button_content(&self.label, self.icon.as_ref()))
             }
@@ -42,7 +46,7 @@ pub struct LinkButton {
     icon: Option<Icons>,
     #[builder(default)]
     #[allow(clippy::struct_field_names)]
-    button_type: ButtonType,
+    button_class: ButtonClass,
 }
 
 impl Render for LinkButton {
@@ -51,7 +55,7 @@ impl Render for LinkButton {
             a
                 role="button"
                 href=(&self.href)
-                class=(self.button_type.as_str())
+                class=(self.button_class.as_str())
                 hx-boost=(self.boost)
                 hx-target=(self.target)
                 hx-push-url=(self.push_url)
@@ -82,17 +86,35 @@ fn button_content(label: &str, icon: Option<&Icons>) -> Markup {
 #[derive(Debug, Clone, Copy, Default)]
 pub enum ButtonType {
     #[default]
+    Button,
+    Submit,
+    Reset,
+}
+
+impl Display for ButtonType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ButtonType::Button => write!(f, "button"),
+            ButtonType::Submit => write!(f, "submit"),
+            ButtonType::Reset => write!(f, "reset"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub enum ButtonClass {
+    #[default]
     Primary,
     Secondary,
     Flat,
 }
 
-impl ButtonType {
+impl ButtonClass {
     pub fn as_str(&self) -> &'static str {
         match self {
-            ButtonType::Primary => "primary",
-            ButtonType::Secondary => "secondary",
-            ButtonType::Flat => "flat",
+            ButtonClass::Primary => "primary",
+            ButtonClass::Secondary => "secondary",
+            ButtonClass::Flat => "flat",
         }
     }
 }

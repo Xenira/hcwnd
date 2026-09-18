@@ -23,9 +23,9 @@ use crate::{
 };
 
 pub mod confirm_step;
-pub mod days_step;
 pub mod details_step;
 pub mod name_step;
+pub mod schedule_step;
 pub mod stages_step;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {

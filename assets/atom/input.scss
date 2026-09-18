@@ -96,4 +96,9 @@ input[type="search"] {
       background: var(--background-elevated, #{$background-elevated});
     }
   }
+
+  & > .status {
+    position: absolute;
+    bottom: -1.5rem;
+  }
 }

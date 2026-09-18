@@ -116,6 +116,7 @@ impl event::ports::ImageRepository for RustFs {
         &self,
         image_bytes: &[u8],
     ) -> Result<Url, Box<dyn std::error::Error + Send + Sync>> {
+        info!("Uploading form image to RustFs");
         self.upload_image("event-image", image_bytes).await
     }
 

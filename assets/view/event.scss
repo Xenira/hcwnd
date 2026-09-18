@@ -72,3 +72,13 @@
   align-items: flex-start;
   gap: 2.5rem;
 }
+
+#create_event_details {
+  display: flex;
+  padding: 3rem 5rem;
+  align-items: flex-start;
+  gap: 2.5rem;
+  flex: 1 0 0;
+  align-self: stretch;
+  justify-content: center;
+}

@@ -1,21 +1,22 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, get, post,
+    get, post,
     web::{self, ServiceConfig},
+    HttpResponse, Responder,
 };
 use log::debug;
 use serde_qs::web::QsForm;
 use ui::event::create::{
     self,
-    days_step::{EventCreateDaysStep, EventDay, day_buttons},
+    days_step::{day_buttons, EventCreateDaysStep, EventDay},
     name_step,
 };
 
 use crate::domain::user::models::user::User;
 
 pub fn configure(cfg: &mut ServiceConfig) {
-    cfg.service(redirect_to_name_step)
-        .service(days_step_form)
+    cfg.service(redirect_to_details_step)
+        .service(schedule_step_form)
         .route(
             ui::event::create::days_step::ADD_DAY_ROUTE,
             web::post().to(add_event_day),
@@ -28,17 +29,17 @@ pub fn configure(cfg: &mut ServiceConfig) {
 
 /// User should not be able to access this step directly, so we redirect them to the first step of the flow
 #[get("")]
-async fn redirect_to_name_step() -> impl Responder {
+async fn redirect_to_details_step() -> impl Responder {
     HttpResponse::Found()
         .append_header((
             "Location",
-            format!("{}{}", create::BASE_ROUTE, name_step::BASE_ROUTE),
+            format!("{}{}", create::BASE_ROUTE, details_step::BASE_ROUTE),
         ))
         .finish()
 }
 
 #[post("")]
-async fn days_step_form(
+async fn schedule_step_form(
     user: User,
     form: QsForm<EventCreateDaysStep>,
     htmx: Htmx,

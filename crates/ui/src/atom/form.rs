@@ -1,12 +1,12 @@
 use std::fmt::Display;
 
 use api::UiState;
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 use crate::{
-    atom::button::Button,
-    component::{Icons, icon},
+    atom::button::{Button, ButtonType},
+    component::{icon, Icons},
     htmx::HxEncoding,
 };
 
@@ -39,6 +39,7 @@ impl Render for Form {
     fn render(&self) -> Markup {
         let submit_button = Button::builder()
             .label(&self.submit_label)
+            .button_type(ButtonType::Submit)
             .icon_opt(self.submit_icon.clone())
             .build();
 

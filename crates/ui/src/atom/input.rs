@@ -1,5 +1,5 @@
 use api::UiState;
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 use crate::{component::Icons, htmx::HxEncoding};
@@ -14,7 +14,7 @@ pub struct TextField {
     value: Option<String>,
     #[builder(default)]
     label: Option<String>,
-    #[builder(setter(!strip_option,strip_bool))]
+    #[builder(default)]
     required: bool,
     #[builder(default)]
     input_type: InputType,
@@ -34,6 +34,7 @@ impl Render for TextField {
             InputType::Email => "email",
             InputType::Number => "number",
             InputType::Url => "url",
+            InputType::Search => "search",
             InputType::File { .. } => "file",
         };
 
@@ -92,6 +93,7 @@ pub enum InputType {
     Email,
     Number,
     Url,
+    Search,
     File {
         accept: Option<String>,
         multiple: bool,
@@ -116,6 +118,8 @@ pub struct ImageInput<'a> {
     multiple: bool,
     #[builder(default)]
     label: Option<String>,
+    #[builder(default)]
+    required: bool,
 }
 
 impl Render for ImageInput<'_> {
@@ -128,7 +132,7 @@ impl Render for ImageInput<'_> {
             })
             .validation_endpoint(&self.upload_url)
             .encoding(HxEncoding::MultipartFormData)
-            .required()
+            .required(self.required)
             .build();
 
         let input = html! {
