@@ -1,17 +1,18 @@
 use actix_htmx::Htmx;
-use actix_web::{get, web, HttpResponse, Responder, ResponseError};
+use actix_web::{HttpResponse, Responder, ResponseError, get, web};
 use anyhow::Context as _;
 use api::UiState;
+use domain::{
+    event::models::event::{Event, EventId},
+    user::models::user::User,
+};
 use thiserror::Error;
 use ui::event::details::EventDetails;
 use uuid::Uuid;
 
-use crate::{
-    domain::{
-        event::models::event::{Event, EventId},
-        user::models::user::User,
-    },
-    inbound::http::{user::Locale, AppState},
+use crate::inbound::http::{
+    AppState,
+    user::{Locale, UiStateExtractor},
 };
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
@@ -38,16 +39,11 @@ impl ResponseError for HandlerError {
 
 #[get("")]
 async fn get_timetable(
-    user: Option<User>,
-    locale: Locale<'_>,
+    state: UiStateExtractor,
     app_state: web::Data<AppState>,
     path: web::Path<Uuid>,
     htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
-    let ui_state = user
-        .as_ref()
-        .map_or_else(|| UiState::from(locale), |u| UiState::from(u));
-
     let event_id = EventId::new(path.into_inner());
     let event = app_state
         .event_service
@@ -60,9 +56,9 @@ async fn get_timetable(
         .context("Failed to map event")?;
 
     let body = if htmx.is_htmx {
-        ui::view::event::timetable::render(&ui_state, &event)
+        ui::view::event::timetable::render(&state, &event)
     } else {
-        ui::view::event::timetable::full_page(&ui_state, &event)
+        ui::view::event::timetable::full_page(&state, &event)
     };
 
     Ok(HttpResponse::Ok()

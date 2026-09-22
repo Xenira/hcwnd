@@ -1,30 +1,23 @@
 use actix_htmx::Htmx;
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{HttpResponse, Responder, post, web};
 use anyhow::Context as _;
+use domain::{
+    event::models::{
+        day::CreateDayRequest,
+        event::{
+            CreateEventRequest, EventDaysCreateRequests, EventDescription, EventName, ImageUrl,
+            WebsiteUrl,
+        },
+    },
+    proposal::ProposalSource,
+};
 use serde_qs::web::QsForm;
 use ui::event::create::{confirm_step::EventCreateConfirmStep, days_step::EventDay};
 
-use crate::{
-    domain::{
-        event::{
-            models::{
-                day::CreateDayRequest,
-                event::{
-                    CreateEventRequest, EventDaysCreateRequests, EventDescription, EventName,
-                    ImageUrl, WebsiteUrl,
-                },
-            },
-            ports::EventService,
-        },
-        proposal::ProposalSource,
-        user::models::user::User,
-    },
-    inbound::http::AppState,
-};
+use crate::inbound::http::{AppState, user::RequestUser};
 
 pub mod confirm_step;
 pub mod details_step;
-pub mod name_step;
 pub mod schedule_step;
 pub mod stages_step;
 
@@ -91,7 +84,7 @@ impl TryFrom<EventDay> for CreateDayRequest {
 #[post("")]
 async fn create_event(
     app_state: web::Data<AppState>,
-    user: User,
+    user: RequestUser,
     form: QsForm<EventCreateConfirmStep>,
     htmx: Htmx,
 ) -> impl Responder {

@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use url::Url;
 
-use crate::domain::{
+use crate::{
     event::{
         models::{
             act::{Act, CreateActError, CreateActRequest},

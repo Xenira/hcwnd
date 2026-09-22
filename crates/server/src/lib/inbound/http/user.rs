@@ -1,22 +1,30 @@
 use std::{borrow::Cow, ops::Deref};
 
 use actix_identity::IdentityExt;
-use actix_utils::future::{ready, Ready};
-use actix_web::{dev::Payload, web, FromRequest, HttpRequest};
+use actix_utils::future::{Ready, ready};
+use actix_web::{FromRequest, HttpRequest, dev::Payload, web};
 use api::UiState;
+use domain::user::{
+    models::user::{User, UserId},
+    ports::UserService,
+};
 use futures::future::LocalBoxFuture;
 use log::{error, info};
 use uuid::Uuid;
 
-use crate::{
-    domain::user::{
-        models::user::{User, UserId},
-        ports::UserService,
-    },
-    inbound::http::AppState,
-};
+use crate::inbound::http::AppState;
 
-impl FromRequest for User {
+pub struct RequestUser(pub User);
+
+impl Deref for RequestUser {
+    type Target = User;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl FromRequest for RequestUser {
     type Error = actix_web::Error;
     type Future = LocalBoxFuture<'static, Result<Self, Self::Error>>;
 
@@ -48,6 +56,7 @@ impl FromRequest for User {
                     ))
                 })?
                 .ok_or_else(|| actix_web::error::ErrorUnauthorized("User not found"))
+                .map(RequestUser)
         })
     }
 }
@@ -101,14 +110,14 @@ impl FromRequest for UiStateExtractor {
 
     fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
         let locale_future = Locale::from_request(req, payload);
-        let user_future = User::from_request(req, payload);
+        let user_future = RequestUser::from_request(req, payload);
 
         Box::pin(async move {
             let locale = locale_future.await?;
             let user = user_future.await.ok();
 
             Ok(UiStateExtractor(
-                user.as_ref()
+                user.as_deref()
                     .map_or_else(|| UiState::from(&locale), UiState::from),
             ))
         })

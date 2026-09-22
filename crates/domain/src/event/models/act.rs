@@ -3,7 +3,7 @@ use thiserror::Error;
 use url::Url;
 use uuid::Uuid;
 
-use crate::domain::artist::models::artist::ArtistId;
+use crate::artist::models::artist::ArtistId;
 
 #[derive(Clone, Debug)]
 pub struct Act {

@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use crate::domain::user::{
+use crate::user::{
     models::user::{
         AuthenticateUserError, AuthenticateUserRequest, ConfirmEmailError, CreateUserError,
         CreateUserRequest, FindUserError, User, UserId, UserName,

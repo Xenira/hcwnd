@@ -4,7 +4,7 @@ use thiserror::Error;
 use url::Url;
 use uuid::Uuid;
 
-use crate::domain::{
+use crate::{
     event::models::{
         act::{Act, ListActsError},
         day::*,

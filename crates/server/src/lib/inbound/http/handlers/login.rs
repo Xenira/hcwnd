@@ -4,17 +4,15 @@ use actix_web::{
     HttpMessage as _, HttpRequest, HttpResponse, Responder, ResponseError, get, post, web,
 };
 use anyhow::Context as _;
+use domain::user::{
+    models::user::{AuthenticateUserRequest, UserEmail, UserPassword},
+    ports::UserService,
+};
 use secrecy::SecretString;
 use serde::Deserialize;
 use thiserror::Error;
 
-use crate::{
-    domain::user::{
-        models::user::{AuthenticateUserRequest, UserEmail, UserPassword},
-        ports::UserService,
-    },
-    inbound::http::{AppState, user::Locale},
-};
+use crate::inbound::http::{AppState, user::Locale};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(login_form).service(login);

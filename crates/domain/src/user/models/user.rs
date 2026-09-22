@@ -1,17 +1,40 @@
+use crate::user::events::*;
 use api::UiState;
 use api::user::User as ApiUser;
 use argon2::{
-    Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
-    password_hash::{SaltString, rand_core::OsRng},
+    Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_hash::phc::SaltString,
+};
+use eventwise::{
+    Aggregate, aggregate::Apply as _, aggregate::Create as _, command::Handle as _, event::StreamId,
 };
 use nutype::nutype;
 use secrecy::{ExposeSecret, SecretString};
 use thiserror::Error;
 use uuid::Uuid;
 
-type ValidationToken = (Uuid, chrono::DateTime<chrono::Utc>);
+pub type ValidationToken = (Uuid, chrono::DateTime<chrono::Utc>);
 
-#[derive(Clone, Debug)]
+#[derive(Error, Debug)]
+pub enum UserError {
+    #[error("User with the same email already exists")]
+    UserAlreadyExists,
+}
+
+impl StreamId for UserId {
+    fn key(&self) -> Uuid {
+        self.clone().into_inner()
+    }
+}
+impl From<Uuid> for UserId {
+    fn from(id: Uuid) -> Self {
+        UserId::new(id)
+    }
+}
+
+#[derive(Aggregate, Clone, Debug)]
+#[aggregate(error_type = UserError, id_type = UserId)]
+#[aggregate(bootstrap(UserCreated))]
+#[aggregate(events(UserEmailConfirmed))]
 pub struct User {
     id: UserId,
     name: UserName,
@@ -77,6 +100,10 @@ impl User {
         self.reputation
     }
 
+    pub fn set_validated(&mut self) {
+        self.validation = None;
+    }
+
     pub fn is_email_confirmed(&self) -> bool {
         self.validation.is_none()
     }
@@ -92,14 +119,16 @@ pub struct UserId(Uuid);
 #[nutype(
     sanitize(trim),
     validate(len_char_min = 3, len_char_max = 32, regex = r"^[a-zA-Z0-9_.]+$"),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef)
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    new_unchecked
 )]
 pub struct UserName(String);
 
 #[nutype(
     sanitize(trim),
     validate(not_empty, len_char_max = 254),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef)
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    new_unchecked
 )]
 pub struct UserEmail(String);
 
@@ -109,7 +138,7 @@ pub struct UserPassword(SecretString);
 impl UserPassword {
     pub fn hash(&self, salt: &SaltString) -> Result<String, anyhow::Error> {
         Argon2::default()
-            .hash_password(self.as_ref().expose_secret().as_bytes(), salt)
+            .hash_password_with_salt(self.as_ref().expose_secret().as_bytes(), salt.as_bytes())
             .map_err(|e| anyhow::anyhow!("Failed to hash password: {}", e))
             .map(|hash| hash.to_string())
     }
@@ -148,7 +177,7 @@ impl CreateUserRequest {
     }
 
     pub fn hashed_password(&self) -> Result<String, anyhow::Error> {
-        let salt = SaltString::generate(&mut OsRng);
+        let salt = SaltString::generate();
         self.password.hash(&salt)
     }
 }

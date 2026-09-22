@@ -1,12 +1,14 @@
 use actix_htmx::Htmx;
-use actix_web::{get, web, HttpResponse, Responder, ResponseError};
+use actix_web::{HttpResponse, Responder, ResponseError, get, web};
 use anyhow::Context;
 use api::UiState;
+use domain::{artist::ports::ArtistService, event::models::event::Event, user::models::user::User};
 use thiserror::Error;
 
-use crate::{
-    domain::{artist::ports::ArtistService, event::models::event::Event, user::models::user::User},
-    inbound::http::{user::Locale, AppState},
+use crate::inbound::http::{
+    AppState,
+    event::RequestEvent,
+    user::{Locale, RequestUser, UiStateExtractor},
 };
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
@@ -31,21 +33,17 @@ impl ResponseError for HandlerError {
 
 #[get("")]
 async fn get_lineup(
-    user: Option<User>,
-    locale: Locale<'_>,
+    state: UiStateExtractor,
     app_state: web::Data<AppState>,
-    event: Event,
+    event: RequestEvent,
     htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
-    let ui_state = user
-        .as_ref()
-        .map_or_else(|| UiState::from(locale), UiState::from);
     let event = app_state.event_mapper.map_event(&event)?;
 
     let body = if htmx.is_htmx {
-        ui::view::event::lineup::render(&ui_state, &event, None)
+        ui::view::event::lineup::render(&state, &event, None)
     } else {
-        ui::view::event::lineup::full_page(&ui_state, &event, None)
+        ui::view::event::lineup::full_page(&state, &event, None)
     };
 
     Ok(HttpResponse::Ok()

@@ -12,19 +12,21 @@ repository = "https://github.com/Xenira/hardcore-will-never-diy"
 website = "https://hardcore-will-never.diy"
 
 [workspace.dependencies]
-base64 = "0.22.1"
+anyhow = "1.0.104"
+async-trait = "0.1.92"
+base64 = "0.23.1"
 chrono = { version = "0.4.45", features = ["serde"] }
 derive_builder = "0.20.2"
 indexmap = "2.14.2"
-itertools = "0.14.0"
+itertools = "0.15.0"
+maud = "0.27.0"
+rust-i18n = "4.2.2"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
-uuid = { version = "1.26.0", features = ["v4"] }
-url = { version = "2.5.8", features = ["serde"] }
-thiserror = "2.0.20"
-rust-i18n = "4.2.2"
 serde_with = "3.23.0"
-maud = "0.27.0"
+thiserror = "2.0.20"
+url = { version = "2.5.8", features = ["serde"] }
+uuid = { version = "1.26.1", features = ["v4"] }
 
 # workspace
 api = { path = "crates/api" }

@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use url::Url;
 
-use crate::domain::{
+use crate::{
     event::models::{
         act::{Act, ActId, CreateActError, CreateActRequest, GetActError, ListActsError},
         day::{CreateDayError, CreateDayRequest, Day, DayId, GetDayError, ListDaysError},

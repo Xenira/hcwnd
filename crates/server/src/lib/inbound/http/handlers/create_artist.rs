@@ -4,18 +4,19 @@ use actix_web::{
     web::{self, ServiceConfig},
 };
 use api::artist::{ArtistCreateForm, ArtistCreateSubmitForm};
+use domain::{
+    artist::models::artist::{ArtistGenre, ArtistName, CreateArtistRequest},
+    user::models::user::User,
+};
 use itertools::Itertools;
 use log::info;
 use serde::Deserialize;
 use serde_qs::web::QsForm;
 use thiserror::Error;
 
-use crate::{
-    domain::{
-        artist::models::artist::{ArtistGenre, ArtistName, CreateArtistRequest},
-        user::models::user::User,
-    },
-    inbound::http::{AppState, user::UiStateExtractor},
+use crate::inbound::http::{
+    AppState,
+    user::{RequestUser, UiStateExtractor},
 };
 
 pub fn configure(cfg: &mut ServiceConfig) {
@@ -39,7 +40,11 @@ impl ResponseError for HandlerError {
 }
 
 #[get("")]
-async fn create_artist_form(_user: User, state: UiStateExtractor, htmx: Htmx) -> impl Responder {
+async fn create_artist_form(
+    _user: RequestUser,
+    state: UiStateExtractor,
+    htmx: Htmx,
+) -> impl Responder {
     let body = if htmx.is_htmx {
         ui::view::artist::create::render(&state, &ArtistCreateForm::default())
     } else {
@@ -53,7 +58,7 @@ async fn create_artist_form(_user: User, state: UiStateExtractor, htmx: Htmx) ->
 
 #[post("")]
 async fn create_artist(
-    user: User,
+    user: RequestUser,
     state: UiStateExtractor,
     app_state: web::Data<AppState>,
     form: QsForm<ArtistCreateSubmitForm>,

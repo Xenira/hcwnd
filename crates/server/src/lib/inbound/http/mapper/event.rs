@@ -1,10 +1,11 @@
+use domain::event::models::event::Event;
 use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,
 };
 use url::Url;
 
-use crate::{domain::event::models::event::Event, inbound::http::mapper::act::ActMapper};
+use crate::inbound::http::mapper::act::ActMapper;
 
 #[derive(Clone)]
 pub struct EventMapper {

@@ -1,14 +1,24 @@
-use actix_web::{dev::Payload, web, FromRequest, HttpRequest};
+use std::ops::Deref;
+
+use actix_web::{FromRequest, HttpRequest, dev::Payload, web};
+use domain::event::models::event::{Event, EventId};
 use futures::future::LocalBoxFuture;
 use log::error;
 use uuid::Uuid;
 
-use crate::{
-    domain::event::models::event::{Event, EventId},
-    inbound::http::AppState,
-};
+use crate::inbound::http::AppState;
 
-impl FromRequest for Event {
+pub struct RequestEvent(pub Event);
+
+impl Deref for RequestEvent {
+    type Target = Event;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl FromRequest for RequestEvent {
     type Error = actix_web::Error;
     type Future = LocalBoxFuture<'static, Result<Self, Self::Error>>;
 
@@ -35,17 +45,19 @@ impl FromRequest for Event {
                     )))
                 })?;
 
-            app_state
-                .event_service
-                .get_event_by_id(&EventId::new(event_id))
-                .await
-                .map_err(|e| {
-                    error!("Failed to retrieve event from service: {}", &e);
-                    actix_web::error::ErrorInternalServerError(format!(
-                        "Failed to retrieve event: {}",
-                        e
-                    ))
-                })
+            Ok(RequestEvent(
+                app_state
+                    .event_service
+                    .get_event_by_id(&EventId::new(event_id))
+                    .await
+                    .map_err(|e| {
+                        error!("Failed to retrieve event from service: {}", &e);
+                        actix_web::error::ErrorInternalServerError(format!(
+                            "Failed to retrieve event: {}",
+                            e
+                        ))
+                    })?,
+            ))
         })
     }
 }

@@ -3,6 +3,7 @@ use actix_web::{
     HttpResponse, Responder, get, post,
     web::{self, ServiceConfig},
 };
+use domain::user::models::user::User;
 use log::debug;
 use serde_qs::web::QsForm;
 use ui::{
@@ -13,7 +14,7 @@ use ui::{
     util::SwitchValue,
 };
 
-use crate::domain::user::models::user::User;
+use crate::inbound::http::user::{RequestUser, UiStateExtractor};
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
@@ -44,12 +45,11 @@ async fn redirect_to_name_step() -> impl Responder {
 
 #[post("")]
 async fn stages_step_form(
-    user: User,
+    state: UiStateExtractor,
+    user: RequestUser,
     form: QsForm<EventCreateStageStep>,
     htmx: Htmx,
 ) -> impl Responder {
-    let state = api::UiState::from(&user);
-
     let mut form = form.into_inner();
     form.populate_stages();
 
@@ -65,12 +65,12 @@ async fn stages_step_form(
 }
 
 async fn add_event_stage(
-    user: User,
+    state: UiStateExtractor,
+    user: RequestUser,
     form: QsForm<EventCreateStageStep>,
     htmx: Htmx,
 ) -> impl Responder {
     debug!("Adding stage to event {form:?}");
-    let state = api::UiState::from(&user);
 
     let stage = EventStage {
         name: String::new(),
@@ -95,13 +95,12 @@ async fn add_event_stage(
 }
 
 async fn remove_event_stage(
-    user: User,
+    state: UiStateExtractor,
+    user: RequestUser,
     form: QsForm<EventCreateStageStep>,
     index: web::Path<usize>,
     htmx: Htmx,
 ) -> impl Responder {
-    let state = api::UiState::from(&user);
-
     if form.stages.len() <= 1 {
         return HttpResponse::BadRequest()
             .content_type("text/html")

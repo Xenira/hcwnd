@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use actix_session::storage::RedisSessionStore;
 use config::{Config, Environment, File};
+use eventwise::{PostgresEventStore, repository::Repository};
 use hcwnd::{
     domain::{artist, event, user},
     inbound::http::HttpServer,
@@ -43,6 +44,8 @@ async fn main() -> anyhow::Result<()> {
 
     let s3 = RustFs::new(&config.s3).await;
 
+    let pg_store = PostgresEventStore::new(pg.clone());
+    let event_repo = Repository::new::<User>(pg_store);
     let event_service =
         event::service::Service::new(pg.clone(), pg.clone(), pg.clone(), pg.clone(), s3.clone());
     let artist_service = artist::service::Service::new(pg.clone());

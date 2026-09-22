@@ -1,11 +1,10 @@
 use anyhow::Context;
+use domain::event::models::{act::Act, event::Event};
 use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,
 };
 use url::Url;
-
-use crate::domain::event::models::{act::Act, event::Event};
 
 #[derive(Clone)]
 pub struct ActMapper {

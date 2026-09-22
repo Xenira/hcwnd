@@ -155,14 +155,6 @@ services:
         mode: 0o755
       - source: rustfs_secret_key
     healthcheck:
-      # Default behavior:
-      # - HTTP when RUSTFS_TLS_PATH is unset
-      # - HTTPS when RUSTFS_TLS_PATH is set
-      # - loopback TLS uses `-k` unless strict host+CA values are provided
-      #
-      # Strict TLS example:
-      # - set RUSTFS_HEALTHCHECK_HOST to a SAN-covered hostname
-      # - optionally set RUSTFS_HEALTHCHECK_CA (defaults to /opt/tls/ca.crt when present)
       test: ["CMD", "sh", "-ec", 'curl -fsS "http://127.0.0.1:9000/health"']
       interval: 30s
       timeout: 10s

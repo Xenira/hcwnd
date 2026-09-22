@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use crate::domain::{
+use crate::{
     artist::{
         models::artist::{
             Artist, ArtistId, CreateArtistError, CreateArtistRequest, GetArtistError,

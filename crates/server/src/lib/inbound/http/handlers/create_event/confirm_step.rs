@@ -3,6 +3,7 @@ use actix_web::{
     HttpResponse, Responder, get, post,
     web::{self, ServiceConfig},
 };
+use domain::user::models::user::User;
 use imgproxy::{ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder, SignedUrlRepo};
 use serde_qs::web::QsForm;
 use ui::event::create::{
@@ -11,7 +12,7 @@ use ui::event::create::{
     name_step,
 };
 
-use crate::domain::user::models::user::User;
+use crate::inbound::http::user::{RequestUser, UiStateExtractor};
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(redirect_to_name_step)
@@ -32,11 +33,11 @@ async fn redirect_to_name_step() -> impl Responder {
 #[post("")]
 async fn confirm_step_form(
     signer: web::Data<SignedUrlRepo>,
-    user: User,
+    state: UiStateExtractor,
+    _: RequestUser,
     form: QsForm<EventCreateConfirmStep>,
     htmx: Htmx,
 ) -> impl Responder {
-    let state = api::UiState::from(&user);
     let mut form = form.into_inner();
     let image_url = ImageUrl::new(&form.image_url).with_option(ProcessingOption::Resize(
         ResizingOptionsBuilder::default()

@@ -1,14 +1,12 @@
 use anyhow::Context;
+use domain::{artist::models::artist::Artist, event::models::event::Event};
 use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,
 };
 use url::Url;
 
-use crate::{
-    domain::{artist::models::artist::Artist, event::models::event::Event},
-    inbound::http::mapper::act::ActMapper,
-};
+use crate::inbound::http::mapper::act::ActMapper;
 
 #[derive(Clone)]
 pub struct ArtistMapper {

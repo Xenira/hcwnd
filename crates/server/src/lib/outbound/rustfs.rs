@@ -3,15 +3,13 @@ use std::io::Cursor;
 use anyhow::ensure;
 use async_trait::async_trait;
 use aws_config::{BehaviorVersion, Region};
-use aws_sdk_s3::{config::Credentials, primitives::ByteStream, Client};
+use aws_sdk_s3::{Client, config::Credentials, primitives::ByteStream};
+use domain::event::{self, models::event::EventId};
 use image::{DynamicImage, ImageFormat, ImageReader};
 use log::info;
 use url::Url;
 
-use crate::{
-    config::S3Config,
-    domain::event::{self, models::event::EventId},
-};
+use crate::config::S3Config;
 
 const EVENT_IMAGE_BUCKET: &str = "event-image";
 const USER_IMAGE_BUCKET: &str = "user-image";

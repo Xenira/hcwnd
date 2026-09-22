@@ -5,16 +5,14 @@ use actix_web::{
 };
 use anyhow::Context as _;
 use api::artist::ArtistCreateForm;
+use domain::artist::models::artist::{ArtistId, SearchArtistsQuery};
 use itertools::Itertools;
 use log::debug;
 use serde::Deserialize;
 use serde_qs::web::QsForm;
 use thiserror::Error;
 
-use crate::{
-    domain::artist::models::artist::{ArtistId, SearchArtistsQuery},
-    inbound::http::{AppState, user::UiStateExtractor},
-};
+use crate::inbound::http::{AppState, user::UiStateExtractor};
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(get_artists).service(artist_detail);

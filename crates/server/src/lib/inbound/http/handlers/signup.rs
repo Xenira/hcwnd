@@ -5,17 +5,15 @@ use actix_web::{
     web::{self},
 };
 use anyhow::Context;
+use domain::user::{
+    models::user::{CreateUserRequest, UserEmail, UserName, UserPassword},
+    ports::UserService,
+};
 use secrecy::SecretString;
 use serde::Deserialize;
 use thiserror::Error;
 
-use crate::{
-    domain::user::{
-        models::user::{CreateUserRequest, UserEmail, UserName, UserPassword},
-        ports::UserService,
-    },
-    inbound::http::{AppState, user::Locale},
-};
+use crate::inbound::http::{AppState, user::Locale};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(signup_form).service(signup);

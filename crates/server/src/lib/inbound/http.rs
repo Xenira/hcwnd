@@ -3,24 +3,28 @@ use std::{fs, sync::Arc, time::Duration};
 use actix_htmx::HtmxMiddleware;
 use actix_identity::IdentityMiddleware;
 use actix_multipart::form::MultipartFormConfig;
-use actix_session::{storage::SessionStore, SessionMiddleware};
+use actix_session::{SessionMiddleware, storage::SessionStore};
 use actix_web::{
+    App, HttpResponse,
     cookie::Key,
     dev::ServiceResponse,
-    http::{header, StatusCode},
+    http::{StatusCode, header},
     middleware::{Compress, ErrorHandlerResponse, ErrorHandlers},
-    web, App, HttpResponse,
+    web,
 };
 use actix_web_helmet::Helmet;
 use anyhow::Context as _;
+use domain::{
+    artist::ports::ArtistService,
+    event::ports::EventService,
+    user::{models::user::User, ports::UserService},
+};
+use eventwise::{PostgresEventStore, repository::Repository, store::EventStore};
 use imgproxy::SignedUrlRepo;
 use log::info;
 use tracing_actix_web::TracingLogger;
 
-use crate::{
-    domain::{artist::ports::ArtistService, event::ports::EventService, user::ports::UserService},
-    inbound::http::mapper::{act::ActMapper, artist::ArtistMapper, event::EventMapper},
-};
+use crate::inbound::http::mapper::{act::ActMapper, artist::ArtistMapper, event::EventMapper};
 
 pub mod actix_macro;
 pub mod event;
@@ -30,6 +34,7 @@ pub mod user;
 
 #[derive(Clone)]
 pub struct AppState {
+    user_repo: Arc<Repository<PostgresEventStore, User>>,
     event_service: Arc<dyn EventService + Sync + Send>,
     artist_service: Arc<dyn ArtistService + Sync + Send>,
     user_service: Arc<dyn UserService + Sync + Send>,
@@ -39,6 +44,7 @@ pub struct AppState {
 
 impl AppState {
     pub fn new(
+        user_repo: Arc<Repository<PostgresEventStore, User>>,
         event_service: Arc<dyn EventService + Sync + Send>,
         artist_service: Arc<dyn ArtistService + Sync + Send>,
         user_service: Arc<dyn UserService + Sync + Send>,
@@ -47,6 +53,7 @@ impl AppState {
         let event_mapper = EventMapper::new(signer.clone());
         let artist_mapper = ArtistMapper::new(signer.clone());
         Self {
+            user_repo,
             event_service,
             artist_service,
             user_service,
@@ -60,13 +67,20 @@ pub struct HttpServer;
 
 impl HttpServer {
     pub async fn run(
+        user_repo: Arc<Repository<PostgresEventStore, User>>,
         event_service: Arc<dyn EventService + Sync + Send + 'static>,
         artist_service: Arc<dyn ArtistService + Sync + Send + 'static>,
         user_service: Arc<dyn UserService + Sync + Send + 'static>,
         session_store: impl SessionStore + Clone + Sync + Send + 'static,
         signer: SignedUrlRepo,
     ) -> anyhow::Result<()> {
-        let app_state = AppState::new(event_service, artist_service, user_service, signer.clone());
+        let app_state = AppState::new(
+            user_repo,
+            event_service,
+            artist_service,
+            user_service,
+            signer.clone(),
+        );
         let app_data = web::Data::new(app_state);
 
         let url_repo = web::Data::new(signer);

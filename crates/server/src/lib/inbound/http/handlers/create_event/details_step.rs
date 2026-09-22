@@ -1,13 +1,13 @@
 use std::fs;
 
 use actix_htmx::{Htmx, SwapType};
-use actix_multipart::form::{bytes::Bytes, tempfile::TempFile, MultipartForm};
+use actix_multipart::form::{MultipartForm, bytes::Bytes, tempfile::TempFile};
 use actix_web::{
-    get, post,
+    HttpResponse, Responder, get, post,
     web::{self, ServiceConfig},
-    HttpResponse, Responder,
 };
-use api::{event::new::EventCreateDetailsStep, UiState};
+use api::{UiState, event::new::EventCreateDetailsStep};
+use domain::user::models::user::User;
 use imgproxy::{ImageUrl, SignedUrlRepo};
 use log::info;
 use maud::html;
@@ -20,12 +20,12 @@ use ui::{
         self,
         name_step::{self},
     },
-    view::{event::new::details::DetailsStep, View as _},
+    view::{View as _, event::new::details::DetailsStep},
 };
 
-use crate::{
-    domain::user::models::user::User,
-    inbound::http::{user::UiStateExtractor, AppState},
+use crate::inbound::http::{
+    AppState,
+    user::{RequestUser, UiStateExtractor},
 };
 
 pub fn configure(cfg: &mut ServiceConfig) {
@@ -38,7 +38,7 @@ pub fn configure(cfg: &mut ServiceConfig) {
 
 /// User should not be able to access this step directly, so we redirect them to the first step of the flow
 #[get("")]
-async fn details_step(user: User, state: UiStateExtractor, htmx: Htmx) -> impl Responder {
+async fn details_step(_: RequestUser, state: UiStateExtractor, htmx: Htmx) -> impl Responder {
     let details = EventCreateDetailsStep::default();
     let details_view = DetailsStep::builder().details_step(&details).build();
 
@@ -60,7 +60,7 @@ struct ValidateNameForm {
 
 #[post("/validate_name")]
 async fn validate_name(
-    _: User,
+    _: RequestUser,
     state: UiStateExtractor,
     image_repo: web::Data<SignedUrlRepo>,
     form: QsForm<EventCreateDetailsStep>,
@@ -89,7 +89,7 @@ struct UploadImageForm {
 
 #[post("/upload_image")]
 async fn upload_image(
-    _: User,
+    _: RequestUser,
     state: UiStateExtractor,
     app_state: web::Data<AppState>,
     image_repo: web::Data<SignedUrlRepo>,
@@ -116,7 +116,7 @@ async fn upload_image(
 
 #[post("/validate_description")]
 async fn validate_description(
-    _: User,
+    _: RequestUser,
     state: UiStateExtractor,
     form: QsForm<EventCreateDetailsStep>,
 ) -> impl Responder {
@@ -125,7 +125,7 @@ async fn validate_description(
 
 #[post("")]
 async fn details_step_form(
-    _: User,
+    _: RequestUser,
     state: UiStateExtractor,
     htmx: Htmx,
     form: QsForm<EventCreateDetailsStep>,

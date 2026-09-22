@@ -1,16 +1,16 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get,
+    HttpResponse, Responder, ResponseError, get,
     web::{self, Data, ServiceConfig},
-    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
+use domain::{event::ports::EventService, user::models::user::User};
 use thiserror::Error;
 use ui::view::{Home, View};
 
-use crate::{
-    domain::{event::ports::EventService, user::models::user::User},
-    inbound::http::{user::Locale, AppState},
+use crate::inbound::http::{
+    AppState,
+    user::{Locale, UiStateExtractor},
 };
 
 pub mod artist;
@@ -56,16 +56,10 @@ impl ResponseError for HandlerError {
 
 #[get("/")]
 async fn index(
+    state: UiStateExtractor,
     app_state: Data<AppState>,
-    user: Option<User>,
-    locale: Locale<'_>,
     htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
-    let state = user
-        .as_ref()
-        .map(api::UiState::from)
-        .unwrap_or_else(|| api::UiState::from(&locale));
-
     let events = app_state
         .event_service
         .list_events()
