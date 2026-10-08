@@ -1,17 +1,17 @@
 use std::ops::Deref;
 
-use actix_web::{FromRequest, HttpRequest, dev::Payload, web};
-use domain::event::models::event::{Event, EventId};
+use actix_web::{dev::Payload, web, FromRequest, HttpRequest};
+use domain::event::models::festival::{Festival, FestivalId};
 use futures::future::LocalBoxFuture;
 use log::error;
 use uuid::Uuid;
 
 use crate::inbound::http::AppState;
 
-pub struct RequestEvent(pub Event);
+pub struct RequestEvent(pub Festival);
 
 impl Deref for RequestEvent {
-    type Target = Event;
+    type Target = Festival;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -44,20 +44,21 @@ impl FromRequest for RequestEvent {
                         e
                     )))
                 })?;
+            todo!("Implement caching for event retrieval to improve performance and reduce load on the event service.");
 
-            Ok(RequestEvent(
-                app_state
-                    .event_service
-                    .get_event_by_id(&EventId::new(event_id))
-                    .await
-                    .map_err(|e| {
-                        error!("Failed to retrieve event from service: {}", &e);
-                        actix_web::error::ErrorInternalServerError(format!(
-                            "Failed to retrieve event: {}",
-                            e
-                        ))
-                    })?,
-            ))
+            // Ok(RequestEvent(
+            //     app_state
+            //         .event_service
+            //         .get_event_by_id(&EventId::new(event_id))
+            //         .await
+            //         .map_err(|e| {
+            //             error!("Failed to retrieve event from service: {}", &e);
+            //             actix_web::error::ErrorInternalServerError(format!(
+            //                 "Failed to retrieve event: {}",
+            //                 e
+            //             ))
+            //         })?,
+            // ))
         })
     }
 }

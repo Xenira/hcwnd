@@ -53,7 +53,7 @@ impl Default for EventCreateDetailsStep {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum EventType {
     Indoor,
     Outdoor,
@@ -106,6 +106,81 @@ pub struct EventCreateScheduleStep {
     pub website: Option<Url>,
     #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
     // Review Step
+    pub source: Option<String>,
+    #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
+    pub source_url: Option<Url>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EventCreateStageStep {
+    pub name: String,
+    pub description: String,
+    pub website: Url,
+    pub image_url: Url,
+    pub start_date: NaiveDate,
+    pub days: Vec<EventDay>,
+    #[serde(default)]
+    pub stages: Vec<EventStage>,
+    pub source: Option<String>,
+    #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
+    pub source_url: Option<Url>,
+}
+
+impl From<EventCreateConfirmStep> for EventCreateStageStep {
+    fn from(confirm_step: EventCreateConfirmStep) -> Self {
+        Self {
+            name: confirm_step.name,
+            description: confirm_step.description,
+            website: confirm_step.website,
+            image_url: confirm_step.image_url,
+            start_date: confirm_step.start_date,
+            days: confirm_step.days,
+            stages: confirm_step.stages,
+            source: confirm_step.source,
+            source_url: confirm_step.source_url,
+        }
+    }
+}
+
+impl EventCreateStageStep {
+    pub fn populate_stages(&mut self) {
+        if self.stages.is_empty() {
+            self.stages.push(EventStage {
+                name: "Main Stage".to_string(),
+                days: HashMap::with_capacity(self.days.len()),
+            });
+        }
+
+        for stage in &mut self.stages {
+            stage
+                .days
+                .retain(|i, _| self.days.iter().any(|d| d.n == *i as u16));
+        }
+
+        for stage in &mut self.stages {
+            for day in &self.days {
+                stage
+                    .days
+                    .entry(day.n as usize)
+                    .or_insert(SwitchValue(true));
+            }
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EventCreateConfirmStep {
+    pub name: String,
+    pub event_type: EventType,
+    pub description: String,
+    pub venue: Uuid,
+    pub image_url: Url,
+    // Schedule Step
+    pub start_date: NaiveDate,
+    pub days: Vec<EventDay>,
+    // Stages Step
+    pub stages: Vec<EventStage>,
+    pub website: Url,
     pub source: Option<String>,
     #[serde(default, deserialize_with = "crate::serde_utils::empty_string_as_none")]
     pub source_url: Option<Url>,

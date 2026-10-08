@@ -18,6 +18,10 @@ pub type ValidationToken = (Uuid, chrono::DateTime<chrono::Utc>);
 pub enum UserError {
     #[error("User with the same email already exists")]
     UserAlreadyExists,
+    #[error("Invalid Username")]
+    InvalidUsername,
+    #[error("Invalid Email")]
+    InvalidEmail,
 }
 
 impl StreamId for UserId {
@@ -43,6 +47,15 @@ pub struct User {
     password_hash: String,
     reputation: i32,
     validation: Option<ValidationToken>,
+}
+
+#[derive(Debug, Clone)]
+pub struct UserProjection {
+    pub id: Uuid,
+    pub name: String,
+    // locale: String,
+    pub email: String,
+    // reputation: i32,
 }
 
 impl From<&User> for ApiUser {
@@ -113,13 +126,13 @@ impl User {
     }
 }
 
-#[nutype(derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef))]
+#[nutype(derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef, Deref))]
 pub struct UserId(Uuid);
 
 #[nutype(
     sanitize(trim),
     validate(len_char_min = 3, len_char_max = 32, regex = r"^[a-zA-Z0-9_.]+$"),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef, Deref),
     new_unchecked
 )]
 pub struct UserName(String);
@@ -127,7 +140,7 @@ pub struct UserName(String);
 #[nutype(
     sanitize(trim),
     validate(not_empty, len_char_max = 254),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef, Deref),
     new_unchecked
 )]
 pub struct UserEmail(String);

@@ -1,7 +1,8 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, ResponseError, get,
+    get,
     web::{self, Data, ServiceConfig},
+    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
 use domain::{event::ports::EventService, user::models::user::User};
@@ -9,8 +10,8 @@ use thiserror::Error;
 use ui::view::{Home, View};
 
 use crate::inbound::http::{
-    AppState,
     user::{Locale, UiStateExtractor},
+    AppState,
 };
 
 pub mod artist;
@@ -60,14 +61,15 @@ async fn index(
     app_state: Data<AppState>,
     htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
-    let events = app_state
-        .event_service
-        .list_events()
-        .await
-        .context("Failed to list events")?
-        .into_iter()
-        .map(|event| app_state.event_mapper.map_event(&event))
-        .collect::<Result<Vec<_>, _>>()?;
+    let events = vec![];
+    // let events = app_state
+    //     .event_service
+    //     .list_events()
+    //     .await
+    //     .context("Failed to list events")?
+    //     .into_iter()
+    //     .map(|event| app_state.event_mapper.map_event(&event))
+    //     .collect::<Result<Vec<_>, _>>()?;
     // let list = EventListBuilder::default()
     //     .events(list_events(&event_repo, &image_repo, 1, 12).await?)
     //     .page(1)

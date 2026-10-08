@@ -1,4 +1,4 @@
-use domain::event::models::event::Event;
+use domain::event::models::festival::Festival;
 use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,
@@ -8,12 +8,12 @@ use url::Url;
 use crate::inbound::http::mapper::act::ActMapper;
 
 #[derive(Clone)]
-pub struct EventMapper {
+pub struct FestivalMapper {
     image_signer: SignedUrlRepo,
     act_mapper: ActMapper,
 }
 
-impl EventMapper {
+impl FestivalMapper {
     pub(crate) fn new(image_signer: SignedUrlRepo) -> Self {
         Self {
             act_mapper: ActMapper::new(image_signer.clone()),
@@ -21,23 +21,23 @@ impl EventMapper {
         }
     }
 
-    pub fn map_event(&self, event: &Event) -> anyhow::Result<api::event::Event> {
+    pub fn map_festival(&self, festival: &Festival) -> anyhow::Result<api::event::Event> {
         let image_url = self
             .image_signer
-            .get(&self.card_image(event.image_url().as_ref())?)?;
+            .get(&self.card_image(festival.image_url().as_ref())?)?;
 
-        let event = api::event::Event {
-            id: event.id().clone().into_inner(),
-            name: event.name().clone().into_inner(),
-            description: event.description().clone().into_inner(),
-            start_date: event.start_date().date(),
-            start_time: Some(event.start_date().time()),
-            end_date: event.end_date().date(),
-            end_time: Some(event.end_date().time()),
-            website_url: event.website_url().clone().into_inner(),
+        let festival = api::event::Event {
+            id: festival.id().clone().into_inner(),
+            name: festival.name().clone().into_inner(),
+            description: festival.description().clone().into_inner(),
+            start_date: festival.start_date(),
+            start_time: festival.days().first().0,
+            end_date: festival.end_date(),
+            end_time: festival.days().last().1,
+            website_url: festival.website_url().clone().into_inner(),
             image_url,
             state: api::event::EventState::Online,
-            acts: event
+            acts: festival
                 .acts()
                 .iter()
                 .map(|act| self.act_mapper.map_act(act))
@@ -45,7 +45,7 @@ impl EventMapper {
             stages: vec![], // TODO: Map stages when available
         };
 
-        Ok(event)
+        Ok(festival)
     }
 
     fn card_image(&self, url: &Url) -> anyhow::Result<ImageUrl> {

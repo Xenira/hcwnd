@@ -3,8 +3,8 @@ use std::io::Cursor;
 use anyhow::ensure;
 use async_trait::async_trait;
 use aws_config::{BehaviorVersion, Region};
-use aws_sdk_s3::{Client, config::Credentials, primitives::ByteStream};
-use domain::event::{self, models::event::EventId};
+use aws_sdk_s3::{config::Credentials, primitives::ByteStream, Client};
+use domain::event::{self, models::festival::FestivalId};
 use image::{DynamicImage, ImageFormat, ImageReader};
 use log::info;
 use url::Url;
@@ -120,7 +120,7 @@ impl event::ports::ImageRepository for RustFs {
 
     async fn persist_form_image(
         &self,
-        event_id: &EventId,
+        event_id: &FestivalId,
         image_url: &Url,
     ) -> Result<Url, Box<dyn std::error::Error + Send + Sync>> {
         // let segments =  image_url.h

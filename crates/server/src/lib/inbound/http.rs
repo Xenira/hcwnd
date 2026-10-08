@@ -24,7 +24,7 @@ use imgproxy::SignedUrlRepo;
 use log::info;
 use tracing_actix_web::TracingLogger;
 
-use crate::inbound::http::mapper::{act::ActMapper, artist::ArtistMapper, event::EventMapper};
+use crate::inbound::http::mapper::{act::ActMapper, artist::ArtistMapper, event::FestivalMapper};
 
 pub mod actix_macro;
 pub mod event;
@@ -34,28 +34,25 @@ pub mod user;
 
 #[derive(Clone)]
 pub struct AppState {
-    user_repo: Arc<Repository<PostgresEventStore, User>>,
     event_service: Arc<dyn EventService + Sync + Send>,
-    artist_service: Arc<dyn ArtistService + Sync + Send>,
+    // artist_service: Arc<dyn ArtistService + Sync + Send>,
     user_service: Arc<dyn UserService + Sync + Send>,
-    event_mapper: EventMapper,
+    event_mapper: FestivalMapper,
     artist_mapper: ArtistMapper,
 }
 
 impl AppState {
     pub fn new(
-        user_repo: Arc<Repository<PostgresEventStore, User>>,
         event_service: Arc<dyn EventService + Sync + Send>,
-        artist_service: Arc<dyn ArtistService + Sync + Send>,
+        // artist_service: Arc<dyn ArtistService + Sync + Send>,
         user_service: Arc<dyn UserService + Sync + Send>,
         signer: SignedUrlRepo,
     ) -> Self {
-        let event_mapper = EventMapper::new(signer.clone());
+        let event_mapper = FestivalMapper::new(signer.clone());
         let artist_mapper = ArtistMapper::new(signer.clone());
         Self {
-            user_repo,
             event_service,
-            artist_service,
+            // artist_service,
             user_service,
             event_mapper,
             artist_mapper,
@@ -67,20 +64,14 @@ pub struct HttpServer;
 
 impl HttpServer {
     pub async fn run(
-        user_repo: Arc<Repository<PostgresEventStore, User>>,
         event_service: Arc<dyn EventService + Sync + Send + 'static>,
-        artist_service: Arc<dyn ArtistService + Sync + Send + 'static>,
+        // artist_service: Arc<dyn ArtistService + Sync + Send + 'static>,
         user_service: Arc<dyn UserService + Sync + Send + 'static>,
         session_store: impl SessionStore + Clone + Sync + Send + 'static,
         signer: SignedUrlRepo,
     ) -> anyhow::Result<()> {
-        let app_state = AppState::new(
-            user_repo,
-            event_service,
-            artist_service,
-            user_service,
-            signer.clone(),
-        );
+        let app_state = AppState::new(event_service, user_service, signer.clone());
+        // let app_state = AppState::new(event_service, artist_service, user_service, signer.clone());
         let app_data = web::Data::new(app_state);
 
         let url_repo = web::Data::new(signer);

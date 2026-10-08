@@ -1,7 +1,8 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, ResponseError, get, post,
+    get, post,
     web::{self, ServiceConfig},
+    HttpResponse, Responder, ResponseError,
 };
 use api::artist::{ArtistCreateForm, ArtistCreateSubmitForm};
 use domain::{
@@ -15,12 +16,12 @@ use serde_qs::web::QsForm;
 use thiserror::Error;
 
 use crate::inbound::http::{
-    AppState,
     user::{RequestUser, UiStateExtractor},
+    AppState,
 };
 
 pub fn configure(cfg: &mut ServiceConfig) {
-    cfg.service(create_artist_form).service(create_artist);
+    // cfg.service(create_artist_form).service(create_artist);
 }
 
 #[derive(Error, Debug)]
@@ -39,59 +40,59 @@ impl ResponseError for HandlerError {
     }
 }
 
-#[get("")]
-async fn create_artist_form(
-    _user: RequestUser,
-    state: UiStateExtractor,
-    htmx: Htmx,
-) -> impl Responder {
-    let body = if htmx.is_htmx {
-        ui::view::artist::create::render(&state, &ArtistCreateForm::default())
-    } else {
-        ui::view::artist::create::full_page(&state, &ArtistCreateForm::default())
-    };
-
-    HttpResponse::Ok()
-        .content_type("text/html")
-        .body(body.into_string())
-}
-
-#[post("")]
-async fn create_artist(
-    user: RequestUser,
-    state: UiStateExtractor,
-    app_state: web::Data<AppState>,
-    form: QsForm<ArtistCreateSubmitForm>,
-    htmx: Htmx,
-) -> impl Responder {
-    info!("Creating artist: {:?}", form);
-    let req = CreateArtistRequest::new(
-        ArtistName::try_new(form.name.clone()).expect("Invalid artist name"),
-        form.image_url.clone(),
-        form.website_url.clone(),
-        form.genres
-            .clone()
-            .unwrap_or_default()
-            .iter()
-            .map(|g| ArtistGenre::try_new(g.clone()))
-            .try_collect()
-            .expect("Invalid artist genres"),
-    );
-
-    let artist = app_state
-        .artist_service
-        .create_artist(&req, user.id())
-        .await
-        .expect("Failed to create artist");
-
-    let id = artist.id().as_ref();
-    let url = format!("{}/{}", ui::view::artist::BASE_PATH, id);
-    if htmx.is_htmx {
-        htmx.redirect_with_swap(url);
-        HttpResponse::Created().finish()
-    } else {
-        HttpResponse::Found()
-            .insert_header(("Location", url))
-            .finish()
-    }
-}
+// #[get("")]
+// async fn create_artist_form(
+//     _user: RequestUser,
+//     state: UiStateExtractor,
+//     htmx: Htmx,
+// ) -> impl Responder {
+//     let body = if htmx.is_htmx {
+//         ui::view::artist::create::render(&state, &ArtistCreateForm::default())
+//     } else {
+//         ui::view::artist::create::full_page(&state, &ArtistCreateForm::default())
+//     };
+//
+//     HttpResponse::Ok()
+//         .content_type("text/html")
+//         .body(body.into_string())
+// }
+//
+// #[post("")]
+// async fn create_artist(
+//     user: RequestUser,
+//     state: UiStateExtractor,
+//     app_state: web::Data<AppState>,
+//     form: QsForm<ArtistCreateSubmitForm>,
+//     htmx: Htmx,
+// ) -> impl Responder {
+//     info!("Creating artist: {:?}", form);
+//     let req = CreateArtistRequest::new(
+//         ArtistName::try_new(form.name.clone()).expect("Invalid artist name"),
+//         form.image_url.clone(),
+//         form.website_url.clone(),
+//         form.genres
+//             .clone()
+//             .unwrap_or_default()
+//             .iter()
+//             .map(|g| ArtistGenre::try_new(g.clone()))
+//             .try_collect()
+//             .expect("Invalid artist genres"),
+//     );
+//
+//     let artist = app_state
+//         .artist_service
+//         .create_artist(&req, user.id())
+//         .await
+//         .expect("Failed to create artist");
+//
+//     let id = artist.id().as_ref();
+//     let url = format!("{}/{}", ui::view::artist::BASE_PATH, id);
+//     if htmx.is_htmx {
+//         htmx.redirect_with_swap(url);
+//         HttpResponse::Created().finish()
+//     } else {
+//         HttpResponse::Found()
+//             .insert_header(("Location", url))
+//             .finish()
+//     }
+// }

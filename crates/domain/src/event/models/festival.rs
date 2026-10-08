@@ -1,57 +1,57 @@
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use std::{collections::HashMap, ops::Deref};
+
+use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
+use eventwise::{Aggregate, event::StreamId};
 use nutype::nutype;
 use thiserror::Error;
+use typed_builder::TypedBuilder;
 use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    event::models::{
-        act::{Act, ListActsError},
-        day::*,
-        stage::{ListStagesError, Stage},
+    event::{
+        events::*,
+        models::{
+            act::{Act, ListActsError},
+            day::*,
+            stage::{ListStagesError, Stage},
+        },
     },
     proposal::{ProposalSource, ProposalSourceUrl},
+    user::models::user::UserId,
 };
 
-#[derive(Clone, Debug)]
-pub struct Event {
-    id: EventId,
+#[derive(Debug, Error)]
+pub enum EventError {
+    #[error(transparent)]
+    Unknown(#[from] anyhow::Error),
+}
+
+#[derive(Clone, Debug, Aggregate, TypedBuilder)]
+#[aggregate(id_type = FestivalId, error_type = EventError)]
+#[aggregate(bootstrap(FestivalSuggested))]
+#[aggregate(events(
+    SuggestionVoted,
+    SuggestionVoteRemoved,
+    SuggestionAccepted,
+    SuggestionRejected,
+    ChangeSuggested,
+))]
+pub struct Festival {
+    id: FestivalId,
     name: EventName,
     description: EventDescription,
     website_url: WebsiteUrl,
     image_url: ImageUrl,
-    stages: EventStages,
-    acts: EventActs,
+    stages: FestivalStages,
+    acts: FestivalActs,
     start_date: NaiveDate,
-    days: EventDays,
+    days: FestivalDays,
+    state: FestivalState,
 }
 
-impl Event {
-    pub fn new(
-        id: EventId,
-        name: EventName,
-        description: EventDescription,
-        website_url: WebsiteUrl,
-        image_url: ImageUrl,
-        stages: EventStages,
-        acts: EventActs,
-        start_date: NaiveDate,
-        days: EventDays,
-    ) -> Self {
-        Self {
-            id,
-            name,
-            description,
-            website_url,
-            image_url,
-            stages,
-            acts,
-            start_date,
-            days,
-        }
-    }
-
-    pub fn id(&self) -> &EventId {
+impl Festival {
+    pub fn id(&self) -> &FestivalId {
         &self.id
     }
 
@@ -71,32 +71,108 @@ impl Event {
         &self.image_url
     }
 
-    pub fn stages(&self) -> &EventStages {
+    pub fn stages(&self) -> &FestivalStages {
         &self.stages
     }
 
-    pub fn acts(&self) -> &EventActs {
+    pub fn acts(&self) -> &FestivalActs {
         &self.acts
     }
 
-    pub fn days(&self) -> &EventDays {
+    pub fn days(&self) -> &FestivalDays {
         &self.days
     }
 
-    #[must_use]
-    pub fn start_date(&self) -> NaiveDateTime {
-        self.days().first().start_datetime(&self.start_date)
+    pub fn start_date(&self) -> NaiveDate {
+        self.start_date
     }
 
-    #[must_use]
-    pub fn end_date(&self) -> NaiveDateTime {
-        self.days().first().end_datetime(&self.start_date)
+    pub fn end_date(&self) -> NaiveDate {
+        self.start_date + Duration::days(self.days.as_ref().len().try_into().unwrap_or(1))
     }
+
+    pub(crate) fn add_vote(&mut self, user_id: UserId, power: i32) {
+        match &mut self.state {
+            FestivalState::Suggested { votes, .. } => {
+                votes.insert(user_id, power);
+            }
+            _ => {
+                // Do nothing, votes can only be added to suggested festivals
+            }
+        }
+    }
+
+    pub(crate) fn remove_vote(&mut self, user_id: UserId) {
+        match &mut self.state {
+            FestivalState::Suggested { votes, .. } => {
+                votes.remove(&user_id);
+            }
+            _ => {
+                // Do nothing, votes can only be removed from suggested festivals
+            }
+        }
+    }
+
+    pub(crate) fn accept(&mut self) {
+        match &self.state {
+            FestivalState::Suggested { .. } => {
+                self.state = FestivalState::Active;
+            }
+            _ => {
+                // Do nothing, only suggested festivals can be accepted
+            }
+        }
+    }
+
+    pub(crate) fn reject(&mut self) {
+        match &self.state {
+            FestivalState::Suggested { .. } => {
+                self.state = FestivalState::Rejected;
+            }
+            _ => {
+                // Do nothing, only suggested festivals can be rejected
+            }
+        }
+    }
+
+    pub(crate) fn set_name(&mut self, name: EventName) {
+        self.name = name;
+    }
+
+    pub(crate) fn set_description(&mut self, description: EventDescription) {
+        self.description = description;
+    }
+
+    pub(crate) fn set_website_url(&mut self, website_url: WebsiteUrl) {
+        self.website_url = website_url;
+    }
+
+    pub(crate) fn set_image_url(&mut self, image_url: ImageUrl) {
+        self.image_url = image_url;
+    }
+
+    pub(crate) fn set_start_date(&mut self, start_date: NaiveDate) {
+        self.start_date = start_date;
+    }
+
+    pub(crate) fn set_days(&mut self, vec: FestivalDays) {
+        self.days = vec;
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum FestivalState {
+    Suggested {
+        votes: HashMap<UserId, i32>,
+        user_id: UserId,
+    },
+    Active,
+    Rejected,
 }
 
 #[derive(Clone, Debug)]
 pub struct EventListItem {
-    id: EventId,
+    id: FestivalId,
     name: EventName,
     description: EventDescription,
     image_url: ImageUrl,
@@ -108,7 +184,7 @@ pub struct EventListItem {
 
 impl EventListItem {
     pub fn new(
-        id: EventId,
+        id: FestivalId,
         name: EventName,
         description: EventDescription,
         image_url: ImageUrl,
@@ -130,7 +206,7 @@ impl EventListItem {
     }
 
     #[must_use]
-    pub fn id(&self) -> &EventId {
+    pub fn id(&self) -> &FestivalId {
         &self.id
     }
 
@@ -171,40 +247,59 @@ impl EventListItem {
 }
 
 #[nutype(derive(Display, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef))]
-pub struct EventId(Uuid);
+pub struct FestivalId(Uuid);
+
+impl StreamId for FestivalId {
+    fn key(&self) -> Uuid {
+        self.clone().into_inner()
+    }
+}
+
+impl From<Uuid> for FestivalId {
+    fn from(id: Uuid) -> Self {
+        FestivalId::new(id)
+    }
+}
 
 #[nutype(
     sanitize(trim),
     validate(len_char_min = 5, len_char_max = 100),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef)
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    new_unchecked
 )]
 pub struct EventName(String);
 
 #[nutype(
     sanitize(trim),
     validate(len_char_max = 1000),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef)
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    new_unchecked
 )]
 pub struct EventDescription(String);
 
-#[nutype(
-    validate(predicate = |v| !v.is_empty()),
-    derive(Debug, Clone, AsRef)
-)]
-pub struct EventStages(Vec<Stage>);
+#[nutype(derive(Debug, Clone, AsRef))]
+pub struct FestivalStages(Vec<Stage>);
 
 #[nutype(derive(Debug, Clone, AsRef, Deref))]
-pub struct EventActs(Vec<Act>);
+pub struct FestivalActs(Vec<Act>);
 
 #[nutype(
     validate(predicate = |v| !v.is_empty()),
-    derive(Debug, Clone, AsRef)
+    derive(Debug, Clone, AsRef, Deref),
+    new_unchecked
 )]
-pub struct EventDays(Vec<Day>);
+pub struct FestivalDays(Vec<(Option<NaiveTime>, Option<NaiveTime>)>);
 
-impl EventDays {
-    pub fn first(&self) -> &Day {
+impl FestivalDays {
+    pub fn first(&self) -> &(Option<NaiveTime>, Option<NaiveTime>) {
         match self.as_ref().first() {
+            Some(day) => day,
+            None => unreachable!("Validation should ensure that this is never empty"),
+        }
+    }
+
+    pub fn last(&self) -> &(Option<NaiveTime>, Option<NaiveTime>) {
+        match self.as_ref().last() {
             Some(day) => day,
             None => unreachable!("Validation should ensure that this is never empty"),
         }
@@ -281,13 +376,15 @@ impl CreateEventRequest {
 
 #[nutype(
     validate(predicate = |v| v.has_host() && v.scheme() == "https"),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef)
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    new_unchecked
 )]
 pub struct WebsiteUrl(Url);
 
 #[nutype(
     validate(predicate = |v| v.has_host() && v.scheme() == "https"),
-    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef)
+    derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef),
+    new_unchecked
 )]
 pub struct ImageUrl(Url);
 

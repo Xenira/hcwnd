@@ -1,4 +1,4 @@
 pub mod act;
 pub mod day;
-pub mod event;
+pub mod festival;
 pub mod stage;

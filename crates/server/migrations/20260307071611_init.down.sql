@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS "sets";
+DROP TABLE IF EXISTS "stages";
+DROP TABLE IF EXISTS "days";
+DROP TABLE IF EXISTS "festivals";
+DROP TABLE IF EXISTS "users";
+DROP TYPE IF EXISTS "event_state";
+DROP TABLE IF EXISTS "artists";
+DROP TABLE IF EXISTS "events";
+DROP INDEX IF EXISTS idx_events_aggregate;

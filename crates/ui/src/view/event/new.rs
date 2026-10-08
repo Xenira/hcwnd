@@ -3,6 +3,7 @@ use maud::Markup;
 use crate::component::StepIndicator;
 
 pub mod details;
+pub mod schedule;
 
 pub(crate) fn step_indicator(state: &api::UiState, current_step: usize) -> StepIndicator {
     StepIndicator::builder()

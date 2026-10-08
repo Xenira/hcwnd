@@ -2,14 +2,15 @@ use std::sync::Arc;
 
 use actix_session::storage::RedisSessionStore;
 use config::{Config, Environment, File};
-use eventwise::{PostgresEventStore, repository::Repository};
-use hcwnd::{
-    domain::{artist, event, user},
-    inbound::http::HttpServer,
-    outbound::{pg::Pg, rustfs::RustFs},
+use domain::{
+    artist, event,
+    user::{self, ports::UserQuery},
 };
+use eventwise::{PostgresEventStore, repository::Repository};
+use hcwnd::{inbound::http::HttpServer, outbound::rustfs::RustFs};
 use imgproxy::SignedUrlRepo;
 use log::info;
+use projection::{festival::PostgresFestivalProjection, user::PostgresUserProjection};
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
@@ -40,21 +41,33 @@ async fn main() -> anyhow::Result<()> {
     let url_secret_key = config.image_proxy.signing_key;
     let signer = SignedUrlRepo::new(url_salt, url_secret_key, "image".to_string());
 
-    let pg = Pg::new(&config.database_url).await?;
-
     let s3 = RustFs::new(&config.s3).await;
 
-    let pg_store = PostgresEventStore::new(pg.clone());
-    let event_repo = Repository::new::<User>(pg_store);
-    let event_service =
-        event::service::Service::new(pg.clone(), pg.clone(), pg.clone(), pg.clone(), s3.clone());
-    let artist_service = artist::service::Service::new(pg.clone());
-    let user_service = user::service::Service::new(pg.clone());
+    let pg = sqlx::PgPool::connect(&config.database_url)
+        .await
+        .expect("Failed to connect to Postgres database");
+
+    let mut pg_store = PostgresEventStore::new(pg.clone());
+    let user_projection = PostgresUserProjection::new(pg.clone());
+    let festival_projection = PostgresFestivalProjection::new(pg.clone());
+    pg_store.register_projection(user_projection.clone());
+    pg_store.register_projection(festival_projection.clone());
+    let pg_store = Arc::new(pg_store);
+
+    let user_repo = Repository::new(pg_store.clone());
+
+    let festival_repo = Repository::new(pg_store);
+    // let event_service =
+    //     event::service::Service::new(pg.clone(), pg.clone(), pg.clone(), pg.clone(), s3.clone());
+    // let artist_service = artist::service::Service::new(pg.clone());
+    let user_service = user::service::Service::new(user_repo, user_projection);
+    let festival_service =
+        event::service::Service::new(festival_repo, s3.clone(), festival_projection);
 
     info!("Starting HTTP server on port {}", config.server_port);
     HttpServer::run(
-        Arc::new(event_service),
-        Arc::new(artist_service),
+        Arc::new(festival_service),
+        // Arc::new(artist_service),
         Arc::new(user_service),
         redis_session_store,
         signer,

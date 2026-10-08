@@ -2,7 +2,9 @@ use actix_htmx::Htmx;
 use actix_web::{HttpResponse, Responder, ResponseError, get, web};
 use anyhow::Context;
 use api::UiState;
-use domain::{artist::ports::ArtistService, event::models::event::Event, user::models::user::User};
+use domain::{
+    artist::ports::ArtistService, event::models::festival::Festival, user::models::user::User,
+};
 use thiserror::Error;
 
 use crate::inbound::http::{
@@ -38,7 +40,7 @@ async fn get_lineup(
     event: RequestEvent,
     htmx: Htmx,
 ) -> Result<impl Responder, HandlerError> {
-    let event = app_state.event_mapper.map_event(&event)?;
+    let event = app_state.event_mapper.map_festival(&event)?;
 
     let body = if htmx.is_htmx {
         ui::view::event::lineup::render(&state, &event, None)

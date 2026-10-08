@@ -25,7 +25,7 @@ api = { workspace = true }
 argon2 = "0.6.0"
 async-trait = { workspace = true }
 chrono = { workspace = true }
-deadpool-redis = "0.23.1"
+deadpool-redis = "0.22"
 derive_builder = { workspace = true }
 env_logger = "0.11.11"
 es-entity = { version = "0.14.1" }
@@ -58,8 +58,9 @@ aws-smithy-json = "=0.63.1"
 aws-smithy-types = "=1.8.0"
 image = "0.25.10"
 actix-multipart = "0.8.4"
-eventwise = { path = "../../../private/eventwise/", features = ["postgres"] }
-domain = { path = "../domain" }
+eventwise = { workspace = true, features = ["postgres"] }
+domain = { workspace = true }
+projection = { workspace = true }
 
 [build-dependencies]
 grass = "0.13.4"

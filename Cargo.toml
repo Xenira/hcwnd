@@ -27,11 +27,15 @@ serde_with = "3.23.0"
 thiserror = "2.0.20"
 url = { version = "2.5.8", features = ["serde"] }
 uuid = { version = "1.26.1", features = ["v4"] }
+eventwise = { path = "../eventwise" }
+# eventwise = { git = "https://github.com/Xenira/eventwise", version = "0.1.0" }
 
 # workspace
 api = { path = "crates/api" }
 ui = { path = "crates/ui" }
 imgproxy = { path = "crates/imgproxy" }
+domain = { path = "crates/domain" }
+projection = { path = "crates/projection" }
 
 [profile.dev]
 debug = "line-tables-only"

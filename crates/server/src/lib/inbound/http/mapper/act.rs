@@ -1,5 +1,5 @@
 use anyhow::Context;
-use domain::event::models::{act::Act, event::Event};
+use domain::event::models::{act::Act, festival::Festival};
 use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,

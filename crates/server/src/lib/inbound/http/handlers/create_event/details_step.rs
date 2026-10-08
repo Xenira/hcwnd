@@ -1,12 +1,13 @@
 use std::fs;
 
 use actix_htmx::{Htmx, SwapType};
-use actix_multipart::form::{MultipartForm, bytes::Bytes, tempfile::TempFile};
+use actix_multipart::form::{bytes::Bytes, tempfile::TempFile, MultipartForm};
 use actix_web::{
-    HttpResponse, Responder, get, post,
+    get, post,
     web::{self, ServiceConfig},
+    HttpResponse, Responder,
 };
-use api::{UiState, event::new::EventCreateDetailsStep};
+use api::{event::new::EventCreateDetailsStep, UiState};
 use domain::user::models::user::User;
 use imgproxy::{ImageUrl, SignedUrlRepo};
 use log::info;
@@ -20,17 +21,17 @@ use ui::{
         self,
         name_step::{self},
     },
-    view::{View as _, event::new::details::DetailsStep},
+    view::{event::new::details::DetailsStep, View as _},
 };
 
 use crate::inbound::http::{
-    AppState,
     user::{RequestUser, UiStateExtractor},
+    AppState,
 };
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(details_step)
-        .service(details_step_form)
+        //     .service(details_step_form)
         .service(validate_name)
         .service(validate_description)
         .service(upload_image);
@@ -123,23 +124,23 @@ async fn validate_description(
     DetailsStep::validate_description(&state, &form.description.clone().unwrap_or_default())
 }
 
-#[post("")]
-async fn details_step_form(
-    _: RequestUser,
-    state: UiStateExtractor,
-    htmx: Htmx,
-    form: QsForm<EventCreateDetailsStep>,
-) -> impl Responder {
-    let details = form.into_inner();
-    let details_view = DetailsStep::builder().details_step(&details).build();
-
-    let body = if htmx.is_htmx {
-        details_view.render(&state)
-    } else {
-        details_view.full_page(&state)
-    };
-
-    HttpResponse::Ok()
-        .content_type("text/html")
-        .body(body.into_string())
-}
+// #[post("")]
+// async fn details_step_form(
+//     _: RequestUser,
+//     state: UiStateExtractor,
+//     htmx: Htmx,
+//     form: QsForm<EventCreateDetailsStep>,
+// ) -> impl Responder {
+//     let details = form.into_inner();
+//     let details_view = DetailsStep::builder().details_step(&details).build();
+//
+//     let body = if htmx.is_htmx {
+//         details_view.render(&state)
+//     } else {
+//         details_view.full_page(&state)
+//     };
+//
+//     HttpResponse::Ok()
+//         .content_type("text/html")
+//         .body(body.into_string())
+// }

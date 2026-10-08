@@ -1,7 +1,7 @@
 use actix_htmx::Htmx;
 use actix_identity::Identity;
 use actix_web::{
-    HttpMessage as _, HttpRequest, HttpResponse, Responder, ResponseError, get, post, web,
+    get, post, web, HttpMessage as _, HttpRequest, HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
 use domain::user::{
@@ -12,7 +12,7 @@ use secrecy::SecretString;
 use serde::Deserialize;
 use thiserror::Error;
 
-use crate::inbound::http::{AppState, user::Locale};
+use crate::inbound::http::{user::Locale, AppState};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(login_form).service(login);

@@ -8,8 +8,6 @@ repository.workspace = true
 website.workspace = true
 
 [dependencies]
-# eventwise = { git = "https://github.com/Xenira/eventwise", version = "0.1.0" }
-eventwise = { path = "../../../private/eventwise", version = "0.1.0" }
 anyhow = { workspace = true }
 url = { workspace = true }
 chrono = { workspace = true }
@@ -23,3 +21,7 @@ regex = "1.13.1"
 api = { workspace = true }
 secrecy = "0.10.3"
 async-trait = { workspace = true }
+eventwise = { workspace = true }
+typed-builder = "0.23.2"
+futures = "0.3.34"
+itertools.workspace = true

@@ -1,11 +1,13 @@
 use actix_htmx::Htmx;
 use actix_identity::Identity;
 use actix_web::{
-    HttpMessage, HttpRequest, HttpResponse, Responder, ResponseError, get, post,
+    get, post,
     web::{self},
+    HttpMessage, HttpRequest, HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context;
 use domain::user::{
+    commands::CreateUser,
     models::user::{CreateUserRequest, UserEmail, UserName, UserPassword},
     ports::UserService,
 };
@@ -13,7 +15,7 @@ use secrecy::SecretString;
 use serde::Deserialize;
 use thiserror::Error;
 
-use crate::inbound::http::{AppState, user::Locale};
+use crate::inbound::http::{user::Locale, AppState};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(signup_form).service(signup);
@@ -73,14 +75,16 @@ async fn signup(
         return Err(anyhow::anyhow!("You must agree to the privacy policy").into());
     }
 
-    let username = UserName::try_new(form.username.clone()).context("Invalid username")?;
-    let email = UserEmail::try_new(form.email.clone()).context("Invalid Email")?;
-    let password = UserPassword::new(SecretString::from(form.password.clone()));
-    let req = CreateUserRequest::new(username, email, password);
+    let form: SignupFormData = form.into_inner();
+    let req = CreateUser::new(
+        form.username,
+        form.email,
+        SecretString::from(form.password.clone()),
+    );
 
     let user = app_state
         .user_service
-        .create_user(&req)
+        .create_user(req)
         .await
         .context("Failed to create user")?;
 

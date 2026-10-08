@@ -19,16 +19,16 @@ use crate::{
     event::create::{
         self,
         confirm_step::{self},
-        days_step::{self, EventCreateDaysStep, EventDay},
-        name_step::{self, TOTAL_STEPS},
-        stage_step::{self, EventStage},
     },
     index,
-    view::{event::new::step_indicator, View},
+    view::{
+        event::new::{schedule, step_indicator},
+        View,
+    },
 };
 
 const CURRENT_STEP: usize = 0;
-pub const BASE_ROUTE: &str = "/details";
+pub const BASE_ROUTE: &str = "/schedule";
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -137,7 +137,7 @@ impl DetailsStep<'_> {
 
 impl View for DetailsStep<'_> {
     fn render(&self, state: &UiState) -> Markup {
-        let next_url = format!("{}{}", create::BASE_ROUTE, days_step::BASE_ROUTE);
+        let next_url = format!("{}{}", create::BASE_ROUTE, schedule::BASE_ROUTE);
 
         // let name_step = name_step::render_hidden_inputs(step.name.as_str());
         // let days_step = days_step::render_hidden_inputs(step.start_date, step.days.as_deref());

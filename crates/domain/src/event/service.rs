@@ -1,98 +1,106 @@
+use std::sync::Arc;
+
+use anyhow::Context as _;
 use async_trait::async_trait;
+use eventwise::{repository::Repository, store::EventStore};
+use futures::future::try_join_all;
+use itertools::Itertools;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator as _};
 use url::Url;
+use uuid::Uuid;
 
 use crate::{
     event::{
+        commands::SuggestFestival,
         models::{
             act::{Act, CreateActError, CreateActRequest},
-            event::{
-                CreateEventError, CreateEventRequest, Event, EventId, GetEventError,
+            festival::{
+                CreateEventError, CreateEventRequest, Festival, FestivalId, GetEventError,
                 ListEventsError,
             },
         },
         ports::{
-            ActRepository, DayRepository, EventRepository, EventService, ImageRepository,
-            StageRepository,
+            ActRepository, DayRepository, EventRepository, EventService, FestivalQuery,
+            ImageRepository, StageRepository,
         },
     },
     user::models::user::UserId,
 };
 
 #[derive(Debug, Clone)]
-pub struct Service<ER, DR, SR, AR, IR>
+pub struct Service<S, IR, FQ>
 where
-    ER: EventRepository,
-    DR: DayRepository,
-    SR: StageRepository,
-    AR: ActRepository,
+    S: EventStore,
+    FQ: FestivalQuery,
     IR: ImageRepository,
 {
-    pub event_repository: ER,
-    pub day_repository: DR,
-    pub slot_repository: SR,
-    pub act_repository: AR,
-    pub image_repository: IR,
+    festival_repository: Arc<Repository<Festival, S>>,
+    image_repository: IR,
+    festival_query: FQ,
 }
 
-impl<ER, DR, SR, AR, IR> Service<ER, DR, SR, AR, IR>
+impl<S, IR, FQ> Service<S, IR, FQ>
 where
-    ER: EventRepository,
-    DR: DayRepository,
-    SR: StageRepository,
-    AR: ActRepository,
+    S: EventStore,
     IR: ImageRepository,
+    FQ: FestivalQuery,
 {
     pub fn new(
-        event_repository: ER,
-        day_repository: DR,
-        slot_repository: SR,
-        act_repository: AR,
+        festival_repository: Repository<Festival, S>,
         image_repository: IR,
+        festival_query: FQ,
     ) -> Self {
         Self {
-            event_repository,
-            day_repository,
-            slot_repository,
-            act_repository,
+            festival_repository: Arc::new(festival_repository),
             image_repository,
+            festival_query,
         }
     }
 }
 
 #[async_trait]
-impl<ER, DR, SR, AR, IR> EventService for Service<ER, DR, SR, AR, IR>
+impl<S, IR, FQ> EventService for Service<S, IR, FQ>
 where
-    ER: EventRepository,
-    DR: DayRepository,
-    SR: StageRepository,
-    AR: ActRepository,
-    IR: ImageRepository,
+    S: EventStore + 'static,
+    IR: ImageRepository + 'static,
+    FQ: FestivalQuery,
 {
     async fn create_event(
         &self,
-        req: &CreateEventRequest,
+        req: SuggestFestival,
         author_id: &UserId,
-    ) -> Result<EventId, CreateEventError> {
-        self.event_repository.create_event(req, author_id).await
-    }
+    ) -> Result<FestivalId, CreateEventError> {
+        let id = FestivalId::new(Uuid::now_v7());
 
-    async fn list_events(&self) -> Result<Vec<Event>, ListEventsError> {
-        self.event_repository.list_events().await
-    }
-
-    async fn get_event_by_id(&self, id: &EventId) -> Result<Event, GetEventError> {
-        self.event_repository.get_event_by_id(id).await
-    }
-
-    async fn create_act(
-        &self,
-        event_id: &EventId,
-        req: &CreateActRequest,
-        author_id: &UserId,
-    ) -> Result<Act, CreateActError> {
-        self.act_repository
-            .create_act(event_id, req, author_id)
+        self.festival_repository
+            .as_ref()
+            .execute(&id, req)
             .await
+            .context("Failed to execute festival creation command")?;
+
+        Ok(id)
+    }
+
+    async fn list_events(&self) -> Result<Vec<Festival>, ListEventsError> {
+        let upcoming_festival_ids = self.festival_query.upcoming_festivals().await?;
+        let upcoming = upcoming_festival_ids
+            .iter()
+            .map(|id| self.get_event_by_id(id))
+            .collect_vec();
+
+        try_join_all(upcoming)
+            .await
+            .map_err(|e| ListEventsError::Unknown(e.into()))
+    }
+
+    async fn get_event_by_id(&self, id: &FestivalId) -> Result<Festival, GetEventError> {
+        self.festival_repository
+            .as_ref()
+            .load(id)
+            .await
+            .context("Failed to load festival by ID")?
+            .0
+            .ok_or(GetEventError::EventNotFound)
     }
 
     async fn upload_form_image(
@@ -102,3 +110,40 @@ where
         self.image_repository.upload_form_image(image_bytes).await
     }
 }
+
+// #[async_trait]
+// impl<ER, DR, SR, AR, IR> EventService for Service<ER, DR, SR, AR, IR>
+// where
+//     ER: EventRepository,
+//     DR: DayRepository,
+//     SR: StageRepository,
+//     AR: ActRepository,
+//     IR: ImageRepository,
+// {
+//     async fn create_event(
+//         &self,
+//         req: &CreateEventRequest,
+//         author_id: &UserId,
+//     ) -> Result<FestivalId, CreateEventError> {
+//         self.event_repository.create_event(req, author_id).await
+//     }
+//
+//     async fn list_events(&self) -> Result<Vec<Festival>, ListEventsError> {
+//         self.event_repository.list_events().await
+//     }
+//
+//     async fn get_event_by_id(&self, id: &FestivalId) -> Result<Festival, GetEventError> {
+//         self.event_repository.get_event_by_id(id).await
+//     }
+//
+//     async fn create_act(
+//         &self,
+//         event_id: &FestivalId,
+//         req: &CreateActRequest,
+//         author_id: &UserId,
+//     ) -> Result<Act, CreateActError> {
+//         self.act_repository
+//             .create_act(event_id, req, author_id)
+//             .await
+//     }
+// }

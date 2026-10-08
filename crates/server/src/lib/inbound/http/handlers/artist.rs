@@ -1,7 +1,8 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, ResponseError, get,
+    get,
     web::{self, ServiceConfig},
+    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
 use api::artist::ArtistCreateForm;
@@ -12,10 +13,10 @@ use serde::Deserialize;
 use serde_qs::web::QsForm;
 use thiserror::Error;
 
-use crate::inbound::http::{AppState, user::UiStateExtractor};
+use crate::inbound::http::{user::UiStateExtractor, AppState};
 
 pub fn configure(cfg: &mut ServiceConfig) {
-    cfg.service(get_artists).service(artist_detail);
+    // cfg.service(get_artists).service(artist_detail);
 }
 
 #[derive(Error, Debug)]
@@ -40,60 +41,60 @@ struct CreateArtistForm {
     genres: String,
 }
 
-#[get("")]
-async fn get_artists(
-    state: UiStateExtractor,
-    app_state: web::Data<AppState>,
-    htmx: Htmx,
-) -> impl Responder {
-    let artists = app_state
-        .artist_service
-        .search_artists(&SearchArtistsQuery::default())
-        .await
-        .unwrap_or_default()
-        .iter()
-        .map(|a| app_state.artist_mapper.map_artist(a))
-        .filter_map(|a| a.ok())
-        .collect_vec();
-
-    debug!("Found {} artists", artists.len());
-    dbg!(&artists);
-
-    let body = if htmx.is_htmx {
-        ui::view::artist::list::render(&state, &artists)
-    } else {
-        ui::view::artist::list::full_page(&state, &artists)
-    };
-
-    HttpResponse::Ok()
-        .content_type("text/html")
-        .body(body.into_string())
-}
-
-#[get("/{artist_id}")]
-async fn artist_detail(
-    state: UiStateExtractor,
-    app_state: web::Data<AppState>,
-    artist_id: web::Path<ArtistId>,
-    htmx: Htmx,
-) -> Result<impl Responder, HandlerError> {
-    let artist = app_state
-        .artist_service
-        .get_artist_by_id(&artist_id)
-        .await
-        .context("Failed to fetch artist")?;
-    let artist = app_state.artist_mapper.map_artist(&artist)?;
-
-    let body = if htmx.is_htmx {
-        ui::view::artist::detail::render(&state, &artist)
-    } else {
-        ui::view::artist::detail::full_page(&state, &artist)
-    };
-
-    Ok(HttpResponse::Ok()
-        .content_type("text/html")
-        .body(body.into_string()))
-}
+// #[get("")]
+// async fn get_artists(
+//     state: UiStateExtractor,
+//     app_state: web::Data<AppState>,
+//     htmx: Htmx,
+// ) -> impl Responder {
+//     let artists = app_state
+//         .artist_service
+//         .search_artists(&SearchArtistsQuery::default())
+//         .await
+//         .unwrap_or_default()
+//         .iter()
+//         .map(|a| app_state.artist_mapper.map_artist(a))
+//         .filter_map(|a| a.ok())
+//         .collect_vec();
+//
+//     debug!("Found {} artists", artists.len());
+//     dbg!(&artists);
+//
+//     let body = if htmx.is_htmx {
+//         ui::view::artist::list::render(&state, &artists)
+//     } else {
+//         ui::view::artist::list::full_page(&state, &artists)
+//     };
+//
+//     HttpResponse::Ok()
+//         .content_type("text/html")
+//         .body(body.into_string())
+// }
+//
+// #[get("/{artist_id}")]
+// async fn artist_detail(
+//     state: UiStateExtractor,
+//     app_state: web::Data<AppState>,
+//     artist_id: web::Path<ArtistId>,
+//     htmx: Htmx,
+// ) -> Result<impl Responder, HandlerError> {
+//     let artist = app_state
+//         .artist_service
+//         .get_artist_by_id(&artist_id)
+//         .await
+//         .context("Failed to fetch artist")?;
+//     let artist = app_state.artist_mapper.map_artist(&artist)?;
+//
+//     let body = if htmx.is_htmx {
+//         ui::view::artist::detail::render(&state, &artist)
+//     } else {
+//         ui::view::artist::detail::full_page(&state, &artist)
+//     };
+//
+//     Ok(HttpResponse::Ok()
+//         .content_type("text/html")
+//         .body(body.into_string()))
+// }
 
 // #[get("/act")]
 // async fn search_artist_for_act(
