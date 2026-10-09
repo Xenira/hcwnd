@@ -3,23 +3,22 @@ use std::{fs, sync::Arc, time::Duration};
 use actix_htmx::HtmxMiddleware;
 use actix_identity::IdentityMiddleware;
 use actix_multipart::form::MultipartFormConfig;
-use actix_session::{SessionMiddleware, storage::SessionStore};
+use actix_session::{storage::SessionStore, SessionMiddleware};
 use actix_web::{
-    App, HttpResponse,
     cookie::Key,
     dev::ServiceResponse,
-    http::{StatusCode, header},
+    http::{header, StatusCode},
     middleware::{Compress, ErrorHandlerResponse, ErrorHandlers},
-    web,
+    web, App, HttpResponse,
 };
 use actix_web_helmet::Helmet;
 use anyhow::Context as _;
 use domain::{
     artist::ports::ArtistService,
-    event::ports::EventService,
+    festival::ports::EventService,
     user::{models::user::User, ports::UserService},
 };
-use eventwise::{PostgresEventStore, repository::Repository, store::EventStore};
+use eventwise::{repository::Repository, store::EventStore, PostgresEventStore};
 use imgproxy::SignedUrlRepo;
 use log::info;
 use tracing_actix_web::TracingLogger;

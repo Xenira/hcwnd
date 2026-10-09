@@ -3,7 +3,7 @@ use actix_web::{post, web, HttpResponse, Responder};
 use anyhow::Context as _;
 use api::{day::EventDay, event::new::EventCreateConfirmStep};
 use domain::{
-    event::models::{
+    festival::models::{
         day::CreateDayRequest,
         festival::{
             CreateEventRequest, EventDaysCreateRequests, EventDescription, EventName, ImageUrl,

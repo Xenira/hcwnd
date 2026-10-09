@@ -4,7 +4,7 @@ use anyhow::ensure;
 use async_trait::async_trait;
 use aws_config::{BehaviorVersion, Region};
 use aws_sdk_s3::{config::Credentials, primitives::ByteStream, Client};
-use domain::event::{self, models::festival::FestivalId};
+use domain::festival::{self, models::festival::FestivalId};
 use image::{DynamicImage, ImageFormat, ImageReader};
 use log::info;
 use url::Url;
@@ -109,7 +109,7 @@ impl RustFs {
 }
 
 #[async_trait]
-impl event::ports::ImageRepository for RustFs {
+impl festival::ports::ImageRepository for RustFs {
     async fn upload_form_image(
         &self,
         image_bytes: &[u8],

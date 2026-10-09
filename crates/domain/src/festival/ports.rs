@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use url::Url;
 
 use crate::{
-    event::{
+    festival::{
         commands::SuggestFestival,
         models::{
             act::{Act, ActId, CreateActError, CreateActRequest, GetActError, ListActsError},

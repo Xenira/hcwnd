@@ -5,9 +5,16 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    event::models::festival::{
+    festival::models::festival::{
         EventDescription, EventName, Festival, FestivalActs, FestivalDays, FestivalId,
         FestivalStages, FestivalState, ImageUrl, WebsiteUrl,
+    },
+    suggestion::{
+        events::{
+            impl_suggestion_events, SuggestionAccepted, SuggestionRejected, SuggestionVoteRemoved,
+            SuggestionVoted,
+        },
+        SuggestionState,
     },
     user::models::user::UserId,
 };
@@ -47,60 +54,11 @@ impl Create<FestivalSuggested> for Festival {
             .acts(FestivalActs::new(vec![]))
             .start_date(event.start_date)
             .days(event_days)
-            .state(FestivalState::Suggested {
+            .state(SuggestionState::Suggested {
                 votes: vec![(user_id.clone(), event.score)].into_iter().collect(),
                 user_id,
             })
             .build()
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SuggestionVoted {
-    pub suggestion_id: Uuid,
-    pub user_id: Uuid,
-    pub power: i32,
-}
-
-impl Apply<SuggestionVoted> for Festival {
-    fn apply(&mut self, event: SuggestionVoted) {
-        self.add_vote(UserId::new(event.user_id), event.power);
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SuggestionVoteRemoved {
-    pub suggestion_id: Uuid,
-    pub user_id: Uuid,
-}
-
-impl Apply<SuggestionVoteRemoved> for Festival {
-    fn apply(&mut self, event: SuggestionVoteRemoved) {
-        self.remove_vote(UserId::new(event.user_id));
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SuggestionAccepted {
-    pub suggestion_id: Uuid,
-    pub user_id: Uuid,
-}
-
-impl Apply<SuggestionAccepted> for Festival {
-    fn apply(&mut self, _event: SuggestionAccepted) {
-        self.accept();
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SuggestionRejected {
-    pub suggestion_id: Uuid,
-    pub user_id: Uuid,
-}
-
-impl Apply<SuggestionRejected> for Festival {
-    fn apply(&mut self, _event: SuggestionRejected) {
-        self.reject();
     }
 }
 
@@ -147,3 +105,5 @@ impl Apply<ChangeSuggested> for Festival {
         }
     }
 }
+
+impl_suggestion_events!(Festival, state_mut);

@@ -1,16 +1,16 @@
 use actix_htmx::Htmx;
-use actix_web::{HttpResponse, Responder, ResponseError, get, web};
+use actix_web::{get, web, HttpResponse, Responder, ResponseError};
 use anyhow::Context;
 use api::UiState;
 use domain::{
-    artist::ports::ArtistService, event::models::festival::Festival, user::models::user::User,
+    artist::ports::ArtistService, festival::models::festival::Festival, user::models::user::User,
 };
 use thiserror::Error;
 
 use crate::inbound::http::{
-    AppState,
     event::RequestEvent,
     user::{Locale, RequestUser, UiStateExtractor},
+    AppState,
 };
 
 pub fn configure(cfg: &mut web::ServiceConfig) {

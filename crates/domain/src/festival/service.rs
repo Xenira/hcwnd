@@ -10,7 +10,7 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    event::{
+    festival::{
         commands::SuggestFestival,
         models::{
             act::{Act, CreateActError, CreateActRequest},

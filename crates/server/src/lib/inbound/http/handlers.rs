@@ -5,7 +5,7 @@ use actix_web::{
     HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
-use domain::{event::ports::EventService, user::models::user::User};
+use domain::{festival::ports::EventService, user::models::user::User};
 use thiserror::Error;
 use ui::view::{Home, View};
 

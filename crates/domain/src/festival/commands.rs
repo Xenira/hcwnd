@@ -6,7 +6,7 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    event::{
+    festival::{
         events::FestivalSuggested,
         models::festival::{Festival, FestivalEvent},
     },

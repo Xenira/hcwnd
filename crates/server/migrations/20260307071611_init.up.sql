@@ -65,3 +65,14 @@ CREATE TABLE IF NOT EXISTS "artists" (
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "venues" (
+    "id" UUID PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "country" TEXT NOT NULL,
+    "postal_code" TEXT NOT NULL,
+    "capacity" INT,
+    "created_at" TIMESTAMPTZ NOT NULL
+);

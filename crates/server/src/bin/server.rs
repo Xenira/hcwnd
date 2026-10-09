@@ -3,10 +3,10 @@ use std::sync::Arc;
 use actix_session::storage::RedisSessionStore;
 use config::{Config, Environment, File};
 use domain::{
-    artist, event,
+    artist, festival,
     user::{self, ports::UserQuery},
 };
-use eventwise::{PostgresEventStore, repository::Repository};
+use eventwise::{repository::Repository, PostgresEventStore};
 use hcwnd::{inbound::http::HttpServer, outbound::rustfs::RustFs};
 use imgproxy::SignedUrlRepo;
 use log::info;
@@ -62,7 +62,7 @@ async fn main() -> anyhow::Result<()> {
     // let artist_service = artist::service::Service::new(pg.clone());
     let user_service = user::service::Service::new(user_repo, user_projection);
     let festival_service =
-        event::service::Service::new(festival_repo, s3.clone(), festival_projection);
+        festival::service::Service::new(festival_repo, s3.clone(), festival_projection);
 
     info!("Starting HTTP server on port {}", config.server_port);
     HttpServer::run(

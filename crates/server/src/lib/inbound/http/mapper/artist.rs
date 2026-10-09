@@ -1,5 +1,5 @@
 use anyhow::Context;
-use domain::{artist::models::artist::Artist, event::models::festival::Festival};
+use domain::{artist::models::artist::Artist, festival::models::festival::Festival};
 use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,

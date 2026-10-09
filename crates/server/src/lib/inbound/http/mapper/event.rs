@@ -1,4 +1,4 @@
-use domain::event::models::festival::Festival;
+use domain::festival::models::festival::Festival;
 use imgproxy::{
     Gravity, GravityOptionsBuilder, ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder,
     SignedUrlRepo,

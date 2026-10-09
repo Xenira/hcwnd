@@ -1,11 +1,11 @@
 use crate::user::events::*;
-use api::UiState;
 use api::user::User as ApiUser;
+use api::UiState;
 use argon2::{
-    Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_hash::phc::SaltString,
+    password_hash::phc::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
 };
 use eventwise::{
-    Aggregate, aggregate::Apply as _, aggregate::Create as _, command::Handle as _, event::StreamId,
+    aggregate::Apply as _, aggregate::Create as _, command::Handle as _, event::StreamId, Aggregate,
 };
 use nutype::nutype;
 use secrecy::{ExposeSecret, SecretString};
@@ -126,7 +126,19 @@ impl User {
     }
 }
 
-#[nutype(derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, AsRef, Deref))]
+#[nutype(derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    AsRef,
+    Deref,
+    Serialize,
+    Deserialize
+))]
 pub struct UserId(Uuid);
 
 #[nutype(

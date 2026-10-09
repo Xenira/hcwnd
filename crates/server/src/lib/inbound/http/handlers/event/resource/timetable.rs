@@ -3,7 +3,7 @@ use actix_web::{get, web, HttpResponse, Responder, ResponseError};
 use anyhow::Context as _;
 use api::UiState;
 use domain::{
-    event::models::festival::{Festival, FestivalId},
+    festival::models::festival::{Festival, FestivalId},
     user::models::user::User,
 };
 use thiserror::Error;

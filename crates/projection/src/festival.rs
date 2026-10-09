@@ -3,11 +3,11 @@ use std::ops::Deref;
 use anyhow::Context as _;
 use async_trait::async_trait;
 use chrono::Utc;
-use domain::event::{
+use domain::festival::{
     models::festival::{Festival, FestivalEvent, FestivalId, ListEventsError},
     ports::FestivalQuery,
 };
-use eventwise::{TxProjection, aggregate::Aggregate, event::Envelope, store::ProjectionError};
+use eventwise::{aggregate::Aggregate, event::Envelope, store::ProjectionError, TxProjection};
 use log::debug;
 use sqlx::Postgres;
 use uuid::Uuid;

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, ops::Deref};
 
 use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
-use eventwise::{Aggregate, event::StreamId};
+use eventwise::{event::StreamId, Aggregate};
 use nutype::nutype;
 use thiserror::Error;
 use typed_builder::TypedBuilder;
@@ -9,7 +9,7 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    event::{
+    festival::{
         events::*,
         models::{
             act::{Act, ListActsError},
@@ -18,6 +18,8 @@ use crate::{
         },
     },
     proposal::{ProposalSource, ProposalSourceUrl},
+    suggestion::events::*,
+    suggestion::SuggestionState,
     user::models::user::UserId,
 };
 
@@ -47,7 +49,7 @@ pub struct Festival {
     acts: FestivalActs,
     start_date: NaiveDate,
     days: FestivalDays,
-    state: FestivalState,
+    state: SuggestionState,
 }
 
 impl Festival {
@@ -91,50 +93,6 @@ impl Festival {
         self.start_date + Duration::days(self.days.as_ref().len().try_into().unwrap_or(1))
     }
 
-    pub(crate) fn add_vote(&mut self, user_id: UserId, power: i32) {
-        match &mut self.state {
-            FestivalState::Suggested { votes, .. } => {
-                votes.insert(user_id, power);
-            }
-            _ => {
-                // Do nothing, votes can only be added to suggested festivals
-            }
-        }
-    }
-
-    pub(crate) fn remove_vote(&mut self, user_id: UserId) {
-        match &mut self.state {
-            FestivalState::Suggested { votes, .. } => {
-                votes.remove(&user_id);
-            }
-            _ => {
-                // Do nothing, votes can only be removed from suggested festivals
-            }
-        }
-    }
-
-    pub(crate) fn accept(&mut self) {
-        match &self.state {
-            FestivalState::Suggested { .. } => {
-                self.state = FestivalState::Active;
-            }
-            _ => {
-                // Do nothing, only suggested festivals can be accepted
-            }
-        }
-    }
-
-    pub(crate) fn reject(&mut self) {
-        match &self.state {
-            FestivalState::Suggested { .. } => {
-                self.state = FestivalState::Rejected;
-            }
-            _ => {
-                // Do nothing, only suggested festivals can be rejected
-            }
-        }
-    }
-
     pub(crate) fn set_name(&mut self, name: EventName) {
         self.name = name;
     }
@@ -157,6 +115,10 @@ impl Festival {
 
     pub(crate) fn set_days(&mut self, vec: FestivalDays) {
         self.days = vec;
+    }
+
+    pub(crate) fn state_mut(&mut self) -> &mut SuggestionState {
+        &mut self.state
     }
 }
 

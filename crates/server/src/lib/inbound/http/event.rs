@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use actix_web::{dev::Payload, web, FromRequest, HttpRequest};
-use domain::event::models::festival::{Festival, FestivalId};
+use domain::festival::models::festival::{Festival, FestivalId};
 use futures::future::LocalBoxFuture;
 use log::error;
 use uuid::Uuid;
