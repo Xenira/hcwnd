@@ -4,11 +4,11 @@ use actix_web::{
     web::{self, ServiceConfig},
     HttpResponse, Responder,
 };
-use api::event::new::EventCreateConfirmStep;
+use api::festival::new::EventCreateConfirmStep;
 use domain::user::models::user::User;
 use imgproxy::{ImageUrl, ProcessingOption, ResizeMode, ResizingOptionsBuilder, SignedUrlRepo};
 use serde_qs::web::QsForm;
-use ui::view::event::new;
+use ui::view::festival::new;
 
 use crate::inbound::http::user::{RequestUser, UiStateExtractor};
 

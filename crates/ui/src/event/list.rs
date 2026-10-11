@@ -1,5 +1,5 @@
-use api::{UiState, event::Event, user::User};
-use maud::{Markup, Render, html};
+use api::{festival::Festival, user::User, UiState};
+use maud::{html, Markup, Render};
 use uuid::Uuid;
 
 use crate::{
@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[must_use]
-pub fn full_page(state: &UiState, events: &[Event]) -> Markup {
+pub fn full_page(state: &UiState, events: &[Festival]) -> Markup {
     index::full_page(
         state,
         t!("app.title.home", locale = &state.locale),
@@ -17,7 +17,7 @@ pub fn full_page(state: &UiState, events: &[Event]) -> Markup {
 }
 
 #[must_use]
-pub fn render(state: &UiState, events: &[Event], page: usize, has_more: bool) -> Markup {
+pub fn render(state: &UiState, events: &[Festival], page: usize, has_more: bool) -> Markup {
     let preview = EventSuggestionCard {
             editable: true,
             suggested_by: User {

@@ -1,4 +1,4 @@
-use api::{act::Act, event::Event, UiState};
+use api::{act::Act, festival::Festival, UiState};
 use maud::{html, Markup};
 use uuid::Uuid;
 
@@ -10,7 +10,7 @@ use crate::{
 pub const ACTS_LIST_ID: &str = "acts_list";
 
 #[must_use]
-pub fn full_page(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Markup {
+pub fn full_page(state: &UiState, event: &Festival, stage_filter: Option<Uuid>) -> Markup {
     super::full_page(
         state,
         &t!(
@@ -25,7 +25,7 @@ pub fn full_page(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> 
 }
 
 #[must_use]
-pub fn render(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Markup {
+pub fn render(state: &UiState, event: &Festival, stage_filter: Option<Uuid>) -> Markup {
     super::render(
         state,
         event,
@@ -52,7 +52,7 @@ pub fn render_act(state: &UiState, act: &Act) -> Markup {
     }
 }
 
-fn lineup_view(state: &UiState, event: &Event, stage_filter: Option<Uuid>) -> Markup {
+fn lineup_view(state: &UiState, event: &Festival, stage_filter: Option<Uuid>) -> Markup {
     let acts = if let Some(stage_id) = stage_filter {
         &event
             .acts

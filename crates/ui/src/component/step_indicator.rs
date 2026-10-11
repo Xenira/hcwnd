@@ -1,14 +1,14 @@
 use std::ops::Not as _;
 
-use api::event::Event;
+use api::festival::Festival;
 use chrono::{DateTime, Local};
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 use uuid::Uuid;
 
 use crate::{
     atom::{card::Card, tag::Tag},
-    component::{Icons, icon},
+    component::{icon, Icons},
 };
 
 #[derive(TypedBuilder)]

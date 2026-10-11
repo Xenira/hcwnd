@@ -32,7 +32,7 @@ impl Render for TextField {
             InputType::Text => "text",
             InputType::Password => "password",
             InputType::Email => "email",
-            InputType::Number => "number",
+            InputType::Number { .. } => "number",
             InputType::Url => "url",
             InputType::Search => "search",
             InputType::File { .. } => "file",
@@ -46,6 +46,15 @@ impl Render for TextField {
             InputType::File { multiple, .. } => *multiple,
             _ => false,
         };
+        let min = match &self.input_type {
+            InputType::Number { min, .. } => min,
+            _ => &None,
+        };
+        let max = match &self.input_type {
+            InputType::Number { max, .. } => max,
+            _ => &None,
+        };
+
         let hx_trigger = self
             .validation_endpoint
             .is_some()
@@ -61,6 +70,8 @@ impl Render for TextField {
                 required[self.required]
                 multiple[multiple]
                 accept=[accept]
+                min=[min]
+                max=[max]
                 hx-encoding=[&self.encoding]
                 hx-post=[&self.validation_endpoint]
                 hx-preserve[self.hx_preserve]
@@ -91,7 +102,11 @@ pub enum InputType {
     Text,
     Password,
     Email,
-    Number,
+    Number {
+        min: Option<i64>,
+        max: Option<i64>,
+        step: Option<i64>,
+    },
     Url,
     Search,
     File {

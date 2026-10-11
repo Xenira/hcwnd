@@ -1,10 +1,9 @@
 use actix_web::{
-    get,
+    HttpResponse, Responder, get,
     web::{self, Query},
-    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
-use maud::{html, Markup, Render as _};
+use maud::{Markup, Render as _, html};
 use serde::{Deserialize, Serialize};
 use ui::atom::button::{Button, ButtonClass, LinkButton};
 
@@ -24,11 +23,11 @@ async fn primary(query: Query<ButtonParams>) -> Markup {
     let primary = Button::builder().label(query.label.clone()).build();
     let secondary = Button::builder()
         .label(query.label.clone())
-        .button_class(ButtonClass::Secondary)
+        .class(ButtonClass::Secondary)
         .build();
     let flat = Button::builder()
         .label(query.label.clone())
-        .button_class(ButtonClass::Flat)
+        .class(ButtonClass::Flat)
         .build();
 
     let link_primary = LinkButton::builder()

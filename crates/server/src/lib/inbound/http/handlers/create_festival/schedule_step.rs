@@ -4,7 +4,7 @@ use actix_web::{
     web::{self, ServiceConfig},
     HttpResponse, Responder,
 };
-use api::event::new::EventCreateScheduleStep;
+use api::festival::new::EventCreateScheduleStep;
 use domain::user::models::user::User;
 use log::debug;
 use serde_qs::web::QsForm;

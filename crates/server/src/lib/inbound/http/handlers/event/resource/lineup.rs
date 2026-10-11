@@ -43,9 +43,9 @@ async fn get_lineup(
     let event = app_state.event_mapper.map_festival(&event)?;
 
     let body = if htmx.is_htmx {
-        ui::view::event::lineup::render(&state, &event, None)
+        ui::view::festival::lineup::render(&state, &event, None)
     } else {
-        ui::view::event::lineup::full_page(&state, &event, None)
+        ui::view::festival::lineup::full_page(&state, &event, None)
     };
 
     Ok(HttpResponse::Ok()

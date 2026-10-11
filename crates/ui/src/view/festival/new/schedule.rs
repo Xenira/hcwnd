@@ -1,5 +1,5 @@
 use api::{
-    event::new::{EventCreateDetailsStep, EventType},
+    festival::new::{EventCreateDetailsStep, EventType},
     UiState,
 };
 use chrono::{Local, NaiveDate};
@@ -16,15 +16,19 @@ use crate::{
         select::Select,
     },
     component::EventCard,
-    event::create::{self},
+    event::create::{
+        self,
+        confirm_step::{self},
+    },
+    index,
     view::{
-        event::new::{schedule, step_indicator},
+        festival::new::{schedule, step_indicator},
         View,
     },
 };
 
 const CURRENT_STEP: usize = 0;
-pub const BASE_ROUTE: &str = "/details";
+pub const BASE_ROUTE: &str = "/schedule";
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -191,21 +195,6 @@ impl View for DetailsStep<'_> {
             .value(self.details_step.event_type.to_string())
             .required()
             .build();
-        let location = TextField::builder()
-            .name("venue")
-            .label(t!(
-                "event.create.details_step.venue.label",
-                locale = &state.locale
-            ))
-            .placeholder(t!(
-                "event.create.details_step.venue.placeholder",
-                locale = &state.locale
-            ))
-            .input_type(InputType::Search)
-            .value_opt(self.details_step.venue.clone())
-            .validation_endpoint(Self::url("validate_venue"))
-            .required(true)
-            .build();
         let description = TextArea::builder()
             .name("description")
             .label(t!(
@@ -225,7 +214,6 @@ impl View for DetailsStep<'_> {
         let form_content = html! {
             (event_name)
             (event_type)
-            (location)
             (description)
             (image)
         };

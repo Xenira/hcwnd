@@ -1,7 +1,7 @@
 use std::ops::Not as _;
 
 use api::{
-    event::{new::EventCreateDetailsStep, Event},
+    festival::{new::EventCreateDetailsStep, Festival},
     UiState,
 };
 use chrono::{DateTime, Local};
@@ -124,8 +124,8 @@ impl Render for EventCard {
     }
 }
 
-impl From<&Event> for EventCard {
-    fn from(event: &Event) -> Self {
+impl From<&Festival> for EventCard {
+    fn from(event: &Festival) -> Self {
         Self::builder()
             .id(event.id)
             .name(&event.name)

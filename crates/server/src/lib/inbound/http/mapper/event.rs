@@ -21,12 +21,12 @@ impl FestivalMapper {
         }
     }
 
-    pub fn map_festival(&self, festival: &Festival) -> anyhow::Result<api::event::Event> {
+    pub fn map_festival(&self, festival: &Festival) -> anyhow::Result<api::festival::Festival> {
         let image_url = self
             .image_signer
             .get(&self.card_image(festival.image_url().as_ref())?)?;
 
-        let festival = api::event::Event {
+        let festival = api::festival::Festival {
             id: festival.id().clone().into_inner(),
             name: festival.name().clone().into_inner(),
             description: festival.description().clone().into_inner(),
@@ -36,7 +36,7 @@ impl FestivalMapper {
             end_time: festival.days().last().1,
             website_url: festival.website_url().clone().into_inner(),
             image_url,
-            state: api::event::EventState::Online,
+            state: api::festival::FestivalState::Online,
             acts: festival
                 .acts()
                 .iter()

@@ -1,5 +1,5 @@
-use api::event::Event;
-use maud::{Markup, html};
+use api::festival::Festival;
+use maud::{html, Markup};
 use uuid::Uuid;
 
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
         nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
         tag::Tag,
     },
-    component::{Icons, icon, menu_item},
+    component::{icon, menu_item, Icons},
     index,
 };
 
@@ -32,7 +32,7 @@ pub enum View {
 pub fn full_page(
     state: &api::UiState,
     title: &str,
-    event: &Event,
+    event: &Festival,
     active_view: View,
     content: Markup,
 ) -> Markup {
@@ -40,7 +40,12 @@ pub fn full_page(
 }
 
 #[must_use]
-pub fn render(state: &api::UiState, event: &Event, active_view: View, content: Markup) -> Markup {
+pub fn render(
+    state: &api::UiState,
+    event: &Festival,
+    active_view: View,
+    content: Markup,
+) -> Markup {
     html! {
         div id=(EVENT_CONTAINER_ID) {
             header {
@@ -58,7 +63,7 @@ pub fn render(state: &api::UiState, event: &Event, active_view: View, content: M
 }
 
 #[must_use]
-fn header(state: &api::UiState, event: &Event) -> Markup {
+fn header(state: &api::UiState, event: &Festival) -> Markup {
     let genres = ["Hardcore", "Uptempo"]; // TODO: Replace with actual genres from the event
     html! {
         img src=(event.image_url) alt="Header image" {}
@@ -131,13 +136,11 @@ pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Nav {
             NavEntryDropdown::builder()
                 .label("")
                 .icon(Icons::MoreMenu)
-                .entries(vec![
-                    NavEntrySimple::builder()
-                        .href(format!("{}/{event_id}/history", api::routes::EVENT_ROUTE))
-                        .label(t!("event.detail.menu.history", locale = &state.locale).to_string())
-                        .build()
-                        .into(),
-                ])
+                .entries(vec![NavEntrySimple::builder()
+                    .href(format!("{}/{event_id}/history", api::routes::EVENT_ROUTE))
+                    .label(t!("event.detail.menu.history", locale = &state.locale).to_string())
+                    .build()
+                    .into()])
                 .chevron(false)
                 .alignment(NavEntryAlignment::Right)
                 .build()

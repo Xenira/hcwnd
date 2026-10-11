@@ -1,10 +1,10 @@
-use api::{event::Event, UiState};
+use api::{festival::Festival, UiState};
 use maud::{html, Markup};
 
-use crate::{index, view::event::View};
+use crate::{index, view::festival::View};
 
 #[must_use]
-pub fn full_page(state: &UiState, event: &Event) -> Markup {
+pub fn full_page(state: &UiState, event: &Festival) -> Markup {
     let title = t!(
         "event.detail.timetable.title",
         locale = &state.locale,
@@ -21,11 +21,11 @@ pub fn full_page(state: &UiState, event: &Event) -> Markup {
 }
 
 #[must_use]
-pub fn render(state: &UiState, event: &Event) -> Markup {
+pub fn render(state: &UiState, event: &Festival) -> Markup {
     super::render(state, event, View::Timetable, timetable_view(state, event))
 }
 
-fn timetable_view(state: &UiState, event: &Event) -> Markup {
+fn timetable_view(state: &UiState, event: &Festival) -> Markup {
     html! {
         img src=(event.image_url) alt=(event.name);
         section.hero.hero-primary {

@@ -1,11 +1,11 @@
 use std::fmt::Display;
 
-use api::{UiState, user::User};
-use maud::{DOCTYPE, Markup, Render, html};
+use api::{user::User, UiState};
+use maud::{html, Markup, Render, DOCTYPE};
 
 use crate::{
     atom::nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
-    component::{Icons, menu_item},
+    component::{menu_item, Icons},
     event,
     user::{self},
     view,
@@ -65,7 +65,7 @@ fn nav_bar(state: &UiState) -> Markup {
             .href(format!(
                 "{}{}",
                 event::create::BASE_ROUTE,
-                view::event::new::details::BASE_ROUTE
+                view::festival::new::details::BASE_ROUTE
             ))
             .alignment(NavEntryAlignment::Right)
             .icon(Icons::Create)

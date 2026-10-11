@@ -19,11 +19,7 @@ form {
   align-self: stretch;
 
   label {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    align-self: stretch;
+    width: 100%;
 
     color: var(--text-primary, #{$text-primary});
     font-size: 0.875rem;
@@ -33,6 +29,55 @@ form {
     textarea,
     select {
       width: 100%;
+      margin-top: 0.5rem;
+      &:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    &:not(:has(> [required])) {
+      direction: rtl;
+      text-align: end;
+      input,
+      select,
+      textarea {
+        direction: ltr;
+      }
+      &::before {
+        content: " (optional)";
+        color: var(--text-tertiary, #{$text-tertiary});
+        margin-left: 0.5rem;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  > section {
+    display: flex;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    align-self: stretch;
+
+    border-radius: 0.75rem;
+    border: 1px solid var(--accent-primary, #{$accent-primary});
+    background: var(--background-surface, #{$background-surface});
+
+    > header {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+
+      color: var(--text-primary, #{$text-primary});
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: undefined;
+      text-transform: uppercase;
+
+      > i {
+        color: var(--accent-primary, #{$accent-primary});
+      }
     }
   }
 
@@ -60,4 +105,16 @@ form {
   @include validation-state("success", $status-success);
   @include validation-state("warning", $status-warning);
   @include validation-state("info", $status-info);
+}
+
+.form_row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.25rem;
+  align-self: stretch;
+
+  > * {
+    flex: 1;
+  }
 }

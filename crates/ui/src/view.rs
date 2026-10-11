@@ -6,7 +6,7 @@ use maud::Render;
 use crate::index;
 
 pub mod artist;
-pub mod event;
+pub mod festival;
 
 mod home;
 pub use home::Home;

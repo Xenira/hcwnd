@@ -1,5 +1,5 @@
 use api::{
-    event::new::{EventCreateDetailsStep, EventType},
+    festival::new::{EventCreateDetailsStep, EventType, Venue},
     UiState,
 };
 use chrono::{Local, NaiveDate};
@@ -16,19 +16,16 @@ use crate::{
         select::Select,
     },
     component::EventCard,
-    event::create::{
-        self,
-        confirm_step::{self},
-    },
-    index,
+    event::create::{self},
+    partial::venue::VenueInlineForm,
     view::{
-        event::new::{schedule, step_indicator},
+        festival::new::{schedule, step_indicator},
         View,
     },
 };
 
 const CURRENT_STEP: usize = 0;
-pub const BASE_ROUTE: &str = "/schedule";
+pub const BASE_ROUTE: &str = "/details";
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -118,6 +115,7 @@ impl DetailsStep<'_> {
         }
     }
 
+    #[must_use]
     pub fn image_input(state: &UiState, required: bool) -> ImageInput<'_> {
         let image = ImageInput::builder()
             .name("image")
@@ -153,6 +151,21 @@ impl View for DetailsStep<'_> {
                 }
             }
         };
+
+        // let venue_form = match self.details_step.venue {
+        //     Some(Venue::New { name, address, city, postal_code, country }) => {
+        //         VenueInlineForm::builder()
+        //             .state(state)
+        //             .name(name)
+        //             .address(address)
+        //             .city(city)
+        //             .postal_code(postal_code)
+        //             .country(country)
+        //             .build()
+        //     }
+        //     None =>
+
+        let venue_form = VenueInlineForm::builder().state(state).build();
 
         let event_name = TextField::builder()
             .name("name")
@@ -195,21 +208,6 @@ impl View for DetailsStep<'_> {
             .value(self.details_step.event_type.to_string())
             .required()
             .build();
-        let location = TextField::builder()
-            .name("venue")
-            .label(t!(
-                "event.create.details_step.venue.label",
-                locale = &state.locale
-            ))
-            .placeholder(t!(
-                "event.create.details_step.venue.placeholder",
-                locale = &state.locale
-            ))
-            .input_type(InputType::Search)
-            .value_opt(self.details_step.venue.clone())
-            .validation_endpoint(Self::url("validate_venue"))
-            .required(true)
-            .build();
         let description = TextArea::builder()
             .name("description")
             .label(t!(
@@ -229,7 +227,7 @@ impl View for DetailsStep<'_> {
         let form_content = html! {
             (event_name)
             (event_type)
-            (location)
+            (venue_form)
             (description)
             (image)
         };

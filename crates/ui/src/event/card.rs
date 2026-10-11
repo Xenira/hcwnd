@@ -1,17 +1,17 @@
 use api::{
-    UiState,
-    event::{Event, EventState},
+    festival::{Festival, FestivalState},
     user::User,
+    UiState,
 };
 use chrono::{NaiveDate, NaiveTime};
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 
-use crate::component::{Icons, icon};
+use crate::component::{icon, Icons};
 
 #[must_use]
-pub fn render(_state: &UiState, event: &Event) -> Markup {
+pub fn render(_state: &UiState, event: &Festival) -> Markup {
     let (card_class, section_class) = match event.state {
-        EventState::Suggested { .. } => ("card-warning", "hero-warning"),
+        FestivalState::Suggested { .. } => ("card-warning", "hero-warning"),
         _ => ("card-primary", "hero-primary"),
     };
     dbg!(card_class, section_class);

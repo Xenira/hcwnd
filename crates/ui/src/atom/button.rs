@@ -1,9 +1,12 @@
 use std::fmt::Display;
 
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use typed_builder::TypedBuilder;
 
-use crate::component::Icons;
+use crate::{
+    component::Icons,
+    htmx::{HxMethod, HxMethodOption as _},
+};
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -13,9 +16,11 @@ pub struct Button {
     icon: Option<Icons>,
     #[builder(default)]
     #[allow(clippy::struct_field_names)]
-    button_class: ButtonClass,
+    class: ButtonClass,
     #[builder(default)]
     button_type: ButtonType,
+    #[builder(default)]
+    hx_method: Option<HxMethod>,
 }
 
 impl Render for Button {
@@ -23,7 +28,11 @@ impl Render for Button {
         html! {
             button
                 type=(self.button_type)
-                class=(self.button_class.as_str())
+                class=(self.class.as_str())
+                hx-get=[self.hx_method.get_option()]
+                hx-post=[self.hx_method.post_option()]
+                hx-put=[self.hx_method.put_option()]
+                hx-delete=[self.hx_method.delete_option()]
             {
                 (button_content(&self.label, self.icon.as_ref()))
             }
@@ -107,14 +116,17 @@ pub enum ButtonClass {
     Primary,
     Secondary,
     Flat,
+    Link,
 }
 
 impl ButtonClass {
+    #[must_use]
     pub fn as_str(&self) -> &'static str {
         match self {
             ButtonClass::Primary => "primary",
             ButtonClass::Secondary => "secondary",
             ButtonClass::Flat => "flat",
+            ButtonClass::Link => "link",
         }
     }
 }

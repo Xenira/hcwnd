@@ -1,10 +1,12 @@
 use actix_web::{
-    HttpResponse, Responder, get,
+    get,
     web::{self},
+    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
 use serde::Serialize;
 
+pub mod autocomplete;
 pub mod button;
 pub mod card;
 pub mod chip;
@@ -26,5 +28,6 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .service(web::scope("/tag").configure(tag::configure))
         .service(web::scope("/nav").configure(nav::configure))
         .service(web::scope("/select").configure(select::configure))
+        .service(web::scope("/autocomplete").configure(autocomplete::configure))
         .service(web::scope("/step_indicator").configure(step_indicator::configure));
 }

@@ -13,7 +13,7 @@ pub struct EventCreateDetailsStep {
     pub name: Option<String>,
     pub event_type: EventType,
     pub description: Option<String>,
-    pub venue: Option<String>,
+    pub venue: Option<Venue>,
     pub image_url: Option<Url>,
     // Schedule Step
     pub start_date: Option<NaiveDate>,
@@ -51,6 +51,18 @@ impl Default for EventCreateDetailsStep {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[derive(Debug, Deserialize)]
+pub enum Venue {
+    Existing(Uuid),
+    New {
+        name: String,
+        address: String,
+        city: String,
+        postal_code: String,
+        country: String,
+    },
 }
 
 #[derive(Debug, Deserialize, Serialize)]

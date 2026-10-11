@@ -1,7 +1,7 @@
 use actix_htmx::Htmx;
 use actix_web::{post, web, HttpResponse, Responder};
 use anyhow::Context as _;
-use api::{day::EventDay, event::new::EventCreateConfirmStep};
+use api::{day::EventDay, festival::new::EventCreateConfirmStep};
 use domain::{
     festival::models::{
         day::CreateDayRequest,
@@ -23,7 +23,7 @@ pub mod stages_step;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope(ui::view::event::new::details::BASE_ROUTE).configure(details_step::configure),
+        web::scope(ui::view::festival::new::details::BASE_ROUTE).configure(details_step::configure),
     );
     // .service(web::scope(ui::view::event::new::stages::BASE_ROUTE).configure(stages_step::configure))
     // .service(

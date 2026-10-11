@@ -13,10 +13,10 @@ use crate::{
 
 pub mod new;
 
-pub type PagedEventList = PagedResult<EventListEntry, (Uuid, NaiveDate)>;
+pub type PagedEventList = PagedResult<FestivalListEntry, (Uuid, NaiveDate)>;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Event {
+pub struct Festival {
     pub id: Uuid,
     pub name: String,
     pub description: String,
@@ -27,21 +27,21 @@ pub struct Event {
     pub start_time: Option<NaiveTime>,
     pub end_date: NaiveDate,
     pub end_time: Option<NaiveTime>,
-    pub state: EventState,
+    pub state: FestivalState,
     // pub days: Vec<EventDay>,
     pub acts: Vec<Act>,
     pub stages: Vec<Stage>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum EventState {
+pub enum FestivalState {
     Suggested { upvotes: u32, downvotes: u32 },
     Online,
     Verified { organizer: User },
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
-pub struct EventListEntry {
+pub struct FestivalListEntry {
     pub id: Uuid,
     pub name: String,
     pub description: Option<String>,
@@ -53,7 +53,7 @@ pub struct EventListEntry {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
-pub struct NewEvent {
+pub struct FestivalEvent {
     pub name: String,
     pub description: Option<String>,
     pub website_url: String,
@@ -63,7 +63,7 @@ pub struct NewEvent {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
-pub struct EventDetails {
+pub struct FestivalDetails {
     pub id: Uuid,
     pub name: String,
     pub description: Option<String>,

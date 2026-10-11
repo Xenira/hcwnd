@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt::Display};
 
-use api::{event::Event, UiState};
+use api::{festival::Festival, UiState};
 use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
@@ -14,7 +14,7 @@ use crate::{
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
 pub struct Home {
     #[builder(default)]
-    events: Vec<Event>,
+    events: Vec<Festival>,
 }
 
 impl View for Home {

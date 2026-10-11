@@ -8,11 +8,12 @@ use crate::user::User;
 pub mod act;
 pub mod artist;
 pub mod day;
-pub mod event;
+pub mod festival;
 pub mod routes;
 pub mod serde_utils;
 pub mod stage;
 pub mod user;
+pub mod venue;
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
 pub struct PagedResult<T, U> {
@@ -21,6 +22,7 @@ pub struct PagedResult<T, U> {
     pub after: Option<U>,
 }
 
+#[derive(Clone)]
 pub struct UiState {
     pub locale: String,
     pub user: Option<User>,

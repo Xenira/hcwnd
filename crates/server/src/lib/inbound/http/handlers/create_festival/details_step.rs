@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, ops::Deref};
 
 use actix_htmx::{Htmx, SwapType};
 use actix_multipart::form::{bytes::Bytes, tempfile::TempFile, MultipartForm};
@@ -7,11 +7,11 @@ use actix_web::{
     web::{self, ServiceConfig},
     HttpResponse, Responder,
 };
-use api::{event::new::EventCreateDetailsStep, UiState};
+use api::{festival::new::EventCreateDetailsStep, UiState};
 use domain::user::models::user::User;
 use imgproxy::{ImageUrl, SignedUrlRepo};
 use log::info;
-use maud::html;
+use maud::{html, Render as _};
 use serde::Deserialize;
 use serde_qs::web::QsForm;
 use ui::{
@@ -21,7 +21,8 @@ use ui::{
         self,
         name_step::{self},
     },
-    view::{event::new::details::DetailsStep, View as _},
+    partial::venue::VenueInlineForm,
+    view::{festival::new::details::DetailsStep, View as _},
 };
 
 use crate::inbound::http::{
@@ -80,6 +81,14 @@ async fn validate_name(
             (card)
         }
     }
+}
+
+#[get("/venue/new")]
+async fn new_venue(_: RequestUser, state: UiStateExtractor) -> impl Responder {
+    VenueInlineForm::builder()
+        .state(state.deref())
+        .build()
+        .render()
 }
 
 #[derive(Debug, MultipartForm)]

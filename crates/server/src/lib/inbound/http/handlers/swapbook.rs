@@ -1,6 +1,7 @@
 use actix_web::{
-    HttpResponse, Responder, get,
+    get,
     web::{self},
+    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
 use serde::Serialize;
@@ -93,6 +94,7 @@ async fn manifest() -> impl Responder {
         .chain(preview::tag::stories().into_iter())
         .chain(preview::nav::stories().into_iter())
         .chain(preview::select::stories().into_iter())
+        .chain(preview::autocomplete::stories().into_iter())
         .chain(preview::step_indicator::stories().into_iter())
         .collect();
 

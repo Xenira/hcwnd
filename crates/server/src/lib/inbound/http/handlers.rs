@@ -17,7 +17,7 @@ use crate::inbound::http::{
 pub mod artist;
 pub mod assets;
 pub mod create_artist;
-pub mod create_event;
+pub mod create_festival;
 pub mod event;
 pub mod login;
 pub mod logout;
@@ -27,7 +27,7 @@ pub mod swapbook;
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(index)
         .service(web::scope("/_swapbook").configure(swapbook::configure))
-        .service(web::scope(ui::event::create::BASE_ROUTE).configure(create_event::configure))
+        .service(web::scope(ui::event::create::BASE_ROUTE).configure(create_festival::configure))
         .service(
             web::scope(ui::view::artist::create::BASE_ROUTE).configure(create_artist::configure),
         )
