@@ -1,17 +1,17 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    get,
+    HttpResponse, Responder, ResponseError, get,
     web::{self, Data, ServiceConfig},
-    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
+use api::routes::{RouteSegment as _, VenueRoute};
 use domain::{festival::ports::EventService, user::models::user::User};
 use thiserror::Error;
 use ui::view::{Home, View};
 
 use crate::inbound::http::{
-    user::{Locale, UiStateExtractor},
     AppState,
+    user::{Locale, UiStateExtractor},
 };
 
 pub mod artist;
@@ -23,6 +23,7 @@ pub mod login;
 pub mod logout;
 pub mod signup;
 pub mod swapbook;
+pub mod venue;
 
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(index)
@@ -34,6 +35,7 @@ pub fn configure(cfg: &mut ServiceConfig) {
         .service(web::scope("/assets").configure(assets::configure))
         .service(web::scope(api::routes::EVENT_ROUTE).configure(event::configure))
         .service(web::scope(api::routes::ARTIST_ROUTE).configure(artist::configure))
+        .service(web::scope(VenueRoute::PATH).configure(venue::configure))
         .service(web::scope("/signup").configure(signup::configure))
         .service(web::scope("/login").configure(login::configure))
         .service(web::scope("/logout").configure(logout::configure));

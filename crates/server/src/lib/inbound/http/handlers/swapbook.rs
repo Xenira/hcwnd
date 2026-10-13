@@ -1,7 +1,6 @@
 use actix_web::{
-    get,
+    HttpResponse, Responder, get,
     web::{self},
-    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
 use serde::Serialize;
@@ -86,16 +85,17 @@ pub struct Step {
 async fn manifest() -> impl Responder {
     let stories = preview::button::stories()
         .into_iter()
-        .chain(preview::chip::stories().into_iter())
-        .chain(preview::input::stories().into_iter())
-        .chain(preview::typography::stories().into_iter())
+        .chain(preview::autocomplete::stories().into_iter())
         .chain(preview::card::stories().into_iter())
+        .chain(preview::chip::stories().into_iter())
         .chain(preview::event_card::stories().into_iter())
-        .chain(preview::tag::stories().into_iter())
+        .chain(preview::input::stories().into_iter())
         .chain(preview::nav::stories().into_iter())
         .chain(preview::select::stories().into_iter())
-        .chain(preview::autocomplete::stories().into_iter())
         .chain(preview::step_indicator::stories().into_iter())
+        .chain(preview::tag::stories().into_iter())
+        .chain(preview::tombstone::stories().into_iter())
+        .chain(preview::typography::stories().into_iter())
         .collect();
 
     let manifest = Manifest {

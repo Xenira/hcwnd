@@ -1,9 +1,9 @@
 use api::{
-    festival::new::{EventCreateDetailsStep, EventType, Venue},
     UiState,
+    festival::new::{EventCreateDetailsStep, EventType, Venue},
 };
 use chrono::{Local, NaiveDate};
-use maud::{html, Markup, Render};
+use maud::{Markup, Render, html};
 use serde::Deserialize;
 use typed_builder::TypedBuilder;
 use url::Url;
@@ -15,12 +15,12 @@ use crate::{
         input::{ImageInput, InputType, TextArea, TextField},
         select::Select,
     },
-    component::EventCard,
+    component::{Autocomplete, EventCard, Lazy},
     event::create::{self},
-    partial::venue::VenueInlineForm,
+    partial::venue::{self, VenueInlineForm},
     view::{
-        festival::new::{schedule, step_indicator},
         View,
+        festival::new::{schedule, step_indicator},
     },
 };
 
@@ -131,6 +131,42 @@ impl DetailsStep<'_> {
 
         image
     }
+
+    fn venue_form(&self, state: &UiState) -> maud::PreEscaped<String> {
+        match self.details_step.venue.as_ref() {
+            Some(Venue::Existing(id)) => html! {
+                (Lazy::<venue::inline_card::InlineCard>::builder()
+                .id(*id)
+                .build()
+                .render())
+                input type="hidden" name="venue" value=(id) {}
+            },
+            Some(Venue::New {
+                name,
+                address,
+                city,
+                postal_code,
+                country,
+            }) => venue::VenueInlineForm::builder()
+                .state(state)
+                .name(name.clone())
+                .address(address.clone())
+                .city(city.clone())
+                .postal_code(postal_code.clone())
+                .country(country.clone())
+                .build()
+                .render(),
+            None => Autocomplete::builder()
+                .name("venue")
+                .placeholder(t!(
+                    "event.create.details_step.venue.placeholder",
+                    locale = &state.locale
+                ))
+                .search_url("/venue/search")
+                .build()
+                .render(),
+        }
+    }
 }
 
 impl View for DetailsStep<'_> {
@@ -164,8 +200,7 @@ impl View for DetailsStep<'_> {
         //             .build()
         //     }
         //     None =>
-
-        let venue_form = VenueInlineForm::builder().state(state).build();
+        let venue_form = self.venue_form(state);
 
         let event_name = TextField::builder()
             .name("name")
