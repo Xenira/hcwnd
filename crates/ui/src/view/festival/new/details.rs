@@ -1,6 +1,5 @@
 use api::{
     festival::new::{EventCreateDetailsStep, EventType, Venue},
-    routes::{Route, RouteBuilder},
     UiState,
 };
 use chrono::{Local, NaiveDate};
@@ -165,8 +164,8 @@ impl DetailsStep<'_> {
                     "event.create.details_step.venue.placeholder",
                     locale = &state.locale
                 ),
-                search_url: RouteBuilder::default().venue().build(),
-                form_url: RouteBuilder::default().venue().new_venue().inline().build(),
+                search_url: api::routes::venue::search::url(),
+                form_url: api::routes::venue::new::inline::form::url(),
             }
             .render(), // Autocomplete::builder()
                        // .name("q_venue")

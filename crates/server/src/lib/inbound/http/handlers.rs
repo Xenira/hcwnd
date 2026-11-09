@@ -1,24 +1,23 @@
 use actix_htmx::Htmx;
 use actix_web::{
-    HttpResponse, Responder, ResponseError, get,
+    get,
     web::{self, Data, ServiceConfig},
+    HttpResponse, Responder, ResponseError,
 };
 use anyhow::Context as _;
-use api::routes::{RouteSegment as _, VenueRoute};
 use domain::{festival::ports::EventService, user::models::user::User};
 use thiserror::Error;
 use ui::view::{Home, View};
 
 use crate::inbound::http::{
-    AppState,
     user::{Locale, UiStateExtractor},
+    AppState,
 };
 
 pub mod artist;
 pub mod assets;
 pub mod create_artist;
-pub mod create_festival;
-pub mod event;
+pub mod festival;
 pub mod login;
 pub mod logout;
 pub mod signup;
@@ -28,17 +27,16 @@ pub mod venue;
 pub fn configure(cfg: &mut ServiceConfig) {
     cfg.service(index)
         .service(web::scope("/_swapbook").configure(swapbook::configure))
-        .service(web::scope(ui::event::create::BASE_ROUTE).configure(create_festival::configure))
         .service(
             web::scope(ui::view::artist::create::BASE_ROUTE).configure(create_artist::configure),
         )
-        .service(web::scope("/assets").configure(assets::configure))
-        .service(web::scope(api::routes::EVENT_ROUTE).configure(event::configure))
-        .service(web::scope(api::routes::ARTIST_ROUTE).configure(artist::configure))
-        .service(web::scope(VenueRoute::PATH).configure(venue::configure))
-        .service(web::scope("/signup").configure(signup::configure))
-        .service(web::scope("/login").configure(login::configure))
-        .service(web::scope("/logout").configure(logout::configure));
+        .service(web::scope(api::routes::assets::SEG).configure(assets::configure))
+        .service(web::scope(api::routes::festival::SEG).configure(festival::configure))
+        .service(web::scope(api::routes::artist::SEG).configure(artist::configure))
+        .service(web::scope(api::routes::venue::SEG).configure(venue::configure))
+        .service(web::scope(api::routes::sign_up::SEG).configure(signup::configure))
+        .service(web::scope(api::routes::login::SEG).configure(login::configure))
+        .service(web::scope(api::routes::logout::SEG).configure(logout::configure));
 }
 
 #[derive(Error, Debug)]

@@ -7,6 +7,7 @@ use actix_web::{
     web::{self, ServiceConfig},
     HttpResponse, Responder,
 };
+use api::routes::festival::new::details_step as Route;
 use api::{festival::new::EventCreateDetailsStep, UiState};
 use domain::user::models::user::User;
 use imgproxy::{ImageUrl, SignedUrlRepo};
@@ -31,15 +32,19 @@ use crate::inbound::http::{
 };
 
 pub fn configure(cfg: &mut ServiceConfig) {
-    cfg.service(details_step)
-        //     .service(details_step_form)
-        .service(validate_name)
-        .service(validate_description)
-        .service(upload_image);
+    cfg.route(Route::form::SEG, web::get().to(details_step))
+        .route(Route::validate_name::SEG, web::post().to(validate_name))
+        .route(
+            Route::validate_description::SEG,
+            web::post().to(validate_description),
+        )
+        .route(Route::upload_image::SEG, web::post().to(upload_image));
+    //     .service(details_step_form)
+    // .service(validate_name)
+    // .service(validate_description)
+    // .service(upload_image);
 }
 
-/// User should not be able to access this step directly, so we redirect them to the first step of the flow
-#[get("")]
 async fn details_step(_: RequestUser, state: UiStateExtractor, htmx: Htmx) -> impl Responder {
     let details = EventCreateDetailsStep::default();
     let details_view = DetailsStep::builder().details_step(&details).build();
@@ -60,7 +65,6 @@ struct ValidateNameForm {
     name: String,
 }
 
-#[post("/validate_name")]
 async fn validate_name(
     _: RequestUser,
     state: UiStateExtractor,
@@ -97,7 +101,6 @@ struct UploadImageForm {
     image: TempFile,
 }
 
-#[post("/upload_image")]
 async fn upload_image(
     _: RequestUser,
     state: UiStateExtractor,
@@ -124,7 +127,6 @@ async fn upload_image(
     }
 }
 
-#[post("/validate_description")]
 async fn validate_description(
     _: RequestUser,
     state: UiStateExtractor,

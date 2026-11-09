@@ -23,7 +23,8 @@ pub mod stages_step;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope(ui::view::festival::new::details::BASE_ROUTE).configure(details_step::configure),
+        web::scope(api::routes::festival::new::details_step::SEG)
+            .configure(details_step::configure),
     );
     // .service(web::scope(ui::view::event::new::stages::BASE_ROUTE).configure(stages_step::configure))
     // .service(

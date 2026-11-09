@@ -55,18 +55,14 @@ fn nav_bar(state: &UiState) -> Markup {
     entries.push(
         NavEntrySimple::builder()
             .label(t!("app.menu.artists", locale = &state.locale))
-            .href(api::routes::ARTIST_ROUTE)
+            .href(api::routes::artist::url())
             .build()
             .into(),
     );
     entries.push(
         NavEntrySimple::builder()
             .label(t!("app.menu.create_event", locale = &state.locale))
-            .href(format!(
-                "{}{}",
-                event::create::BASE_ROUTE,
-                view::festival::new::details::BASE_ROUTE
-            ))
+            .href(api::routes::festival::new::details_step::url())
             .alignment(NavEntryAlignment::Right)
             .icon(Icons::Create)
             .build()
@@ -80,12 +76,12 @@ fn nav_bar(state: &UiState) -> Markup {
                 .entries(vec![
                     NavEntrySimple::builder()
                         .label(t!("app.menu.user.profile", locale = &state.locale))
-                        .href(format!("/user/{}", user.id))
+                        .href(api::routes::user::profile::url(user.id))
                         .build()
                         .into(),
                     NavEntrySimple::builder()
                         .label(t!("app.menu.user.logout", locale = &state.locale))
-                        .href("/logout")
+                        .href(api::routes::logout::url())
                         .build()
                         .into(),
                 ])
@@ -97,7 +93,7 @@ fn nav_bar(state: &UiState) -> Markup {
         entries.push(
             NavEntrySimple::builder()
                 .label(t!("app.menu.user.login", locale = &state.locale))
-                .href("/login")
+                .href(api::routes::login::url())
                 .alignment(NavEntryAlignment::Right)
                 .build()
                 .into(),
@@ -105,7 +101,7 @@ fn nav_bar(state: &UiState) -> Markup {
         entries.push(
             NavEntrySimple::builder()
                 .label(t!("app.menu.user.sign_up", locale = &state.locale))
-                .href("/signup")
+                .href(api::routes::sign_up::url())
                 .alignment(NavEntryAlignment::Right)
                 .build()
                 .into(),
@@ -117,12 +113,12 @@ fn nav_bar(state: &UiState) -> Markup {
 
 fn scripts() -> Markup {
     html! {
-        script src="/assets/htmx.min.js" {}
+        script src=(api::routes::assets::file::url("htmx.min.js")) {}
     }
 }
 
 fn styles() -> Markup {
     html! {
-        link rel="stylesheet" href="/assets/style.css";
+        link rel="stylesheet" href=(api::routes::assets::file::url("style.css"));
     }
 }

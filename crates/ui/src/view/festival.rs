@@ -1,4 +1,5 @@
 use api::festival::Festival;
+use api::routes::festival::detail as Routes;
 use maud::{html, Markup};
 use uuid::Uuid;
 
@@ -15,8 +16,6 @@ pub mod detail;
 pub mod lineup;
 pub mod new;
 pub mod timetable;
-
-pub const BASE_ROUTE: &str = "/event";
 
 pub const EVENT_CONTAINER_ID: &str = "event";
 pub const EVENT_CONTENT_CONTAINER_ID: &str = "event_content";
@@ -100,33 +99,25 @@ pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Nav {
     Nav::builder()
         .entries(vec![
             NavEntrySimple::builder()
-                .href(format!("{}/{event_id}", api::routes::EVENT_ROUTE))
+                .href(Routes::details::url(event_id))
                 .label(t!("event.detail.menu.details", locale = &state.locale).to_string())
                 .active(active_view == View::Detail)
                 .build()
                 .into(),
             NavEntrySimple::builder()
-                .href(format!(
-                    "{}/{event_id}{}",
-                    api::routes::EVENT_ROUTE,
-                    api::routes::EVENT_TIMETABLE_ROUTE
-                ))
+                .href(Routes::timetable::url(event_id))
                 .label(t!("event.detail.menu.timetable", locale = &state.locale).to_string())
                 .active(active_view == View::Timetable)
                 .build()
                 .into(),
             NavEntrySimple::builder()
-                .href(format!(
-                    "{}/{event_id}{}",
-                    api::routes::EVENT_ROUTE,
-                    api::routes::EVENT_LINEUP_ROUTE
-                ))
+                .href(Routes::lineup::url(event_id))
                 .label(t!("event.detail.menu.lineup", locale = &state.locale).to_string())
                 .active(active_view == View::Lineup)
                 .build()
                 .into(),
             NavEntrySimple::builder()
-                .href(format!("{}/{event_id}/edit", api::routes::EVENT_ROUTE))
+                .href(Routes::edit::url(event_id))
                 .label("")
                 .icon(Icons::Edit)
                 .active(false)
@@ -137,7 +128,7 @@ pub fn nav_bar(state: &api::UiState, event_id: Uuid, active_view: View) -> Nav {
                 .label("")
                 .icon(Icons::MoreMenu)
                 .entries(vec![NavEntrySimple::builder()
-                    .href(format!("{}/{event_id}/history", api::routes::EVENT_ROUTE))
+                    .href(Routes::history::url(event_id))
                     .label(t!("event.detail.menu.history", locale = &state.locale).to_string())
                     .build()
                     .into()])
