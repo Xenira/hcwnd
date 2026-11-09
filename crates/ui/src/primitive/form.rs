@@ -5,17 +5,35 @@ use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 use crate::{
-    atom::button::{Button, ButtonType},
     component::{icon, Icons},
     htmx::HxEncoding,
+    primitive::button::{Button, ButtonType},
 };
+
+pub trait FormElement: Render {
+    fn set_form(&mut self, id: &str);
+}
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
+#[builder(mutators(
+    #[mutator(requires = [id])]
+    pub fn add_form_element(&mut self, mut element: impl FormElement) -> &mut Self {
+        element.set_form(&self.id);
+        self.elements.push(element.render());
+
+        self
+    }
+
+    pub fn add_element(&mut self, element: impl Render + 'static) -> &mut Self {
+        self.elements.push(element.render());
+
+        self
+    }
+))]
 pub struct Form {
     id: String,
     url: String,
-    content: Markup,
     submit_label: String,
     #[builder(default)]
     submit_icon: Option<Icons>,
@@ -33,6 +51,23 @@ pub struct Form {
     hx_push_url: bool,
     #[builder(default)]
     hx_encoding: Option<HxEncoding>,
+    #[builder(via_mutators(init = vec![]))]
+    elements: Vec<Markup>,
+}
+
+impl Form {
+    pub fn add_form_element(&mut self, mut element: impl FormElement) -> &mut Self {
+        element.set_form(&self.id);
+        self.elements.push(element.render());
+
+        self
+    }
+
+    pub fn add_element(&mut self, element: impl Render + 'static) -> &mut Self {
+        self.elements.push(element.render());
+
+        self
+    }
 }
 
 impl Render for Form {
@@ -41,25 +76,42 @@ impl Render for Form {
             .label(&self.submit_label)
             .button_type(ButtonType::Submit)
             .icon_opt(self.submit_icon.clone())
+            .form_id(&self.id)
             .build();
 
         html! {
-            form id=(self.id)
-                action=(self.url)
-                method=(self.method.to_string())
-                hx-target=(self.hx_target)
-                hx-boost=(self.hx_boost)
-                hx-push-url=(self.hx_push_url)
-                hx-encoding=[self.hx_encoding.as_ref().map(ToString::to_string)]
-            {
-                @if let Some(header) = &self.header {
-                    (header)
+            section {
+                form id=(self.id)
+                    action=(self.url)
+                    method=(self.method.to_string())
+                    hx-target=(self.hx_target)
+                    hx-boost=(self.hx_boost)
+                    hx-push-url=(self.hx_push_url)
+                    hx-encoding=[self.hx_encoding.as_ref().map(ToString::to_string)]
+                {
                 }
-                (self.content)
 
+                @if let Some(header) = &self.header {
+                    header {
+                        (header)
+                    }
+                }
+                @for element in &self.elements {
+                    (element)
+                }
                 footer {
                     @if let Some(back_action) = &self.back_action {
-                        (back_action)
+                        button.secondary
+                            type="submit"
+                            form=(self.id)
+                            formaction=(back_action.url)
+                            formnovalidate
+                        {
+                            @if let Some(i) = &back_action.icon {
+                                (icon(i, None))
+                            }
+                            (back_action.label)
+                        }
                     } @else {
                         span {}
                     }
@@ -76,25 +128,9 @@ impl Render for Form {
 pub struct BackAction {
     url: String,
     label: String,
+    form_id: String,
     #[builder(default)]
     icon: Option<Icons>,
-}
-
-impl Render for BackAction {
-    fn render(&self) -> Markup {
-        html! {
-            button.secondary
-                type="submit"
-                formaction=(self.url)
-                formnovalidate
-            {
-                @if let Some(i) = &self.icon {
-                    (icon(i, None))
-                }
-                (self.label)
-            }
-        }
-    }
 }
 
 #[derive(Default)]

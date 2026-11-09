@@ -4,9 +4,9 @@ use api::{user::User, UiState};
 use maud::{html, Markup, Render, DOCTYPE};
 
 use crate::{
-    atom::nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
     component::{menu_item, Icons},
     event,
+    primitive::nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
     user::{self},
     view,
 };

@@ -10,17 +10,17 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    atom::{
-        form::{Form, FormValidation, Method},
-        input::{ImageInput, InputType, TextArea, TextField},
-        select::Select,
-    },
     component::EventCard,
     event::create::{
         self,
         confirm_step::{self},
     },
     index,
+    primitive::{
+        form::{Form, FormValidation, Method},
+        input::{ImageInput, InputType, TextArea, TextField},
+        select::Select,
+    },
     view::{
         festival::new::{schedule, step_indicator},
         View,
@@ -222,7 +222,7 @@ impl View for DetailsStep<'_> {
         let form = Form::builder()
             .id("create_event_form")
             .url(next_url)
-            .content(form_content)
+            // .content(form_content)
             .header(form_header)
             .submit_label(t!("event.create.next", locale = &state.locale))
             .build();

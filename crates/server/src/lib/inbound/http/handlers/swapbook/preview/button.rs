@@ -1,11 +1,12 @@
 use actix_web::{
-    HttpResponse, Responder, get,
+    get,
     web::{self, Query},
+    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
-use maud::{Markup, Render as _, html};
+use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
-use ui::atom::button::{Button, ButtonClass, LinkButton};
+use ui::primitive::button::{Button, ButtonClass, LinkButton};
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};
 

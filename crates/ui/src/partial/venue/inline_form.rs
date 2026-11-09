@@ -3,8 +3,8 @@ use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 use crate::{
-    atom::input::{InputType, TextField},
     component::{icon, Icons},
+    primitive::input::{InputType, TextField},
 };
 
 #[derive(TypedBuilder)]

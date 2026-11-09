@@ -7,11 +7,11 @@ use es_entity::prelude::serde_json;
 use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
 use ui::{
-    atom::{
+    component::{Autocomplete, AutocompleteItem},
+    primitive::{
         input::{Search, TextField},
         select::Select,
     },
-    component::{Autocomplete, AutocompleteItem},
 };
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};

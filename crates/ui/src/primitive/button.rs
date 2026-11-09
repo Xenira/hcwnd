@@ -1,11 +1,12 @@
 use std::fmt::Display;
 
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 use crate::{
     component::Icons,
-    htmx::{HxMethod, HxMethodOption as _},
+    htmx::{HxMethod, HxMethodOption as _, HxSwap},
+    primitive::form::FormElement,
 };
 
 #[derive(TypedBuilder)]
@@ -21,6 +22,12 @@ pub struct Button {
     button_type: ButtonType,
     #[builder(default)]
     hx_method: Option<HxMethod>,
+    #[builder(default)]
+    hx_target: Option<String>,
+    #[builder(default)]
+    hx_swap: Option<HxSwap>,
+    #[builder(default)]
+    form_id: Option<String>,
 }
 
 impl Render for Button {
@@ -33,10 +40,19 @@ impl Render for Button {
                 hx-post=[self.hx_method.post_option()]
                 hx-put=[self.hx_method.put_option()]
                 hx-delete=[self.hx_method.delete_option()]
+                hx-target=[self.hx_target.as_ref()]
+                hx-swap=[self.hx_swap.as_ref()]
+                form=[self.form_id.as_ref()]
             {
                 (button_content(&self.label, self.icon.as_ref()))
             }
         }
+    }
+}
+
+impl FormElement for Button {
+    fn set_form(&mut self, id: &str) {
+        self.form_id = Some(id.to_string());
     }
 }
 

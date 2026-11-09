@@ -1,14 +1,15 @@
 use actix_web::{
-    HttpResponse, Responder, get,
+    get,
     web::{self, Query},
+    HttpResponse, Responder,
 };
 use chrono::Local;
 use es_entity::prelude::serde_json;
-use maud::{Markup, Render as _, html};
+use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
 use ui::{
-    atom::{card::Card, chip::Chip},
     component::{EventCard, Icons},
+    primitive::{card::Card, chip::Chip},
 };
 use uuid::Uuid;
 

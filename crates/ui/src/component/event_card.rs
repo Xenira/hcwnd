@@ -10,12 +10,12 @@ use typed_builder::TypedBuilder;
 use uuid::Uuid;
 
 use crate::{
-    atom::{
+    component::{icon, Icons},
+    primitive::{
         button::{ButtonClass, LinkButton},
         card::Card,
         tag::Tag,
     },
-    component::{icon, Icons},
 };
 
 #[derive(TypedBuilder)]

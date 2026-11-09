@@ -7,8 +7,8 @@ use typed_builder::TypedBuilder;
 use uuid::Uuid;
 
 use crate::{
-    atom::{card::Card, tag::Tag},
     component::{icon, Icons},
+    primitive::{card::Card, tag::Tag},
 };
 
 #[derive(TypedBuilder)]

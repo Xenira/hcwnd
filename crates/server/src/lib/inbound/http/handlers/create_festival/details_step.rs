@@ -15,13 +15,13 @@ use maud::{html, Render as _};
 use serde::Deserialize;
 use serde_qs::web::QsForm;
 use ui::{
-    atom::form::FormValidation,
     component::EventCard,
     event::create::{
         self,
         name_step::{self},
     },
     partial::venue::VenueInlineForm,
+    primitive::form::FormValidation,
     view::{festival::new::details::DetailsStep, View as _},
 };
 

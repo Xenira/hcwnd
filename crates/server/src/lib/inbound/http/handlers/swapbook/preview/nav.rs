@@ -7,12 +7,12 @@ use es_entity::prelude::serde_json;
 use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
 use ui::{
-    atom::{
+    component::Icons,
+    primitive::{
         card::Card,
         chip::Chip,
         nav::{Nav, NavEntry, NavEntryAlignment, NavEntrySimple},
     },
-    component::Icons,
 };
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};

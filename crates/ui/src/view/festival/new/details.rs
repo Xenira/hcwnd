@@ -1,26 +1,27 @@
 use api::{
-    UiState,
     festival::new::{EventCreateDetailsStep, EventType, Venue},
+    routes::{Route, RouteBuilder},
+    UiState,
 };
 use chrono::{Local, NaiveDate};
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use serde::Deserialize;
 use typed_builder::TypedBuilder;
 use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    atom::{
+    component::{Autocomplete, EventCard, Lazy, SelectOrCreate},
+    event::create::{self},
+    partial::venue::{self, VenueInlineForm},
+    primitive::{
         form::{Form, FormValidation, Method},
         input::{ImageInput, InputType, TextArea, TextField},
         select::Select,
     },
-    component::{Autocomplete, EventCard, Lazy},
-    event::create::{self},
-    partial::venue::{self, VenueInlineForm},
     view::{
-        View,
         festival::new::{schedule, step_indicator},
+        View,
     },
 };
 
@@ -134,37 +135,48 @@ impl DetailsStep<'_> {
 
     fn venue_form(&self, state: &UiState) -> maud::PreEscaped<String> {
         match self.details_step.venue.as_ref() {
-            Some(Venue::Existing(id)) => html! {
-                (Lazy::<venue::inline_card::InlineCard>::builder()
-                .id(*id)
-                .build()
-                .render())
-                input type="hidden" name="venue" value=(id) {}
-            },
+            Some(Venue::Existing(id)) => SelectOrCreate::Selected(
+                Lazy::<venue::inline_card::InlineCard>::builder()
+                    .id(*id)
+                    .build()
+                    .render(),
+            )
+            .render(),
             Some(Venue::New {
                 name,
                 address,
                 city,
                 postal_code,
                 country,
-            }) => venue::VenueInlineForm::builder()
-                .state(state)
-                .name(name.clone())
-                .address(address.clone())
-                .city(city.clone())
-                .postal_code(postal_code.clone())
-                .country(country.clone())
-                .build()
-                .render(),
-            None => Autocomplete::builder()
-                .name("venue")
-                .placeholder(t!(
+            }) => SelectOrCreate::Create(
+                venue::VenueInlineForm::builder()
+                    .state(state)
+                    .name(name.clone())
+                    .address(address.clone())
+                    .city(city.clone())
+                    .postal_code(postal_code.clone())
+                    .country(country.clone())
+                    .build()
+                    .render(),
+            )
+            .render(),
+            None => SelectOrCreate::None {
+                placeholder: t!(
                     "event.create.details_step.venue.placeholder",
                     locale = &state.locale
-                ))
-                .search_url("/venue/search")
-                .build()
-                .render(),
+                ),
+                search_url: RouteBuilder::default().venue().build(),
+                form_url: RouteBuilder::default().venue().new_venue().inline().build(),
+            }
+            .render(), // Autocomplete::builder()
+                       // .name("q_venue")
+                       // .placeholder(t!(
+                       //     "event.create.details_step.venue.placeholder",
+                       //     locale = &state.locale
+                       // ))
+                       // .search_url("/venue/search")
+                       // .build()
+                       // .render(),
         }
     }
 }
@@ -266,14 +278,19 @@ impl View for DetailsStep<'_> {
             (description)
             (image)
         };
+
         // TODO: Add hidden inputs
 
         let form = Form::builder()
             .id("create_event_form")
             .url(next_url)
-            .content(form_content)
             .header(form_header)
             .submit_label(t!("event.create.next", locale = &state.locale))
+            .add_form_element(event_name)
+            .add_form_element(event_type)
+            .add_element(venue_form)
+            .add_form_element(description)
+            .add_form_element(image)
             .build();
 
         // let preview = EventCard::builder()

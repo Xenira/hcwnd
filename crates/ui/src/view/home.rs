@@ -5,8 +5,8 @@ use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
 use crate::{
-    atom::{input::Search, select::Select},
     component::EventCard,
+    primitive::{input::Search, select::Select},
     view::View,
 };
 

@@ -11,7 +11,8 @@
   }
 }
 
-form {
+form,
+section:has(form:first-child) {
   display: flex;
   flex-direction: column;
   align-items: center;

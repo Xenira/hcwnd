@@ -1,8 +1,8 @@
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 use uuid::Uuid;
 
-use crate::atom::tombstone::Tombstoneable;
+use crate::primitive::tombstone::Tombstoneable;
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]

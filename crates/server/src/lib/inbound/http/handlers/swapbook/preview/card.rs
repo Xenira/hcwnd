@@ -7,8 +7,8 @@ use es_entity::prelude::serde_json;
 use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
 use ui::{
-    atom::{card::Card, chip::Chip},
     component::Icons,
+    primitive::{card::Card, chip::Chip},
 };
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};

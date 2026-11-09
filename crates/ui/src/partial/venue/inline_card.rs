@@ -1,15 +1,15 @@
 use api::UiState;
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 use uuid::Uuid;
 
 use crate::{
-    atom::{
+    component::Fetchable,
+    primitive::{
         card::Card,
         image::Image,
         tombstone::{Tombstone, Tombstoneable},
     },
-    component::Fetchable,
 };
 
 pub struct TombstoneCard;
@@ -44,7 +44,7 @@ impl Render for InlineCard {
                 Image::builder()
                     .src(url.clone())
                     .alt(self.name.clone())
-                    .format(crate::atom::image::ImageFormat::Square)
+                    .format(crate::primitive::image::ImageFormat::Square)
                     .build()
                     .render()
             })

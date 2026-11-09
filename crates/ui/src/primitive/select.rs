@@ -1,5 +1,7 @@
-use maud::{Markup, Render, html};
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
+
+use crate::primitive::form::FormElement;
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -14,6 +16,14 @@ pub struct Select {
     label: Option<String>,
     #[builder(setter(!strip_option,strip_bool))]
     required: bool,
+    #[builder(default)]
+    form_id: Option<String>,
+}
+
+impl FormElement for Select {
+    fn set_form(&mut self, id: &str) {
+        self.form_id = Some(id.to_string());
+    }
 }
 
 impl Render for Select {
@@ -21,6 +31,7 @@ impl Render for Select {
         let select = html! {
             select
                 name=(self.name)
+                form=[&self.form_id]
                 required[self.required]
             {
                 @if let Some(placeholder) = &self.placeholder {

@@ -1,14 +1,15 @@
 use actix_web::{
-    HttpResponse, Responder, get,
+    get,
     web::{self, Query},
+    HttpResponse, Responder,
 };
 use es_entity::prelude::serde_json;
 use itertools::Itertools;
-use maud::{Markup, Render as _, html};
+use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
 use ui::{
-    atom::{chip::Chip, tag::Tag},
     component::{Icons, StepIndicator},
+    primitive::{chip::Chip, tag::Tag},
 };
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};

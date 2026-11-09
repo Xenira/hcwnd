@@ -3,12 +3,12 @@ use maud::{html, Markup};
 use uuid::Uuid;
 
 use crate::{
-    atom::{
+    component::{icon, menu_item, Icons},
+    index,
+    primitive::{
         nav::{Nav, NavEntry, NavEntryAlignment, NavEntryDropdown, NavEntrySimple},
         tag::Tag,
     },
-    component::{icon, menu_item, Icons},
-    index,
 };
 
 pub mod detail;

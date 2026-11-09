@@ -6,7 +6,7 @@ use actix_web::{
 use es_entity::prelude::serde_json;
 use maud::{html, Markup, Render as _};
 use serde::{Deserialize, Serialize};
-use ui::{atom::chip::Chip, component::Icons};
+use ui::{component::Icons, primitive::chip::Chip};
 
 use crate::inbound::http::handlers::swapbook::{Control, ControlValue, Story, Variant};
 

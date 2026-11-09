@@ -1,7 +1,10 @@
 use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
-use crate::atom::input::{InputType, TextField};
+use crate::{
+    htmx::HxMethod,
+    primitive::input::{InputType, TextField},
+};
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -18,9 +21,10 @@ impl Render for Autocomplete {
         let search_input = TextField::builder()
             .name(self.name.clone())
             .placeholder(self.placeholder.clone())
-            .validation_endpoint(self.search_url.clone())
+            .hx_method(HxMethod::Query(self.search_url.clone()))
             .input_type(InputType::Search)
             .build();
+
         html! {
             .autocomplete {
                 (search_input)

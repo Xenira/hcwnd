@@ -2,7 +2,11 @@ use api::UiState;
 use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
 
-use crate::{component::Icons, htmx::HxEncoding};
+use crate::{
+    component::Icons,
+    htmx::{HxEncoding, HxMethod, HxMethodOption as _},
+    primitive::form::FormElement,
+};
 
 #[derive(TypedBuilder)]
 #[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
@@ -23,7 +27,17 @@ pub struct TextField {
     #[builder(default)]
     validation_endpoint: Option<String>,
     #[builder(default)]
+    hx_method: Option<HxMethod>,
+    #[builder(default)]
     encoding: Option<HxEncoding>,
+    #[builder(default)]
+    form_id: Option<String>,
+}
+
+impl FormElement for TextField {
+    fn set_form(&mut self, id: &str) {
+        self.form_id = Some(id.to_string());
+    }
 }
 
 impl Render for TextField {
@@ -55,15 +69,19 @@ impl Render for TextField {
             _ => &None,
         };
 
-        let hx_trigger = self
-            .validation_endpoint
-            .is_some()
+        let hx_trigger = (self.hx_method.is_some() || self.validation_endpoint.is_some())
             .then_some("input changed delay:300ms");
         let hx_target = self.validation_endpoint.is_some().then_some("next span");
+        let hx_method = self.hx_method.clone().or_else(|| {
+            self.validation_endpoint
+                .as_ref()
+                .map(|url| HxMethod::Post(url.clone()))
+        });
 
         let input = html! {
             input
                 name=(self.name)
+                form=[&self.form_id]
                 type=(input_type)
                 placeholder=[&self.placeholder]
                 value=[&self.value]
@@ -73,7 +91,11 @@ impl Render for TextField {
                 min=[min]
                 max=[max]
                 hx-encoding=[&self.encoding]
-                hx-post=[&self.validation_endpoint]
+                hx-get=[hx_method.get_option()]
+                hx-post=[hx_method.post_option()]
+                hx-put=[hx_method.put_option()]
+                hx-delete=[hx_method.delete_option()]
+                hx-query=[hx_method.query_option()]
                 hx-preserve[self.hx_preserve]
                 hx-target=[hx_target]
                 hx-trigger=[hx_trigger]
@@ -135,6 +157,14 @@ pub struct ImageInput<'a> {
     label: Option<String>,
     #[builder(default)]
     required: bool,
+    #[builder(default)]
+    form_id: Option<String>,
+}
+
+impl FormElement for ImageInput<'_> {
+    fn set_form(&mut self, id: &str) {
+        self.form_id = Some(id.to_string());
+    }
 }
 
 impl Render for ImageInput<'_> {
@@ -148,6 +178,7 @@ impl Render for ImageInput<'_> {
             .validation_endpoint(&self.upload_url)
             .encoding(HxEncoding::MultipartFormData)
             .required(self.required)
+            .form_id_opt(self.form_id.clone())
             .build();
 
         let input = html! {
@@ -200,6 +231,14 @@ pub struct TextArea {
     required: bool,
     #[builder(default)]
     validation_endpoint: Option<String>,
+    #[builder(default)]
+    form_id: Option<String>,
+}
+
+impl FormElement for TextArea {
+    fn set_form(&mut self, id: &str) {
+        self.form_id = Some(id.to_string());
+    }
 }
 
 impl Render for TextArea {
@@ -213,6 +252,7 @@ impl Render for TextArea {
         let area = html! {
             textarea
                 name=(self.name)
+                form=[&self.form_id]
                 placeholder=[&self.placeholder]
                 rows=(self.rows)
                 autofocus[self.autofocus]

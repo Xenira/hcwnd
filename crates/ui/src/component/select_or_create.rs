@@ -1,36 +1,53 @@
-use maud::{Markup, Render, html};
+use std::{borrow::Cow, fmt::Display};
+
+use maud::{html, Markup, Render};
 use typed_builder::TypedBuilder;
+use uuid::Uuid;
 
 use crate::{
-    atom::button::{Button, ButtonClass, ButtonType},
     component::Autocomplete,
+    htmx::{HxMethod, HxSwap},
+    primitive::button::{Button, ButtonClass, ButtonType},
 };
 
-#[derive(TypedBuilder)]
-#[builder(field_defaults(setter(into, strip_option(ignore_invalid, fallback_suffix = "_opt"))))]
-pub struct SelectOrCreate {
-    name: String,
-    placeholder: String,
-    search_url: String,
-    create_form: Markup,
-    #[builder(default)]
-    multiple: bool,
+pub enum SelectOrCreate {
+    None {
+        placeholder: Cow<'static, str>,
+        search_url: String,
+        form_url: String,
+    },
+    Selected(Markup),
+    Create(Markup),
 }
 
 impl Render for SelectOrCreate {
     fn render(&self) -> Markup {
-        let autocomplete = Autocomplete::builder()
-            .name(self.name.clone())
-            .placeholder(self.placeholder.clone())
-            .search_url(self.search_url.clone())
-            .build();
-        let new_button = Button::builder()
-            .label("Create new")
-            .class(ButtonClass::Link)
-            .build();
-        html! {
-            (autocomplete)
-            (new_button)
+        match self {
+            Self::None {
+                placeholder,
+                search_url,
+                form_url,
+            } => {
+                let autocomplete = Autocomplete::builder()
+                    .name(Uuid::new_v4().to_string())
+                    .placeholder(placeholder.clone())
+                    .search_url(search_url.clone())
+                    .build();
+                let new_button = Button::builder()
+                    .label("Create new")
+                    .class(ButtonClass::Link)
+                    .hx_method(HxMethod::Get(form_url.clone()))
+                    .hx_swap(HxSwap::OuterHtml)
+                    .build();
+                html! {
+                    div {
+                        (autocomplete)
+                        (new_button)
+                    }
+                }
+            }
+            Self::Selected(selected) => html! { (selected) },
+            Self::Create(create) => html! { (create) },
         }
     }
 }
